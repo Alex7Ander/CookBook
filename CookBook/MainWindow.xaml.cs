@@ -13,14 +13,52 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.Collections;
 
 namespace CookBook
 {
     public partial class MainWindow : Window
     {
+        public PhotoWindow pWin;
+        List<string> pathList;
+
         public MainWindow()
         {
             InitializeComponent();
+            pathList = new List<string>();
+            this.Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Book.openBook();
+            this.fillTypesComboBox();
+            TypesComboBox.SelectedIndex = 0;
+            int index = TypesComboBox.SelectedIndex;
+            this.fillRecipeList(index);
+
+            photoPanel.Orientation = Orientation.Horizontal;
+            photoPanel.HorizontalAlignment = HorizontalAlignment.Center;
+            this.showPictures(7);
+            
+        }
+
+        private void showPictures(int countOfPictures)
+        {
+            pathList.Clear();
+            for (int i = 0; i < countOfPictures; i++)
+            {
+                Image img = new Image();
+                img.Name = "img_" + i.ToString();
+                photoPanel.Children.Add(img);
+                img.Width = 130;
+                img.Height = 130;
+                img.Stretch = Stretch.Fill;
+                string path = Environment.CurrentDirectory + "/files/Images/Init/" + (i + 1).ToString() + ".jpg";
+                ImageSource image = new BitmapImage(new Uri(Environment.CurrentDirectory + "/files/Images/Init/" + (i + 1).ToString() + ".jpg", UriKind.Absolute));
+                img.Source = image;
+                pathList.Add(path);
+            }
         }
 
         public int fillTypesComboBox()
@@ -78,17 +116,28 @@ namespace CookBook
 
         private void TempBtn_Click(object sender, RoutedEventArgs e)
         {
-            Book.openBook();
-            this.fillTypesComboBox();
-            TypesComboBox.SelectedIndex = 0;
-            int index = TypesComboBox.SelectedIndex;
-            this.fillRecipeList(index);
+
         }
 
         private void TypesComboBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             int index = TypesComboBox.SelectedIndex;
             this.fillRecipeList(index);
+        }
+
+        private void aPicture_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (pWin == null)
+            {
+                pWin = new PhotoWindow();
+                pWin.Owner = this;
+                pWin.Show();
+            }
+            else
+            {
+                //
+            }
+            return;
         }
     }
 }

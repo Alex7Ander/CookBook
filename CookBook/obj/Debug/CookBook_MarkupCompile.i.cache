@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\obj\Debug\
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\
 CookBook
 none
 false
 DEBUG;TRACE
-C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\App.xaml
-22095101650
+N:\Проекты\C#\CookBook\CookBook\CookBook\App.xaml
+317082978
 
-13-526548770
+14-1067457922
 12-1401562060
-AddRecipeWindow.xaml;MainWindow.xaml;
+AddRecipeWindow.xaml;MainWindow.xaml;PhotoWindow.xaml;
 
-False
+True
 

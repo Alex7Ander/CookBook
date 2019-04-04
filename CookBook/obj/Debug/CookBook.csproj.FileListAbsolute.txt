@@ -56,3 +56,8 @@ C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\obj\Debug\CookBook.pdb
 C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\obj\Debug\AddRecipeWindow.g.cs
 C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\obj\Debug\CookBook_MarkupCompile.lref
 C:\Users\Alex\Desktop\CookBook\CookBook\CookBook\obj\Debug\AddRecipeWindow.baml
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\AddRecipeWindow.g.cs
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\CookBook_MarkupCompile.lref
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\AddRecipeWindow.baml
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\PhotoWindow.g.cs
+N:\Проекты\C#\CookBook\CookBook\CookBook\obj\Debug\PhotoWindow.baml
