@@ -145,10 +145,18 @@ namespace CookBook
             return resOfQuerry;
         }
 
-        public void editType(String type)
+        public int editType(String newType)
         {
-
-            return;
+            int resOfQuerry = 0;
+            string filePath = System.IO.Directory.GetCurrentDirectory() + "\\data\\data.mdb";
+            AccessConnector connector = new AccessConnector(filePath);
+            string sqlString = "UPDATE [Recipes] SET Type='" + newType + "' WHERE ReciepName='" + this.Name + "' AND Type='" + this.typeGroup + "'";
+            resOfQuerry = connector.sendQuerry(sqlString);
+            if (resOfQuerry == 0) 
+            {
+                this.typeGroup = newType;
+            }
+            return resOfQuerry;
         }
     }
 }
