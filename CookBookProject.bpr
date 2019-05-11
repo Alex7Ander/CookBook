@@ -4,7 +4,8 @@
   <MACROS>
     <VERSION value="BCB.06.00"/>
     <PROJECT value="CookBookProject.exe"/>
-    <OBJFILES value="CookBookProject.obj Units\MainUnit\MainUnit.obj"/>
+    <OBJFILES value="CookBookProject.obj Units\MainUnit\MainUnit.obj 
+      Units\DataBaseUnit\DataBaseUnit.obj"/>
     <RESFILES value="CookBookProject.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -12,7 +13,7 @@
     <RESDEPEN value="$(RESFILES) Units\MainUnit\MainUnit.dfm"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
-    <SPARELIBS value="vcl.lib rtl.lib"/>
+    <SPARELIBS value="vcl.lib rtl.lib dbrtl.lib adortl.lib"/>
     <PACKAGES value="vcl.bpi rtl.bpi dbrtl.bpi adortl.bpi vcldb.bpi vclx.bpi bdertl.bpi 
       vcldbx.bpi ibxpress.bpi dsnap.bpi cds.bpi bdecds.bpi qrpt.bpi teeui.bpi 
       teedb.bpi tee.bpi dss.bpi teeqr.bpi visualclx.bpi visualdbclx.bpi 
@@ -20,7 +21,7 @@
       inetdbbde.bpi inetdbxpress.bpi inetdb.bpi nmfast.bpi webdsnap.bpi 
       bcbie.bpi websnap.bpi soaprtl.bpi dclocx.bpi dbexpress.bpi dbxcds.bpi 
       indy.bpi bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;Units\MainUnit"/>
+    <PATHCPP value=".;Units\MainUnit;Units\DataBaseUnit"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -30,14 +31,14 @@
     <USERDEFINES value="_DEBUG"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT;USEPACKAGES"/>
     <MAINSOURCE value="CookBookProject.cpp"/>
-    <INCLUDEPATH value="Units\MainUnit;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="Units\MainUnit;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <INCLUDEPATH value="Units\DataBaseUnit;Units\MainUnit;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="Units\DataBaseUnit;Units\MainUnit;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
     <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <IDLCFLAGS value="-IUnits\MainUnit -I$(BCB)\include -I$(BCB)\include\vcl -src_suffix cpp 
-      -D_DEBUG -boa"/>
+    <IDLCFLAGS value="-IUnits\DataBaseUnit -IUnits\MainUnit -I$(BCB)\include 
+      -I$(BCB)\include\vcl -src_suffix cpp -D_DEBUG -boa"/>
     <CFLAG1 value="-Od -H=&quot;C:\Program Files (x86)\Borland\CBuilder6\Lib\test.csm&quot; -Hc -Vx -Ve 
       -X- -r- -a8 -b- -k -y -v -vi- -c -tW -tWM"/>
     <PFLAGS value="-$YD -$W -$O- -$A8 -v -JPHNE -M"/>
@@ -56,6 +57,7 @@
       <FILE FILENAME="CookBookProject.res" FORMNAME="" UNITNAME="CookBookProject.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="CookBookProject.cpp" FORMNAME="" UNITNAME="CookBookProject" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Units\MainUnit\MainUnit.cpp" FORMNAME="Form1" UNITNAME="MainUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Units\DataBaseUnit\DataBaseUnit.cpp" FORMNAME="" UNITNAME="DataBaseUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>
