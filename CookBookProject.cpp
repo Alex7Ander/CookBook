@@ -3,14 +3,19 @@
 #include <vcl.h>
 #pragma hdrstop
 //---------------------------------------------------------------------------
-USEFORM("Units\MainUnit\MainUnit.cpp", Form1);
+USEFORM("Units\StartUnit\StartUnit.cpp", StartForm);
+USEFORM("Units\NewIngredientUnit\NewIngredientUnit.cpp", NewIngredientForm);
+USEFORM("Units\IngredientsUnit\IngredientsUnit.cpp", IngredientsForm);
+USEFORM("Units\ReciepUnit\ReciepUnit.cpp", ReciepForm);
+USEFORM("Units\NewReciepUnit\NewReciepUnit.cpp", NewRecieptForm);
+USEFORM("Units\ShopListUnit\ShopListUnit.cpp", ShopListForm);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
         try
         {
                  Application->Initialize();
-                 Application->CreateForm(__classid(TForm1), &Form1);
+                 Application->CreateForm(__classid(TStartForm), &StartForm);
                  Application->Run();
         }
         catch (Exception &exception)

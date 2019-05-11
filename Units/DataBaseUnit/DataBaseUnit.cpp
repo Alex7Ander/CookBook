@@ -28,7 +28,7 @@ DATA_BASE::~DATA_BASE()
   this->adoConnect->Connected = false;
 }
 //---------------------------------------------------------------------------
-int __fastcall DATA_BASE::ChangeTable(String tableNameInDB)
+int DATA_BASE::ChangeTable(String tableNameInDB)
 {
   try
   {

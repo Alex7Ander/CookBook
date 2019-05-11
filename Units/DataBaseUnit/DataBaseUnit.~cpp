@@ -35,7 +35,7 @@ int __fastcall DATA_BASE::ChangeTable(String tableNameInDB)
     adoTable->Active = false;
     adoTable->TableName = tableNameInDB;
     adoTable->Active = true;
-    this->tableName = tableNameInDB;  //Присовение должно стоять именно тут!!! Последним!!! Не перемещать!!!
+    this->tableName = tableNameInDB; 
     return 0;
   }
   catch (Exception &exp)
@@ -44,94 +44,7 @@ int __fastcall DATA_BASE::ChangeTable(String tableNameInDB)
   }
 }
 //---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushSQL(String sqlString)
-{
-  adoQuery->Close();
-  adoQuery->SQL->Clear();
-  adoQuery->SQL->Add(sqlString);
-  try
-  {
-     adoQuery->ExecSQL();
-  }
-  catch (Exception &except)
-  {
-     String BtOk[]={"Продолжить"};
-     MsgDialog("Ошибка", except.Message, mtWarning, TMsgDlgButtons()<<mbOK, 1, BtOk,0,0); 
-  }
-  adoQuery->Close();
-}
-//---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQL(String sqlString, String fieldName, int *result)
-{
-  adoQuery->Close();
-  adoQuery->SQL->Clear();
-  adoQuery->SQL->Add(sqlString);
-  try
-  {
-    adoQuery->Open();
-    *result=adoQuery->FieldByName(fieldName)->AsInteger;
-  }
-  catch (Exception &except)
-  {
-     String BtOk[]={"Продолжить"};
-     MsgDialog("Ошибка", except.Message, mtWarning, TMsgDlgButtons()<<mbOK, 1, BtOk, 0, 0);
-  }
-  adoQuery->Close();
-}
-//---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQL(String sqlString, String fieldName, String *arrayResults)
-{
-  String result;
-  adoQuery->Close();
-  adoQuery->SQL->Clear();
-  adoQuery->SQL->Add(sqlString);
-  try
-  {
-    adoQuery->Open();
-    for (int i=0; i<adoQuery->RecordCount; i++)
-      {
-         arrayResults[i]=adoQuery->FieldByName(fieldName)->AsString;
-         adoQuery->Next();
-      }
-  }
-  catch (Exception &except)
-  {
-     String BtOk[]={"Продолжить"};
-     MsgDialog("Ошибка", except.Message, mtWarning, TMsgDlgButtons()<<mbOK, 1, BtOk, 0, 0);
-  }
-  adoQuery->Close();
-}
-//---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQL(String sqlString, String *fieldName, int countOfFields, String **arrayResults)
-{
-  String result;
-  adoQuery->Close();
-  adoQuery->SQL->Clear();
-  adoQuery->SQL->Add(sqlString);
-  try
-  {
-    adoQuery->Open();
-    for (int i=0; i<adoQuery->RecordCount; i++)
-      {
-         for (int j=0; j<countOfFields; j++)
-         {
-             arrayResults[j][i]=adoQuery->FieldByName(fieldName[j])->AsString;
-         }
-         adoQuery->Next();
-      }
-  }
-  catch (Exception &except)
-  {
-     String BtOk[]={"Продолжить"};
-     MsgDialog("Ошибка", except.Message, mtWarning, TMsgDlgButtons()<<mbOK, 1, BtOk,0,0);
-  }
-  adoQuery->Close();
-}
-//---------------------------------------------------------------------------
-//--------Варианты всех вышеобозначенных методов, но без отлавливания искл.--
-//-------------(Используются при реализации механизма транзакций)------------
-//--------------------Работа с компонентами ADOQuerry------------------------
-void __fastcall DATA_BASE::PushSQLWithoutExpCatching(String sqlString)
+void DATA_BASE::sendSqlQuery(String sqlString)
 {
   adoQuery->Close();
   adoQuery->SQL->Clear();
@@ -140,7 +53,7 @@ void __fastcall DATA_BASE::PushSQLWithoutExpCatching(String sqlString)
   adoQuery->Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlString, String fieldName, int *result)
+void DATA_BASE::sendSqlQuery(String sqlString, String fieldName, int *result)
 {
   adoQuery->Close();
   adoQuery->SQL->Clear();
@@ -150,7 +63,7 @@ void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlStrin
   adoQuery->Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlString, String fieldName, String *arrayResults)
+void DATA_BASE::sendSqlQuery(String sqlString, String fieldName, String *arrayResults)
 {
   String result;
   adoQuery->Close();
@@ -165,7 +78,7 @@ void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlStrin
   adoQuery->Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlString, String *fieldName, int countOfFields, String **arrayResults)
+void DATA_BASE::sendSqlQuery(String sqlString, String *fieldName, int countOfFields, String **arrayResults)
 {
   String result;
   adoQuery->Close();
@@ -181,12 +94,4 @@ void __fastcall DATA_BASE::PushAndGetResultSQLWithoutExpCatching(String sqlStrin
          adoQuery->Next();
       }
   adoQuery->Close();
-}
-//---------------------------------------------------------------------------
-int __fastcall DATA_BASE::SelectCount()
-{
-  int resultSqlInt;
-/*  String  sqlCmd;
-  sqlCmd = "SELECT COUNT FROM ["+this->tableName+"] WHERE ";  */
-  return resultSqlInt;
 }
