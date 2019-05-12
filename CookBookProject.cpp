@@ -9,6 +9,7 @@ USEFORM("Units\IngredientsUnit\IngredientsUnit.cpp", IngredientsForm);
 USEFORM("Units\ReciepUnit\ReciepUnit.cpp", ReciepForm);
 USEFORM("Units\NewReciepUnit\NewReciepUnit.cpp", NewRecieptForm);
 USEFORM("Units\ShopListUnit\ShopListUnit.cpp", ShopListForm);
+USEFORM("Units\NewReciepUnit\IngredientCountUnit.cpp", IngredientCountForm);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

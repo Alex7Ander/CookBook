@@ -23,7 +23,7 @@ void TIngredientsForm::ClearInfo()
 void __fastcall TIngredientsForm::AddNewButtonClick(TObject *Sender)
 {
   Application->CreateForm(__classid(TNewIngredientForm), &NewIngredientForm);
-  for (int i=0; i<typeCount; i++) NewIngredientForm->typeComboBox->Items->Add(TypesList[i]);
+  //for (int i=0; i<IngrTypes->getItemsCount(); i++) NewIngredientForm->typeComboBox->Items->Add(IngrTypes->getItem(i));
   NewIngredientForm->Show();       
 }
 //---------------------------------------------------------------------------
@@ -31,50 +31,34 @@ void __fastcall TIngredientsForm::FormClose(TObject *Sender,
       TCloseAction &Action)
 {
   StartForm->closeIngredientBranch();
-  delete[] TypesList;
   Action = caFree;
 }
 //---------------------------------------------------------------------------
 void __fastcall TIngredientsForm::FormShow(TObject *Sender)
 {
   DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
-  try{
-    String sqlCmd = "SELECT COUNT(type) AS resultSqlInt FROM (SELECT DISTINCT type FROM [Ingredients])";//sqlCmd = "SELECT COUNT(name) FROM [Ingredients] AS resultSqlInt";
-    dataBase->sendSqlQuery(sqlCmd, "resultSqlInt", &typeCount);
-    if (typeCount>0){
-      TypesList = new String[typeCount];
-      sqlCmd = "SELECT DISTINCT type FROM [Ingredients]";
-      dataBase->sendSqlQuery(sqlCmd, "type", TypesList);
-      for (int i=0; i<typeCount; i++)
-        this->TypeComboBox->Items->Add(TypesList[i]);
-      this->TypeComboBox->ItemIndex = 0;
-      this->TypeComboBoxChange(Sender);
-    }
-    else{
-      MessageBox(NULL,(LPCTSTR)"Нет зарегистрированный ингредиентов",(LPCTSTR)"Нет ингредиентов", MB_OK | MB_ICONASTERISK | MB_TOPMOST);
-    }
-  }catch(...){}
+  typeList *IngrTypes = new typeList(dataBase, "Ingredients");
+  if (IngrTypes->getItemsCount()>0){
+    for (int i=0; i<IngrTypes->getItemsCount(); i++)
+      this->TypeComboBox->Items->Add(IngrTypes->getItem(i));
+    this->TypeComboBox->ItemIndex = 0;
+    this->TypeComboBoxChange(Sender);
+  }
+  else{
+    MessageBox(NULL,(LPCTSTR)"Нет зарегистрированный ингредиентов",(LPCTSTR)"Нет ингредиентов", MB_OK | MB_ICONASTERISK | MB_TOPMOST);
+  }
 }
 //---------------------------------------------------------------------------
 void __fastcall TIngredientsForm::TypeComboBoxChange(TObject *Sender)
 {
-  String Type = this->TypeComboBox->Text;
-  String sqlCmd = "SELECT COUNT(name) AS resultSqlInt FROM [Ingredients] WHERE type='"+Type+"'";
-  int countOfIngredients;
   DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
-  try{
-      dataBase->sendSqlQuery(sqlCmd, "resultSqlInt", &countOfIngredients);
-      if (countOfIngredients>0){
-        String *listOfIngredients = new String[countOfIngredients];
-        sqlCmd = "SELECT name FROM [Ingredients] WHERE type='"+Type+"'";
-        dataBase->sendSqlQuery(sqlCmd, "name", listOfIngredients);
-        this->IngredientsListBox->Items->Clear();
-        for (int i=0; i<countOfIngredients; i++){
-          this->IngredientsListBox->Items->Add(listOfIngredients[i]);
-        }
-        ClearInfo();
-      }
-  }catch(...){}
+  String Type = this->TypeComboBox->Text;
+  objectsList *Ingredients = new objectsList(dataBase, "Ingredients", Type);
+  this->IngredientsListBox->Items->Clear();
+  for (int i=0; i<Ingredients->getItemsCount(); i++){
+    this->IngredientsListBox->Items->Add(Ingredients->getItem(i));
+  }
+  ClearInfo();
 }
 //---------------------------------------------------------------------------
 void __fastcall TIngredientsForm::IngredientsListBoxClick(TObject *Sender)
@@ -94,7 +78,7 @@ void __fastcall TIngredientsForm::IngredientsListBoxClick(TObject *Sender)
 void __fastcall TIngredientsForm::DeleteButtonClick(TObject *Sender)
 {
   if (currentIngr==NULL){
-    ShowMessage("Вы не выбрали ингредиент");
+    MessageBox(NULL,(LPCTSTR)"Вы не выбрали ингредиент!",(LPCTSTR)"Ингредиент?",MB_OK| MB_ICONQUESTION | MB_TOPMOST);
   }
   else{
     int res = MessageBox(NULL,(LPCTSTR)"Вы уверены, что хотете удалить этот ингредиент?",(LPCTSTR)"Удалить?",MB_OKCANCEL | MB_ICONQUESTION | MB_TOPMOST);
@@ -111,3 +95,26 @@ void __fastcall TIngredientsForm::DeleteButtonClick(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
+void __fastcall TIngredientsForm::EditButtonClick(TObject *Sender)
+{
+  if (this->protEdit->Text!=currentIngr->getProteins()){
+     DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
+     currentIngr->EditIngredient(dataBase, 2, this->protEdit->Text);
+  }
+  if (this->fatsEdit->Text!=currentIngr->getFats()){
+     DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
+     currentIngr->EditIngredient(dataBase, 3, this->fatsEdit->Text);
+  }
+  if (this->carbEdit->Text!=currentIngr->getCarbohydrates()){
+     DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
+     currentIngr->EditIngredient(dataBase, 4, this->carbEdit->Text);
+  }
+  String newDescr;
+  for (int i=0; i<descriptionMemo->Lines->Count; i++) newDescr += descriptionMemo->Lines->Strings[i];
+  if (newDescr!=currentIngr->getDescription()){
+     DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
+     currentIngr->EditIngredient(dataBase, 5, newDescr);
+  }
+}
+//---------------------------------------------------------------------------
+

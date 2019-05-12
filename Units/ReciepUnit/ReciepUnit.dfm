@@ -1,6 +1,6 @@
 object ReciepForm: TReciepForm
-  Left = 194
-  Top = 136
+  Left = 234
+  Top = 132
   BorderStyle = bsDialog
   Caption = #1056#1077#1094#1077#1087#1090#1099
   ClientHeight = 519
@@ -73,6 +73,7 @@ object ReciepForm: TReciepForm
       Top = 232
       Width = 481
       Height = 273
+      ScrollBars = ssVertical
       TabOrder = 1
     end
   end
@@ -99,6 +100,7 @@ object ReciepForm: TReciepForm
       Height = 25
       Caption = #1059#1076#1072#1083#1080#1090#1100' '#1088#1077#1094#1077#1087#1090
       TabOrder = 1
+      OnClick = DeleteReciepButtonClick
     end
   end
 end

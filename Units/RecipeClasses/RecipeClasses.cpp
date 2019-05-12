@@ -91,28 +91,47 @@ int Ingredient::DeleteIngredient(DATA_BASE *dataBase)
   catch(...){return 2;}
 }
 //---------------------------------------------------------------------------
-int Ingredient::EditIngredient()
+int Ingredient::EditIngredient(DATA_BASE *dataBase, int editedParam, String newValue)
 {
-//
-return 0;
+  String sqlCmd;
+  switch(editedParam) {
+    case(0): sqlCmd= "UPDATE [Ingredients] SET name='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    case(1): sqlCmd= "UPDATE [Ingredients] SET type='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    case(2): sqlCmd= "UPDATE [Ingredients] SET prot='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    case(3): sqlCmd= "UPDATE [Ingredients] SET fats='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    case(4): sqlCmd= "UPDATE [Ingredients] SET carb='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    case(5): sqlCmd= "UPDATE [Ingredients] SET description='"+newValue+"' WHERE name='"+this->name+"' AND type='"+this->type+"'"; break;
+    default: return 2;
+  }
+  try{
+    dataBase->sendSqlQuery(sqlCmd);
+    return 0;
+  }catch(...){return 1;}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-Recipe::Recipe (String Name, String Type, String Text, int CountOfIngredients)
+Recipe::Recipe (String Name, String Type, String Text, int CountOfIngredients, String *ingrNames, double *ingrVolumes, DATA_BASE *dataBase)
 {
   this->name = Name;
   this->type = Type;
-  this->text = Text;
+
+  if (Text.Length()==0)this->text = "А как готовить то и не известно";
+  else this->text = Text;
   this->countOfIngredients = CountOfIngredients;
-  this->ingrTable = "Ingredients_of_"+this->name+"_"+this->type;
+  this->ingrTable = this->name+"_"+this->type;
+  dataBase->ChangeTable("Ingredients");
+  for (int i=0; i<this->countOfIngredients; i++){
+     this->volumeOfIngr.push_back(ingrVolumes[i]);
+     ingredients.push_back(new Ingredient(ingrNames[i], dataBase));
+  }
 }
 //---------------------------------------------------------------------------
 Recipe::Recipe (String Name, DATA_BASE *dataBase)
 {
    this->name = Name;
    String sqlCmd;
-   String values[3] = {"type", "text", "ingrTable"};
+   String values[3] = {"type", "recipeText", "ingrTable"};
    dataBase->ChangeTable("Recipes");
    for (int i=0; i<3; i++){
      sqlCmd = "SELECT "+values[i]+" FROM [Recipes] WHERE name='"+Name+"'";
@@ -132,7 +151,12 @@ Recipe::Recipe (String Name, DATA_BASE *dataBase)
    String *ingrID = new String[this->countOfIngredients];
    sqlCmd = "SELECT ingrId FROM ["+this->ingrTable+"]";
    dataBase->sendSqlQuery(sqlCmd, "ingrId", ingrID);
+   String *tIngrVolume = new String[this->countOfIngredients];
+   sqlCmd = "SELECT vol FROM ["+this->ingrTable+"]";
+   dataBase->sendSqlQuery(sqlCmd, "vol", tIngrVolume);
+   dataBase->ChangeTable("Ingredients");
    for (int i=0; i<this->countOfIngredients; i++){
+     this->volumeOfIngr.push_back(StrToFloat(tIngrVolume[i]));
      String ingrName;
      sqlCmd = "SELECT name FROM [Ingredients] WHERE Код="+ingrID[i]+"";
      dataBase->sendSqlQuery(sqlCmd, "name", &ingrName);
@@ -144,15 +168,18 @@ int Recipe::SaveRecipe(DATA_BASE *dataBase)
 {
   String sqlCmd;
   try{
-    dataBase->ChangeTable("Recieps");
+    dataBase->ChangeTable("Recipes");
     sqlCmd = "BEGIN TRANSACTION";
     dataBase->sendSqlQuery(sqlCmd);
-    sqlCmd = "INSERT INTO [Recieps] (name, type, text, ingrTable) values ('"+this->name+"','"+this->type+"','"+this->text+"','"+this->ingrTable+"')";
+    sqlCmd = "INSERT INTO Recipes (name, type, recipeText, ingrTable) values ('"+this->name+"','"+this->type+"','"+this->text+"','"+this->ingrTable+"')";
     dataBase->sendSqlQuery(sqlCmd);
-    sqlCmd = "CREATE TABLE ["+this->ingrTable+"] (Код COUNTER, ingrId TEXT, volume TEXT, PRIMARY KEY (Код))";
+    sqlCmd = "CREATE TABLE ["+this->ingrTable+"] (Код COUNTER, ingrId TEXT, vol TEXT, PRIMARY KEY (Код))";
     dataBase->sendSqlQuery(sqlCmd);
     for (int i=0; i<this->countOfIngredients; i++){
-      sqlCmd = "INSERT INTO ["+this->ingrTable+"] (ingrId, volume) values ('(SELECT Код FROM [Ingredients] WHERE name='"+this->ingredients[i]->getName()+"' AND type='"+this->ingredients[i]->getType()+"')','"+FloatToStr(this->volumeOfIngr[i])+"')";
+      int code;
+      sqlCmd = "SELECT Код FROM [Ingredients] WHERE name='"+this->ingredients[i]->getName()+"' AND type='"+this->ingredients[i]->getType()+"'";
+      dataBase->sendSqlQuery(sqlCmd, "Код", &code);
+      sqlCmd = "INSERT INTO ["+this->ingrTable+"] (ingrId, vol) values ('"+IntToStr(code)+"','"+FloatToStr(this->volumeOfIngr[i])+"')";
       dataBase->sendSqlQuery(sqlCmd);
     }
     sqlCmd = "COMMIT";
@@ -170,10 +197,10 @@ int Recipe::DeleteRecipe(DATA_BASE *dataBase)
 {
   String sqlCmd;
   try{
-    dataBase->ChangeTable("Recieps");
+    dataBase->ChangeTable("Recipes");
     sqlCmd = "BEGIN TRANSACTION";
     dataBase->sendSqlQuery(sqlCmd);
-    sqlCmd = "DELETE FROM [Recieps] WHERE name='"+this->name+"' AND type='"+this->type+"'";
+    sqlCmd = "DELETE FROM [Recipes] WHERE name='"+this->name+"' AND type='"+this->type+"'";
     dataBase->sendSqlQuery(sqlCmd);
     dataBase->ChangeTable(this->ingrTable);
     sqlCmd = "DROP TABLE ["+this->ingrTable+"]";
@@ -195,3 +222,33 @@ int Recipe::EditRecipe(DATA_BASE *dataBase)
 return 0;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+typeList::typeList(DATA_BASE *dataBase, String Table)
+{
+  try{
+    String sqlCmd = "SELECT COUNT(type) AS resultSqlInt FROM (SELECT DISTINCT type FROM ["+Table+"])";
+    dataBase->sendSqlQuery(sqlCmd, "resultSqlInt", &this->itemsCount);
+    if (this->itemsCount>0){
+      items = new String[this->itemsCount];
+      sqlCmd = "SELECT DISTINCT type FROM ["+Table+"]";
+      dataBase->sendSqlQuery(sqlCmd, "type", items);
+    }
+  }catch(...){}
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+objectsList::objectsList(DATA_BASE *dataBase, String Table, String Type)
+{
+  String sqlCmd = "SELECT COUNT(name) AS resultSqlInt FROM ["+Table+"] WHERE type='"+Type+"'";
+  try{
+      dataBase->sendSqlQuery(sqlCmd, "resultSqlInt", &this->itemsCount);
+      if (this->itemsCount>0){
+        this->items = new String[this->itemsCount];
+        sqlCmd = "SELECT name FROM ["+Table+"] WHERE type='"+Type+"'";
+        dataBase->sendSqlQuery(sqlCmd, "name", this->items);
+      }
+  }catch(...){}
+}
+

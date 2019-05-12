@@ -31,7 +31,7 @@ public:
         String getType(){return type;}
         int SaveNewIngredient(DATA_BASE *dataBase);
         int DeleteIngredient(DATA_BASE *dataBase);
-        int EditIngredient();
+        int EditIngredient(DATA_BASE *dataBase, int editedParam, String newValue);
 };
 
 class Recipe
@@ -46,7 +46,7 @@ private:
         vector<Ingredient*> ingredients;
         vector<double> volumeOfIngr;
 public:
-        Recipe (String Name, String Type, String text, int countOfIngredients);
+        Recipe (String Name, String Type, String text, int countOfIngredients, String *ingrNames, double *ingrVolumes, DATA_BASE *dataBase);
         Recipe (String Name, DATA_BASE *dataBase);
         String getName(){return name;}
         String getType(){return type;}
@@ -58,4 +58,29 @@ public:
         int DeleteRecipe(DATA_BASE *dataBase);
         int EditRecipe(DATA_BASE *dataBase);
 };
+
+class List
+{
+protected:
+        String *items;
+        int itemsCount;
+public:
+        int getItemsCount(){return itemsCount;}
+        String getItem(int at){return items[at];}
+};
+
+class typeList : public List
+{
+public:
+        typeList(DATA_BASE *dataBase, String Table);
+        ~typeList(){delete[] items;}
+};
+
+class objectsList : public List
+{
+public:
+        objectsList(DATA_BASE *dataBase, String Table, String Type);
+        ~objectsList(){delete[] items;}
+};
+
 #endif

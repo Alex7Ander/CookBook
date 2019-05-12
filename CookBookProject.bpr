@@ -8,7 +8,8 @@
       Units\StartUnit\StartUnit.obj Units\RecipeClasses\RecipeClasses.obj 
       Units\NewIngredientUnit\NewIngredientUnit.obj 
       Units\IngredientsUnit\IngredientsUnit.obj Units\ReciepUnit\ReciepUnit.obj 
-      Units\NewReciepUnit\NewReciepUnit.obj Units\ShopListUnit\ShopListUnit.obj"/>
+      Units\NewReciepUnit\NewReciepUnit.obj Units\ShopListUnit\ShopListUnit.obj 
+      Units\NewReciepUnit\IngredientCountUnit.obj"/>
     <RESFILES value="CookBookProject.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -16,7 +17,8 @@
     <RESDEPEN value="$(RESFILES) Units\StartUnit\StartUnit.dfm 
       Units\NewIngredientUnit\NewIngredientUnit.dfm 
       Units\IngredientsUnit\IngredientsUnit.dfm Units\ReciepUnit\ReciepUnit.dfm 
-      Units\NewReciepUnit\NewReciepUnit.dfm Units\ShopListUnit\ShopListUnit.dfm"/>
+      Units\NewReciepUnit\NewReciepUnit.dfm Units\ShopListUnit\ShopListUnit.dfm 
+      Units\NewReciepUnit\IngredientCountUnit.dfm"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <SPARELIBS value="vcl.lib rtl.lib dbrtl.lib adortl.lib"/>
@@ -27,7 +29,7 @@
       inetdbbde.bpi inetdbxpress.bpi inetdb.bpi nmfast.bpi webdsnap.bpi 
       bcbie.bpi websnap.bpi soaprtl.bpi dclocx.bpi dbexpress.bpi dbxcds.bpi 
       indy.bpi bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;Units\DataBaseUnit;Units\StartUnit;Units\RecipeClasses;Units\NewIngredientUnit;Units\IngredientsUnit;Units\ReciepUnit;Units\NewReciepUnit;Units\ShopListUnit"/>
+    <PATHCPP value=".;Units\DataBaseUnit;Units\StartUnit;Units\RecipeClasses;Units\NewIngredientUnit;Units\IngredientsUnit;Units\ReciepUnit;Units\NewReciepUnit;Units\ShopListUnit;Units\NewReciepUnit"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -72,6 +74,7 @@
       <FILE FILENAME="Units\ReciepUnit\ReciepUnit.cpp" FORMNAME="ReciepForm" UNITNAME="ReciepUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Units\NewReciepUnit\NewReciepUnit.cpp" FORMNAME="NewRecieptForm" UNITNAME="NewReciepUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Units\ShopListUnit\ShopListUnit.cpp" FORMNAME="ShopListForm" UNITNAME="ShopListUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Units\NewReciepUnit\IngredientCountUnit.cpp" FORMNAME="IngredientCountForm" UNITNAME="IngredientCountUnit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>

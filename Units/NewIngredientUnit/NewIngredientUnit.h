@@ -29,6 +29,7 @@ __published:	// IDE-managed Components
         TMemo *descriptionMemo;
         void __fastcall saveButtonClick(TObject *Sender);
         void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+        void __fastcall FormShow(TObject *Sender);
 private:	// User declarations
         
 public:		// User declarations

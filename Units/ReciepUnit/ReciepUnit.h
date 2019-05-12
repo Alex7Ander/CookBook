@@ -29,6 +29,7 @@ __published:	// IDE-managed Components
         void __fastcall FormShow(TObject *Sender);
         void __fastcall RecipeTypeComboBoxChange(TObject *Sender);
         void __fastcall RecipesListBoxClick(TObject *Sender);
+        void __fastcall DeleteReciepButtonClick(TObject *Sender);
 private:	// User declarations
         int typeCount;
         String *TypesList;

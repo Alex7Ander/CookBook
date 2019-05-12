@@ -13,6 +13,7 @@ object NewIngredientForm: TNewIngredientForm
   Font.Style = []
   OldCreateOrder = False
   OnClose = FormClose
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 19
   object GroupBox1: TGroupBox
@@ -113,6 +114,7 @@ object NewIngredientForm: TNewIngredientForm
       Top = 56
       Width = 385
       Height = 121
+      ScrollBars = ssVertical
       TabOrder = 6
     end
   end

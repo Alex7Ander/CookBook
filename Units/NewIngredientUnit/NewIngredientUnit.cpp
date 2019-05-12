@@ -50,3 +50,14 @@ void __fastcall TNewIngredientForm::FormClose(TObject *Sender,
   Action = caFree;        
 }
 //---------------------------------------------------------------------------
+void __fastcall TNewIngredientForm::FormShow(TObject *Sender)
+{
+  DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Ingredients");
+  typeList *IngrTypes = new typeList(dataBase, "Ingredients");
+  if (IngrTypes->getItemsCount()>0){
+    for (int i=0; i<IngrTypes->getItemsCount(); i++)
+      this->typeComboBox->Items->Add(IngrTypes->getItem(i));
+  }        
+}
+//---------------------------------------------------------------------------
+

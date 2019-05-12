@@ -39,9 +39,12 @@ __published:	// IDE-managed Components
         void __fastcall TypeComboBoxChange(TObject *Sender);
         void __fastcall IngredientsListBoxClick(TObject *Sender);
         void __fastcall DeleteButtonClick(TObject *Sender);
+        void __fastcall EditButtonClick(TObject *Sender);
 private:	// User declarations
-        int typeCount;
-        String *TypesList;
+        /*int typeCount;
+        String *TypesList;  */
+        typeList *IngrTypes;
+        objectsList *Ingredients;
         Ingredient *currentIngr;
         void ClearInfo();
 public:		// User declarations

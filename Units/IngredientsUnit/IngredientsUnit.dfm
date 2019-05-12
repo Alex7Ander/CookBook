@@ -4,7 +4,7 @@ object IngredientsForm: TIngredientsForm
   BorderStyle = bsDialog
   Caption = #1048#1085#1075#1088#1077#1076#1080#1077#1085#1090#1099
   ClientHeight = 442
-  ClientWidth = 624
+  ClientWidth = 662
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -54,7 +54,7 @@ object IngredientsForm: TIngredientsForm
   object GroupBox1: TGroupBox
     Left = 320
     Top = 0
-    Width = 297
+    Width = 337
     Height = 441
     Caption = #1048#1085#1092#1086#1088#1084#1072#1094#1080#1103': '
     TabOrder = 2
@@ -103,7 +103,7 @@ object IngredientsForm: TIngredientsForm
     object DeleteButton: TButton
       Left = 8
       Top = 376
-      Width = 281
+      Width = 321
       Height = 25
       Caption = #1059#1076#1072#1083#1080#1090#1100
       TabOrder = 0
@@ -112,15 +112,16 @@ object IngredientsForm: TIngredientsForm
     object EditButton: TButton
       Left = 8
       Top = 344
-      Width = 281
+      Width = 321
       Height = 25
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1080#1079#1084#1077#1085#1077#1085#1080#1103
       TabOrder = 1
+      OnClick = EditButtonClick
     end
     object AddNewButton: TButton
       Left = 8
       Top = 408
-      Width = 281
+      Width = 321
       Height = 25
       Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1085#1086#1074#1099#1081
       TabOrder = 2
@@ -129,35 +130,35 @@ object IngredientsForm: TIngredientsForm
     object energyEdit: TEdit
       Left = 168
       Top = 144
-      Width = 121
+      Width = 161
       Height = 27
       TabOrder = 3
     end
     object protEdit: TEdit
       Left = 168
       Top = 48
-      Width = 121
+      Width = 161
       Height = 27
       TabOrder = 4
     end
     object fatsEdit: TEdit
       Left = 168
       Top = 80
-      Width = 121
+      Width = 161
       Height = 27
       TabOrder = 5
     end
     object carbEdit: TEdit
       Left = 168
       Top = 112
-      Width = 121
+      Width = 161
       Height = 27
       TabOrder = 6
     end
     object descriptionMemo: TMemo
       Left = 8
       Top = 208
-      Width = 281
+      Width = 321
       Height = 129
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
@@ -165,6 +166,7 @@ object IngredientsForm: TIngredientsForm
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
+      ScrollBars = ssVertical
       TabOrder = 7
     end
   end
