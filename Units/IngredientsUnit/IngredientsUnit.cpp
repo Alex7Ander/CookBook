@@ -23,7 +23,6 @@ void TIngredientsForm::ClearInfo()
 void __fastcall TIngredientsForm::AddNewButtonClick(TObject *Sender)
 {
   Application->CreateForm(__classid(TNewIngredientForm), &NewIngredientForm);
-  //for (int i=0; i<IngrTypes->getItemsCount(); i++) NewIngredientForm->typeComboBox->Items->Add(IngrTypes->getItem(i));
   NewIngredientForm->Show();       
 }
 //---------------------------------------------------------------------------

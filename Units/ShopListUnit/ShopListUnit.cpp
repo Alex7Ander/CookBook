@@ -23,7 +23,6 @@ void TShopListForm::AddIngredient(Recipe *anyRecipe)
        ShopListBox->Items->Add(item);
      }
   }
-
 }
 //---------------------------------------------------------------------------
 void __fastcall TShopListForm::FormClose(TObject *Sender,

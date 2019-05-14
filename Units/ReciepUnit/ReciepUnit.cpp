@@ -42,24 +42,6 @@ void __fastcall TReciepForm::RecipeTypeComboBoxChange(TObject *Sender)
   for (int i=0; i<Recipes->getItemsCount(); i++){
     this->RecipesListBox->Items->Add(Recipes->getItem(i));
   }
-
-/*
-  String Type = this->RecipeTypeComboBox->Text;
-  String sqlCmd = "SELECT COUNT(name) AS resultSqlInt FROM [Recipes] WHERE type='"+Type+"'";
-  int countOfRecipes;
-  DATA_BASE *dataBase = new DATA_BASE(this, "data.mdb", "Recipes");
-  try{
-      dataBase->sendSqlQuery(sqlCmd, "resultSqlInt", &countOfRecipes);
-      if (countOfRecipes>0){
-        String *listOfRecipes = new String[countOfRecipes];
-        sqlCmd = "SELECT name FROM [Recipes] WHERE type='"+Type+"'";
-        dataBase->sendSqlQuery(sqlCmd, "name", listOfRecipes);
-        this->RecipesListBox->Items->Clear();
-        for (int i=0; i<countOfRecipes; i++){
-          this->RecipesListBox->Items->Add(listOfRecipes[i]);
-        }
-      }
-  }catch(...){} */
 }
 //---------------------------------------------------------------------------
 void __fastcall TReciepForm::RecipesListBoxClick(TObject *Sender)
@@ -85,14 +67,12 @@ void __fastcall TReciepForm::AddReciepButtonClick(TObject *Sender)
   NewRecieptForm->Show();          
 }
 //---------------------------------------------------------------------------
-void __fastcall TReciepForm::FormClose(TObject *Sender,
-      TCloseAction &Action)
+void __fastcall TReciepForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
   StartForm->closeReciepBranch();
   Action = caFree;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TReciepForm::DeleteReciepButtonClick(TObject *Sender)
 {
   int index = this->RecipesListBox->ItemIndex;
