@@ -91,9 +91,6 @@ void __fastcall TReciepForm::DeleteReciepButtonClick(TObject *Sender)
       RecipeTable->RowCount = 2;
       this->RecipeTextMemo->Lines->Clear();
     }
-    else{
-
-    }
   }
 }
 //---------------------------------------------------------------------------
