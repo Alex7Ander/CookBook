@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class DataBase {
 	private Connection dbConnection;
@@ -25,11 +26,22 @@ public class DataBase {
 			
 		}
 	}
-	
-	public void sqlQuery(String queryText) throws SQLException {
-		this.dbStatement.executeUpdate(queryText);
+//*********************************	
+	public int sqlQuery(String queryText) throws SQLException {
+		return this.dbStatement.executeUpdate(queryText);
 	}
-	
+
+	public int sqlQuery(String queryText, int result) throws SQLException {
+		ResultSet rSet = this.dbStatement.executeQuery(queryText);
+		if(rSet.next()) {
+			result = rSet.getInt(0);
+			return 0;
+		}
+		else {
+			return -1;
+		}
+	}
+//**********************************	
 	public int sqlQuery(String queryText, String[] data) throws SQLException {
 		ResultSet rSet = this.dbStatement.executeQuery(queryText);
 		int i = 0;
@@ -40,6 +52,26 @@ public class DataBase {
 		return i;
 	}
 	
+	public int sqlQuery(String queryText, ArrayList<String> data) throws SQLException{
+		ResultSet rSet = this.dbStatement.executeQuery(queryText);
+		int i = 0;
+		while(rSet.next()) {
+			data.add(rSet.getString(0));
+			i++;
+		}
+		return i;
+	}
+	
+	public int sqlQuery(String queryText, int[] data) throws SQLException {
+		ResultSet rSet = this.dbStatement.executeQuery(queryText);
+		int i = 0;
+		while(rSet.next()) {
+			data[i] = rSet.getInt(0);
+			i++;
+		}
+		return i;
+	}
+//************************************	
 	public int sqlQuery(String queryText, String[][] data, int countOfFields) throws SQLException{
 		ResultSet rSet = this.dbStatement.executeQuery(queryText);
 		int i=0;
@@ -50,7 +82,7 @@ public class DataBase {
 		}
 		return i;
 	}
-	
+//*******************************************	
 	public DataBase getInctanceDB() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
 		if (instanceDB == null) {
 			DataBase.instanceDB = new DataBase();
