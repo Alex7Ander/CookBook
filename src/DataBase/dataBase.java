@@ -8,15 +8,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class DataBase {
+public class dataBase {
 	private Connection dbConnection;
 	private Statement dbStatement;
 	private String url = "jdbc:mysql://localhost/my_airsoft_team?serverTimezone=Europe/Moscow&useSSL=false";
 	private String username = "root";
 	private String password = "89151032839ôûâ";
 	
-	private static DataBase instanceDB;
-	private DataBase() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException{
+	private static dataBase instanceDB;
+	private dataBase() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException{
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
 			this.dbConnection = DriverManager.getConnection(url, username, password);
@@ -83,11 +83,11 @@ public class DataBase {
 		return i;
 	}
 //*******************************************	
-	public DataBase getInctanceDB() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+	public static dataBase getInctanceDB() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
 		if (instanceDB == null) {
-			DataBase.instanceDB = new DataBase();
+			dataBase.instanceDB = new dataBase();
 		}
-		return DataBase.instanceDB;
+		return dataBase.instanceDB;
 	}
 	
 	public int close(){
