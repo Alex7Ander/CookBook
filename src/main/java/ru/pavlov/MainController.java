@@ -4,31 +4,30 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.pavlov.repos.RecipeRepo;
 
 @Controller
 public class MainController {
+	@SuppressWarnings("unused")
 	@Autowired
 	private RecipeRepo recipeRepo;
 	
-    @GetMapping
-    public String main(Map<String, Object> model) {
-        return "main";
-    }
-	
-    @GetMapping("/autorisation")
-    public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Map<String, Object> model) {
-        model.put("name", name);
+    @GetMapping(path="/autorisation")
+    public String autorisation() {
         return "autorisation";
     }
-    
-    @PostMapping("registration")
+
+    @GetMapping(path="/registration")
     public String registration() {
         return "registration";
     }
-
+    
+    @GetMapping(path="/resurection")
+    public String resurection() {
+        return "registration";
+    }
 }
