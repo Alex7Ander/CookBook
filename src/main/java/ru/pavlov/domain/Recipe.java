@@ -17,6 +17,9 @@ public class Recipe {
 	private String name;
 	private String tagline;
 	
+	public Recipe() {		
+	}
+	
 	public Integer getId() {
 		return id;
 	}

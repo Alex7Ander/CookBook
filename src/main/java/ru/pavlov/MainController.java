@@ -1,5 +1,6 @@
 package ru.pavlov;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,7 @@ public class MainController {
 
 	@Autowired
 	private RecipeRepo recipeRepo;
-	/*
-	@GetMapping
-	public String hello() {
-		return "hello";
-	}
-	*/
+	
 	@GetMapping("cookbook")
 	public String cookbook(Map<String, Object> model) {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
@@ -29,18 +25,11 @@ public class MainController {
 		return "cookbook";
 	}
 	
-    @GetMapping(path="/autorisation")
-    public String autorisation() {
-        return "autorisation";
-    }
-
-    @GetMapping(path="/registration")
-    public String registration() {
-        return "registration";
-    }
-    
-    @GetMapping(path="/resurection")
-    public String resurection() {
-        return "registration";
-    }
+	@GetMapping("recipe")
+	public String recipe(@RequestParam(name="name", required=true) String name, Map<String, Object> model) {
+		List<Recipe> recipes = recipeRepo.findByName(name);
+		Recipe recipe = recipes.get(0);
+		model.put("recipe", recipe);
+		return "recipe";
+	}
 }
