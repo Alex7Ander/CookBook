@@ -4,8 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "recipelist")
 public class Recipe {
 
 	@Id
@@ -13,6 +15,7 @@ public class Recipe {
 	private Integer id;	
 	private String type;
 	private String name;
+	private String tagline;
 	
 	public Integer getId() {
 		return id;
@@ -32,6 +35,11 @@ public class Recipe {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+	public String getTagline() {
+		return tagline;
+	}
+	public void setTagline(String tagline) {
+		this.tagline = tagline;
+	}
+		
 }

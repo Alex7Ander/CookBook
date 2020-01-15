@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title> CookBook </title>
+		<title>CookBook</title>
 		<link rel="stylesheet" href="/styles/style.css" type="text/css">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
 	
 	<body>
+		{{#recipes}}
+		<div class = "recipecontainer">
+			<b class="label">Название: {{name}}</b><br>
+			<p>Категория: {{type}}</p><br>
+			<p>Слоган блюда: {{tagline}}</p><br>
+		</div>
+		{{/recipes}}
 	</body>
 
 </html>
