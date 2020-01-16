@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.pavlov.domain.Recipe;
@@ -32,4 +32,26 @@ public class MainController {
 		model.put("recipe", recipe);
 		return "recipe";
 	}
+	
+	@GetMapping("addrecipe")
+	public String addrecipe() {
+		return "addrecipe";
+	}
+	
+	@GetMapping("personal")
+	public String personal() {
+		return "personal";
+	}
+	
+	//---------------------------------
+	
+	@PostMapping("saverecipe")
+	public String saverecipe(@RequestParam String name, @RequestParam String type, @RequestParam String tagline, @RequestParam String text, Map<String, Object> model) {
+		Recipe recipe = new Recipe(name, type, tagline, text);
+		recipeRepo.save(recipe);
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.put("recipes", recipes);
+		return "cookbook";
+	}
+	
 }

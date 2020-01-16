@@ -1,61 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="/styles/style.css" type="text/css">
-	<title>Книга рецептов</title>
-</head>
-<body>
-	</div>
-		<form>
-			<div class = "container_menu">
-				<div>
-					<input class = "dws-btn" type = "submit" name = "submit" value = "Мои Рецепты">
-				</div>
-				
-				<div>
-					<input class = "dws-btn" type = "submit" name = "submit" value = "Мои Беседы">
-				</div>
-				
-				<div>
-					<input class = "dws-btn" type = "submit" name = "submit" value = "Пользователи">
-				</div>
-				
-				<div>
-					<input class = "dws-btn" type = "submit" name = "submit" value = "Обо мне...">
-				</div>
-				</br>
-				<a href="../Web/Autorisation.html">Выход</a>
-			</div>
-			
-			<div class = "container_personInfo">
-				<b class = "label">Фамилия:</b>
-				</br>
-				<b class = "label">Имя:</b>
-				</br>
-				<b class = "label">Прозвище:</b>
-				</br>
-				<b class = "label">Место рождения:</b>
-				</br>
-				<b class = "label">Темперамент:</b>
-				</br>
-				<b class = "label">Самое любимое блюдо:</b>
-				</br>
-				<b class = "label">Количество моих рецептов:</b>
-				</br>
-				<b class = "label">Количество понравившехся рецептов:</b>
-				</br>
-				<b class = "label">Телефон:</b>
-				</br>
-				<b class = "label">E-mail:</b>
-				</br>
-			</div>
-			
-			<div class = "container_wall">
-				<b class = "label">Новости</b>
-			</div>
-
-		</form>
-	</div>
-</body>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="/styles/style _person.css" type="text/css">
+		<title>Книга рецептов</title>
+	</head>
+	
+	<body>
+		<div class = "container_menu">
+			<form method="get" action="addrecipe">
+				<button class = "dws-btn" type="submit">Написать рецепт</button>
+			</form>
+		</div>				
+					
+		<div class = "container_personInfo">
+			<b class = "label">Фамилия:</b>
+			</br>
+			<b class = "label">Имя:</b>
+			</br>
+			<b class = "label">Я живу в:</b>
+			</br>
+			<b class = "label">Темперамент:</b>
+			</br>
+			<b class = "label">Телефон:</b>
+			</br>
+			<b class = "label">E-mail:</b>
+			</br>
+			<a class = "label" href="index">Выход</a>
+		</div>
+	</body>
 </html>

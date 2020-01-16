@@ -7,6 +7,7 @@
 	</head>
 	
 	<body>
+		<a class="label" href="personal">На свою страницу</a>
 		{{#recipes}}
 		<div class = "recipecontainer">
 			<b class="label">Название: {{name}}</b><br>
@@ -14,7 +15,7 @@
 			<p>Слоган блюда: {{tagline}}</p><br>
 			<form method="get" action="recipe">
 				<button class = "dws-btn" type="submit">Войти</button><br>
-			</form>
+			</form>  
 		</div>
 		{{/recipes}}
 	</body>

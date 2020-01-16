@@ -13,13 +13,22 @@ public class Recipe {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;	
+	
 	private String type;
 	private String name;
 	private String tagline;
+	private String text;
 	
 	public Recipe() {		
 	}
 	
+	public Recipe(String type, String name, String tagline, String text) {
+		this.type = type;
+		this.name = name;
+		this.tagline = tagline;
+		this.text = text;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -43,6 +52,12 @@ public class Recipe {
 	}
 	public void setTagline(String tagline) {
 		this.tagline = tagline;
+	}
+	public String getText() {
+		return text;
+	}
+	public void setText(String text) {
+		this.text = text;
 	}
 		
 }
