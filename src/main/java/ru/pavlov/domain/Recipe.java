@@ -1,5 +1,4 @@
 package ru.pavlov.domain;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,8 +20,8 @@ public class Recipe {
 	
 	public Recipe() {		
 	}
-	
-	public Recipe(String type, String name, String tagline, String text) {
+
+	public Recipe(String name, String type, String tagline, String text) {
 		this.type = type;
 		this.name = name;
 		this.tagline = tagline;
