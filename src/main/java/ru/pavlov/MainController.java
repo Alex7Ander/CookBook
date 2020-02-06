@@ -21,46 +21,11 @@ public class MainController {
 	private RecipeRepository recipeRepo;
 	@Autowired 
 	private UserRepository userRepo;
-	
+
+// /**
 	@GetMapping("regPage")
 	public String regPage() {
 		return "regPage";
-	}
-	
-	@GetMapping("cookbook")
-	public String cookbook(Map<String, Object> model) {
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.put("recipes", recipes);
-		return "cookbook";
-	}
-	
-	@GetMapping("recipe")
-	public String recipe(@RequestParam(name="name", required=true) String name, Map<String, Object> model) {
-		List<Recipe> recipes = recipeRepo.findByName(name);
-		Recipe recipe = recipes.get(0);
-		model.put("recipe", recipe);
-		return "recipe";
-	}
-	
-	@GetMapping("addrecipe")
-	public String addrecipe() {
-		return "addrecipe";
-	}
-	
-	@GetMapping("personal")
-	public String personal() {
-		return "personal";
-	}
-	
-	//---------------------------------
-	
-	@PostMapping("saverecipe")
-	public String saverecipe(@RequestParam String name, @RequestParam String type, @RequestParam String tagline, @RequestParam String text, Map<String, Object> model) {
-		Recipe recipe = new Recipe(name, type, tagline, text);
-		recipeRepo.save(recipe);
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.put("recipes", recipes);
-		return "cookbook";
 	}
 	
 	@PostMapping("regUser")
@@ -69,4 +34,43 @@ public class MainController {
 		userRepo.save(user);
 		return "login";
 	}
+	
+// /user/**	
+	@GetMapping("user/cookbook")
+	public String cookbook(Map<String, Object> model) {
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.put("recipes", recipes);
+		return "cookbook";
+	}
+	
+	@GetMapping("user/recipe")
+	public String recipe(@RequestParam(name="name", required=true) String name, Map<String, Object> model) {
+		List<Recipe> recipes = recipeRepo.findByName(name);
+		Recipe recipe = recipes.get(0);
+		model.put("recipe", recipe);
+		return "recipe";
+	}
+	
+	@GetMapping("user/addrecipe")
+	public String addrecipe() {
+		return "addrecipe";
+	}
+	
+	@GetMapping("user/personal")
+	public String personal() {
+		return "personal";
+	}
+	
+	//---------------------------------
+	
+	@PostMapping("user/saverecipe")
+	public String saverecipe(@RequestParam String name, @RequestParam String type, @RequestParam String tagline, @RequestParam String text, Map<String, Object> model) {
+		Recipe recipe = new Recipe(name, type, tagline, text);
+		recipeRepo.save(recipe);
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.put("recipes", recipes);
+		return "cookbook";
+	}
+	
+
 }

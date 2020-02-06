@@ -125,8 +125,5 @@ public class User {
 	public void setEnabled(int enabled) {
 		this.enabled = enabled;
 	}
-
-	
-	
 	
 }

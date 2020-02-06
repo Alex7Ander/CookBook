@@ -20,7 +20,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http.csrf().disable().authorizeRequests()
 			.antMatchers("/**").permitAll()
 			.antMatchers("/cookbook").hasAnyRole("ADMIN", "USER")
 			.antMatchers("/admin").hasRole("ADMIN")
@@ -29,7 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(getPasswordEncoder());
+		auth. userDetailsService(userDetailsService).passwordEncoder(getPasswordEncoder());
 	}
 	
     @Bean 
