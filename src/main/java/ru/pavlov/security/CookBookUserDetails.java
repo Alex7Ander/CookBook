@@ -1,54 +1,58 @@
 package ru.pavlov.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import ru.pavlov.domain.User;
+
 public class CookBookUserDetails implements UserDetails{
-	private List<String> userRoles;
+	private List<GrantedAuthority> userRoles;
+	private User user;
+	
+	public CookBookUserDetails(User user) {
+		this.user = user;
+		userRoles = new ArrayList<GrantedAuthority>();
+		userRoles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+	}
 	
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<? extends GrantedAuthority> getAuthorities() {		
+		return userRoles;
 	}
 
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.user.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.user.getUserLoginName();
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

@@ -1,29 +1,28 @@
 package ru.pavlov.security;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import ru.pavlov.domain.security.User;
-import ru.pavlov.domain.security.UserRepository;
-import ru.pavlov.domain.security.UserRoleRepository;
+import ru.pavlov.domain.User;
+import ru.pavlov.repos.UserRepository;
 
+@Service
 public class CooBookUserDetailsService implements UserDetailsService {
 
+	@Autowired
 	private UserRepository userRepository;
-	private UserRoleRepository userRoleRepository;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUserName(username);
-		if (user != null) {
-			throw new UsernameNotFoundException("No user present with username: "+username);
+		User user = userRepository.findByUserLoginName(username);
+		if (user == null) {
+			throw new UsernameNotFoundException("No user present with login: " + username);
 		}
 		else {
-			List<String> userRoles = userRoleRepository.findRoleByUserName(username);
-			return new CookBookUserDetails(user, userRoles);
+			return new CookBookUserDetails(user);
 		}
 	}
 

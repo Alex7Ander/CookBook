@@ -10,13 +10,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.pavlov.domain.Recipe;
-import ru.pavlov.repos.RecipeRepo;
+import ru.pavlov.domain.User;
+import ru.pavlov.repos.RecipeRepository;
+import ru.pavlov.repos.UserRepository;
 
 @Controller
 public class MainController {
 
 	@Autowired
-	private RecipeRepo recipeRepo;
+	private RecipeRepository recipeRepo;
+	@Autowired 
+	private UserRepository userRepo;
+	
+	@GetMapping("regPage")
+	public String regPage() {
+		return "regPage";
+	}
 	
 	@GetMapping("cookbook")
 	public String cookbook(Map<String, Object> model) {
@@ -54,4 +63,10 @@ public class MainController {
 		return "cookbook";
 	}
 	
+	@PostMapping("regUser")
+	public String regUser(@RequestParam String login, @RequestParam String password, @RequestParam String email) {
+		User user = new User(login, password, email);
+		userRepo.save(user);
+		return "login";
+	}
 }

@@ -8,29 +8,34 @@
 <body>
 	<div class="container">
 		<img src="img/autorisation_ico.png">
-		<form>
+		<form method="post" action="regUser">
 			<div class = "dws-input">
 				<b class = "label">Логин: </b>
-				<br/>
-				<input type = "text" name = "username" placeholder = "Введите логин">
+				<br>
+				<input type = "text" name = "login" placeholder = "Введите логин">
 			</div>
 			
 			<div class = "dws-input">
 				<b class = "label">Пароль: </b>
-				<br/>
+				<br>
 				<input type = "password" name = "password" placeholder = "Введите пароль">
 			</div>
 			
 			<div class = "dws-input">
+				<b class = "label">Повторите пароль: </b>
+				<br>
+				<input type = "password" name = "password2" placeholder = "Введите пароль">
+			</div>
+			
+			<div class = "dws-input">
 				<b class = "label">E-mail: </b>
-				<br/>
-				<input type = "text" name = "password" placeholder = "e-mail">
+				<br>
+				<input type = "text" name = "email" placeholder = "e-mail">
 			</div>
 			
 			<div class = "dws-input">
 				<input class = "dws-btn" type = "submit" name = "submit" value = "Зарегистрироваться">
-				<br/>
-				<a href="/autorisation">На главную</a>
+				<br>
 			</div>
 		</form>
 	</div> 

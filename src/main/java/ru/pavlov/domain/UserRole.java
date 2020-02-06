@@ -1,4 +1,4 @@
-package ru.pavlov.domain.security;
+package ru.pavlov.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
