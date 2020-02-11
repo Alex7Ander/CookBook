@@ -32,7 +32,7 @@ public class MainController {
 	public String regUser(@RequestParam String login, @RequestParam String password, @RequestParam String email) {
 		User user = new User(login, password, email);
 		userRepo.save(user);
-		return "login";
+		return "redirect:/login";
 	}
 	
 // /user/**	
