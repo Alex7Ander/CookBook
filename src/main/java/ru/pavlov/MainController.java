@@ -1,9 +1,9 @@
 package ru.pavlov;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +14,7 @@ import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.UserRepository;
+import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
 public class MainController {
@@ -24,6 +25,11 @@ public class MainController {
 	private UserRepository userRepo;
 
 // /**
+/*	@GetMapping("/login")
+	public String login() {
+		return "login";
+	}
+*/	
 	@GetMapping("regPage")
 	public String regPage() {
 		return "regPage";
@@ -58,11 +64,13 @@ public class MainController {
 	}
 	
 	@GetMapping("user/personal")
-	public String personal() {
+	public String personal(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
+		User currentUser = currentUserDetails.getUser();
+		model.addAttribute("user", currentUser);
 		return "personal";
 	}
 	
-	//---------------------------------
+//---------------------------------
 	
 	@PostMapping("user/saverecipe")
 	public String saverecipe(@RequestParam String name, @RequestParam String type, @RequestParam String tagline, @RequestParam String text, Model model) {
@@ -72,6 +80,5 @@ public class MainController {
 		model.addAttribute("recipes", recipes);
 		return "cookbook";
 	}
-	
 
 }

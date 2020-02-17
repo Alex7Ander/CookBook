@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="/styles/style _person.css" type="text/css">
@@ -8,25 +8,23 @@
 	
 	<body>
 		<div class = "container_menu">
-			<form method="get" action="addrecipe">
-				<a type="submit"> Написать рецепт</a>				
-			</form>
+			<a href="/user/addrecipe"> Написать рецепт</a>				
 			<br>
 			<a href="/logout">Выйти</a>
 		</div>				
 					
 		<div class = "container_personInfo">
-			<b class = "label">Фамилия:</b>
+			<b class = "label"> Имя: <span th:text="${user.getName()}"> - </span> </b>
 			<br>
-			<b class = "label">Имя:</b>
+			<b class = "label"> Фамилия: <span th:text="${user.getSurname()}"> - </span> </b>
 			<br>
-			<b class = "label">Я живу в:</b>
+			<b class = "label"> Я живу в: <span th:text="${user.getCity()}"> - </span> </b>
 			<br>
-			<b class = "label">Темперамент:</b>
+			<b class = "label"> Темперамент: <span th:text="${user.getTemperament()}"> - </span> </b>
 			<br>
-			<b class = "label">Телефон:</b>
+			<b class = "label"> Телефон: <span th:text="${user.getPhone()}"> - </span> </b>
 			<br>
-			<b class = "label">E-mail:</b>
+			<b class = "label"> E-mail: <span th:text="${user.getEmail()}"> - </span> </b>
 			<br>
 		</div>
 	</body>

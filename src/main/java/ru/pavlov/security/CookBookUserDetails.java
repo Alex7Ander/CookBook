@@ -3,21 +3,25 @@ package ru.pavlov.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import ru.pavlov.domain.User;
+import ru.pavlov.domain.UserRole;
 
 public class CookBookUserDetails implements UserDetails{
+	
 	private List<GrantedAuthority> userRoles;
 	private User user;
 	
 	public CookBookUserDetails(User user) {
-		this.user = user;
+		this.user = user;		
 		userRoles = new ArrayList<GrantedAuthority>();
-		userRoles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		for (UserRole role : this.user.getRoles()) {
+			GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_" + role.getRole());
+			userRoles.add(ga);
+		}
+		//userRoles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	}
 	
 	@Override
@@ -53,6 +57,14 @@ public class CookBookUserDetails implements UserDetails{
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

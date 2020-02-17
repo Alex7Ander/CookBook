@@ -1,14 +1,20 @@
 package ru.pavlov.domain;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 @Entity
-@Table(name = "users")
+@Table(name = "cookbook_users")
 public class User {
 	public User(String userLoginName, String password, String name, String surname, String city, String temperament,
 			String email, String phone, int enabled) {
@@ -43,6 +49,10 @@ public class User {
 	private String phone;	   
 	private int enabled;
 		
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns=@JoinColumn(name = "role_id"))
+	private List<UserRole> roles;
+	
 	public User(){		
 	}
 
@@ -124,6 +134,12 @@ public class User {
 
 	public void setEnabled(int enabled) {
 		this.enabled = enabled;
+	}
+	public List<UserRole> getRoles() {
+		return roles;
+	}
+	public void setRoles(List<UserRole> roles) {
+		this.roles = roles;
 	}
 	
 }
