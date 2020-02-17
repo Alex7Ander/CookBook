@@ -21,7 +21,6 @@ public class CookBookUserDetails implements UserDetails{
 			GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_" + role.getRole());
 			userRoles.add(ga);
 		}
-		//userRoles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	}
 	
 	@Override
@@ -31,12 +30,14 @@ public class CookBookUserDetails implements UserDetails{
 
 	@Override
 	public String getPassword() {
-		return this.user.getPassword();
+		String pass = this.user.getPassword();
+		return pass;
 	}
 
 	@Override
 	public String getUsername() {
-		return this.user.getUserLoginName();
+		String login = this.user.getUserLoginName();
+		return login;
 	}
 
 	@Override

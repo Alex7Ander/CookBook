@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.JoinColumn;;
 
 @Entity
-@Table(name="users_roles")
+@Table(name="roles")
 public class UserRole {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)    
