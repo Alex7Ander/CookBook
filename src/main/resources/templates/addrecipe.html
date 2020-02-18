@@ -2,19 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">	
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" href="/styles/style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/style.css}" href="../static/styles/style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/add_recipe_style.css}" href="../static/styles/add_recipe_style.css" type="text/css">
 		<title>Новый рецепт</title>	
 	</head>
 	<body>
-		<div class="container">
-			<img src="/img/autorisation_ico.png">	
+		<div>	
 			<form method="post" action="saverecipe">	
-				<input type = "text" name = "name" placeholder = "Название рецепта">
-				<input type = "text" name = "type" placeholder = "Категория">
-				<input type = "text" name = "tagline" placeholder = "Слоган">
-				<p>Алгоритм: </p><br>
-				<textarea name="text" cols="50" rows="12">Итак, </textarea>					
-				<button class = "dws-btn" type="submit"> Сохранить </button> <br>					
+				<div class="main_info_conteiner">
+					<h4>Основная информация</h4>
+					<b>Название:</b><br>
+					<input type = "text" name = "name" placeholder = "Название рецепта"><br>
+					<b>Категория:</b><br>
+					<select>
+						<option>Горячие блюда</option>
+						<option>Гарниры</option>
+						<option>Закуски</option>
+						<option>Салаты</option>
+						<option>Десерты</option>
+						<option>Напитки</option>
+						<option>Fast food</option>
+					</select><br>
+					<b>Слоган:</b><br>
+					<input type = "text" name = "tagline" placeholder = "Слоган"><br>	
+				</div>
+
+				<div class="main_info_conteiner">
+					<h4>Добавить новый ингридиент<h4>	
+					<b>Белки:</b><br>
+					<input type = "text" name = "name" placeholder = "Белки / 100гр"><br>
+					<b>Жиры:</b><br>
+					<input type = "text" name = "name" placeholder = "Жиры / 100 гр"><br>
+					<b>Углеводы:</b><br>
+					<input type = "text" name = "name" placeholder = "Углеводы / 100 гр"><br>
+					<b>Калорийность:</b>
+					<b>0 ккал</b><br>
+					<button class = "dws-btn" type="submit"> Добавить </button> <br>
+				</div>
+
+				<div class="text_container">	
+					<b>Алгоритм: </b><br>
+					<textarea name="text" cols="50" rows="12">Итак, </textarea>	<br>									
+				</div>
+
+				<button class = "dws-btn" type="submit"> Сохранить </button> <br>		
 			</form>
 		</div> 		
 	</body>
