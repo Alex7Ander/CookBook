@@ -5,11 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,15 +20,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private UserDetailsService userDetailsService;
 	
 	@Override
+	public void configure(WebSecurity web) throws Exception {
+		web
+			.ignoring()
+			.antMatchers("/resources/**");
+	}
+	
+	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.csrf().disable()
-			.authorizeRequests().anyRequest().authenticated()			
-				.antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
-				.antMatchers("/admin/**").hasRole("ADMIN")
-				.antMatchers("/styles/style.css", "/img/**", "/js/**").permitAll()
+		http.csrf().disable();
+		http.authorizeRequests()
+			//.anyRequest().authenticated()		
+			.antMatchers("/regPage").permitAll()
+			.antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+			.antMatchers("/admin/**").hasRole("ADMIN")
+			.antMatchers("/static/**").anonymous()
 			//.and().formLogin().and().logout();
-			.and().formLogin().loginPage("/login").permitAll()
+			.and().formLogin().loginPage("/login").permitAll().loginProcessingUrl("/login").successHandler(cookbookSuccessHandler())
 			.and().logout().permitAll();
 	}
 	
@@ -35,10 +45,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth. userDetailsService(userDetailsService).passwordEncoder(getPasswordEncoder());
 	}
 	
-    @Bean 
-    public PasswordEncoder getPasswordEncoder() { 
-    	return NoOpPasswordEncoder.getInstance();
-        //return new BCryptPasswordEncoder(10); 
-    } 
-    
+	@Bean
+	public PasswordEncoder getPasswordEncoder() {
+		return NoOpPasswordEncoder.getInstance();
+	//return new BCryptPasswordEncoder(10); 
+	}
+	
+	@Bean 
+	public AuthenticationSuccessHandler cookbookSuccessHandler() {
+		return new CookBookAuthSuccessHandler();
+		
+	}
+
 }

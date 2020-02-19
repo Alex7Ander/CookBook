@@ -9,4 +9,5 @@ import ru.pavlov.domain.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	public User findByName(String username);
 	public User findByUserLoginName(String login);
+	public User findByEmail(String email);
 }

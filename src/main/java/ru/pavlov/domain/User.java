@@ -1,5 +1,6 @@
 package ru.pavlov.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -16,6 +17,9 @@ import javax.persistence.JoinColumn;
 @Entity
 @Table(name = "cookbook_users")
 public class User {
+	public User(){		
+	}
+	
 	public User(String userLoginName, String password, String name, String surname, String city, String temperament,
 			String email, String phone, int enabled) {
 		this.userLoginName = userLoginName;
@@ -28,10 +32,12 @@ public class User {
 		this.phone = phone;
 		this.enabled = enabled;
 	}
+	
 	public User(String userLoginName, String password, String email) {
 		this.userLoginName = userLoginName;
 		this.password = password;
 		this.email = email;
+		this.roles = new ArrayList<UserRole>();
 	}
 
 	@Id
@@ -53,9 +59,6 @@ public class User {
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns=@JoinColumn(name = "role_id"))
 	private List<UserRole> roles;
 	
-	public User(){		
-	}
-
 	public Long getId() {
 		return id;
 	}

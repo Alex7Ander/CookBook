@@ -7,6 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import ru.pavlov.domain.Recipe;
 
 public interface RecipeRepository extends CrudRepository<Recipe, Integer>  {
-	List<Recipe> findByType(String type);
-	List<Recipe> findByName(String type);
+	public List<Recipe> findByType(String type);
+	public List<Recipe> findByName(String type);
 }
