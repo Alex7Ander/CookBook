@@ -7,25 +7,15 @@
     border-radius: 0 0 30px 30px;
     border-width: 10 px;
     margin: 10px auto 10px auto;
-    box-shadow: 0 0 10px #ea3939;
 }
 
 .main_info_conteiner{
     text-align: center;
-
 }
 
 .text_container{
     text-align: left;
     float: left;
-}
-
-input[type="text"], input[type="password"]{
-	width: 300px;
-	height: 30px;
-	font-size: 18px;
-	margin-bottom: 5px;
-	border-radius: 5px;
 }
 
 select{

@@ -33,11 +33,11 @@ public class User {
 		this.enabled = enabled;
 	}
 	
-	public User(String userLoginName, String password, String email) {
+	public User(String userLoginName, String password, String email, List<UserRole> roles) {
 		this.userLoginName = userLoginName;
 		this.password = password;
 		this.email = email;
-		this.roles = new ArrayList<UserRole>();
+		this.roles = roles;
 	}
 
 	@Id

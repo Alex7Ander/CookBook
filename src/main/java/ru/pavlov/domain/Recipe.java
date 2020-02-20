@@ -11,12 +11,14 @@ public class Recipe {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;	
+	private Long id;	
 	
 	private String type;
 	private String name;
 	private String tagline;
 	private String text;
+	
+	private Long userId;
 	
 	public Recipe() {		
 	}
@@ -28,10 +30,10 @@ public class Recipe {
 		this.text = text;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getType() {
@@ -57,6 +59,14 @@ public class Recipe {
 	}
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 		
 }

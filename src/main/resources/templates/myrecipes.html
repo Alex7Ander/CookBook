@@ -8,12 +8,14 @@
 	<body>
 		<a class="label" href="personal">На свою страницу</a>
 		<div class = "recipecontainer" th:each="recipe : ${recipes}">
-			<form method="get" th:action="recipe">
-				<input type="hidden" name="recipeId" th:value="${recipe.id}">
+			<form method="get" action="recipe">
+				<b class="label" name="id"><span th:text="${recipe.id}"> # </span></b>
 				<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
 				<p><span th:text="${recipe.type}"> Категория </span></p><br>
 				<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>			
-				<button class = "dws-btn" type="submit">Подробнее</button><br>
+				<button class = "dws-btn" type="submit">Подробнее</button>
+				<button class = "dws-btn" type="submit">Редактировать</button>
+				<button class = "dws-btn" type="submit">Удалить</button><br>
 			</form>  
 		</div>
 	</body>

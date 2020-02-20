@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html>	
+<html xmlns:th="http://www.thymeleaf.org">	
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" href="/styles/style.css" type="text/css">
-		<title>Книга рецептов - авторизация</title>	
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
+		<title>Рецепт</title>	
 	</head>
 	<body>
-		<div class="container">
-			<p>{{name}}</p>
+		<a class="label" href="personal">На свою страницу</a>
+		<div class = "container">
+			<b class="label"> <span th:text="${recipe.name}"> - </span> </b><br>
+			<p> <span th:text="${recipe.type}"> Категория </span> </p><br>
+			<p> <span th:text="${recipe.tagline}"> Слоган </span> </p><br> 
 		</div> 
 	</body>
 </html>
