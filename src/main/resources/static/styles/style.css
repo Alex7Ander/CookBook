@@ -13,6 +13,14 @@ a:hover{
 	text-decoration: none;
 }
 
+b{
+	color: white;
+}
+
+b:hover{
+	color: black;
+}
+
 .container{
 	width: 450px;
 	height: auto;

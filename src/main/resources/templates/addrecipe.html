@@ -6,71 +6,93 @@
 		<link rel="stylesheet" th:href="@{/styles/add_recipe_style.css}" href="../static/styles/add_recipe_style.css" type="text/css">
 		<title>Новый рецепт</title>	
 	</head>
-	<body>
-		<div>	
-			<form method="post" action="saverecipe">	
-				<div class="main_info_conteiner">
-					<h4>Основная информация</h4>
-					<b>Название:</b><br>
-					<input type = "text" name = "name" placeholder = "Название рецепта"><br>
-					<b>Категория:</b><br>
-					<select>
-						<option>Горячие блюда</option>
-						<option>Гарниры</option>
-						<option>Закуски</option>
-						<option>Салаты</option>
-						<option>Десерты</option>
-						<option>Напитки</option>
-						<option>Fast food</option>
-					</select><br>
-					<b>Слоган:</b><br>
-					<input type = "text" name = "tagline" placeholder = "Слоган"><br>	
-				</div>
-
-				<div class="main_info_conteiner">
-					<h4>Добавить новый ингридиент<h4>	
-					<b>Белки:</b><br>
-					<input type = "text" name = "name" placeholder = "Белки / 100гр"><br>
-					<b>Жиры:</b><br>
-					<input type = "text" name = "name" placeholder = "Жиры / 100 гр"><br>
-					<b>Углеводы:</b><br>
-					<input type = "text" name = "name" placeholder = "Углеводы / 100 гр"><br>
-					<b>Калорийность:</b>
-					<b>0 ккал</b><br>
-					<button class = "dws-btn" type="submit"> Добавить </button> <br>
-				</div>
-
-				<div class="text_container">	
-					<b>Алгоритм: </b><br>
-					<textarea name="text" cols="50" rows="12">Итак, </textarea>	<br>									
-				</div>
-				
-				<div>
-					<table>
-						<tr>
-							<th colspan="6">Фото</th>
-						</tr>
-						<tr>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-							<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
-						</tr>
-						<tr>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-							<td><button class = "dws-btn" type="submit">+</button></td>
-						</tr>
-					</table>
-				</div>
-				
-				<button class = "dws-btn" type="submit"> Сохранить </button> <br>		
-			</form>
-		</div> 		
+	<body>	
+		<div class="main_info_conteiner">		
+			<form id="saverecipeform" method="post" action="saverecipe">					
+				<h4>Основная информация</h4>
+				<b>Название:</b>
+				<input type = "text" name = "name" placeholder = "Название рецепта">
+				<b>Категория:</b>
+				<select>
+					<option>Горячие блюда</option>
+					<option>Гарниры</option>
+					<option>Закуски</option>
+					<option>Салаты</option>
+					<option>Десерты</option>
+					<option>Напитки</option>
+					<option>Fast food</option>
+				</select>
+				<b>Слоган:</b>
+				<input type = "text" name = "tagline" placeholder = "Слоган">	
+				<b>Ссылка на youtube:</b>
+				<input form="saverecipeform" type = "text" name="youtubelink" placeholder = "https://www.youtube.com/..."></input>				
+			</form>	
+		</div>
+		
+		<div class="text_container">	
+			<b>Алгоритм: </b><br>
+			<textarea name="text" cols=170 rows=10>Итак, </textarea>									
+		</div>
+		
+		<div>		
+			<table>
+				<tr>
+					<th colspan = "3"><b>Ингридиенты</b></th>
+				</tr>
+				<tr>
+					<th><b>Ингридиенты</b></th>
+					<th><b>Количество (гр/мл)</b></th>
+					<th><b>Управление</b></th>
+				</tr>
+				<tr>
+					<td> Морковь </td>
+					<td> 0 </td>
+					<td> <button class = "dws-btn" type="submit"> Удалить </button> </td>
+				</tr>
+				<tr>
+					<th colspan="3"><button class = "dws-btn" type="submit"> Добавить </button></th>
+				<tr>
+			<table>
+		</div>	
+		
+		<div class="photo_conteiner">
+			<table>
+				<tr>
+					<th colspan="6">Фото</th>
+				</tr>
+				<tr>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+					<td> <img th:src="@{/img/noimg.png}" src="../static/img/noimg.png" /> </td>
+				</tr>
+				<tr>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+					<td><button class = "dws-btn" type="submit">+</button></td>
+				</tr>
+			</table>			
+		</div>
+		<button form="saverecipeform" class = "dws-btn" type="submit"> Сохранить </button> 	 		
 	</body>
 </html>
+
+		<!--	
+			<div class="main_info_conteiner">
+				<h4>Добавить новый ингридиент<h4>	
+				<b>Белки:</b><br>
+				<input type = "text" name = "name" placeholder = "Белки / 100гр"><br>
+				<b>Жиры:</b><br>
+				<input type = "text" name = "name" placeholder = "Жиры / 100 гр"><br>
+				<b>Углеводы:</b><br>
+				<input type = "text" name = "name" placeholder = "Углеводы / 100 гр"><br>
+				<b>Калорийность:</b>
+				<b>0 ккал</b><br>
+				<button class = "dws-btn" type="submit"> Добавить </button> <br>
+			</div>
+		-->

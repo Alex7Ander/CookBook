@@ -97,8 +97,14 @@ public class UserController {
 //---------------------------------
 	
 	@PostMapping("saverecipe")
-	public String saverecipe(@RequestParam String name, @RequestParam String type, @RequestParam String tagline, @RequestParam String text, Model model) {
-		Recipe recipe = new Recipe(name, type, tagline, text);
+	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
+								@RequestParam String name, 
+								@RequestParam String type, 
+								@RequestParam String tagline, 
+								@RequestParam String text, 
+								Model model) {
+		Long userId= currentUserDetails.getUser().getId();
+		Recipe recipe = new Recipe(userId, name, type, tagline, text, null);
 		recipeRepo.save(recipe);
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);

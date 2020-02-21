@@ -1,8 +1,14 @@
 package ru.pavlov.domain;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -20,14 +26,19 @@ public class Recipe {
 	
 	private Long userId;
 	
-	public Recipe() {		
-	}
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipe_id"), inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
+	private List<Ingredient> ingredients;
+	
+	public Recipe() {}
 
-	public Recipe(String name, String type, String tagline, String text) {
+	public Recipe(Long userId, String name, String type, String tagline, String text, List<Ingredient> ingredients) {
+		this.userId = userId;
 		this.type = type;
 		this.name = name;
 		this.tagline = tagline;
 		this.text = text;
+		this.ingredients = ingredients;
 	}
 
 	public Long getId() {
@@ -67,6 +78,14 @@ public class Recipe {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public List<Ingredient> getIngredients() {
+		return ingredients;
+	}
+
+	public void setIngredients(List<Ingredient> ingredients) {
+		this.ingredients = ingredients;
 	}
 		
 }
