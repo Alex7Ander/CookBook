@@ -63,7 +63,7 @@
 	<body>
 		<div class="container">
 			<form method="post" action="/login">
-			<img src="autorisation_ico.png">		
+			<img th:src="@{/img/autorisation_ico.png}" src="../static/img/autorisation_ico.png">		
 			<div class = "dws-input">
 				<input type = "text" name = "username" placeholder = "Введите логин">
 			</div>			
@@ -75,7 +75,7 @@
 				<br/>
 			</div>
 			<div class = "dws-input">
-				<a href="/resurection">Восстановить пароль</a>
+				<a href="/resurectionPage">Восстановить пароль</a>
 				<b>/</b>
 				<a href="/registration">Зарегистрироваться</a>
 			</div>

@@ -21,29 +21,29 @@ public class MainController {
 	@Autowired
 	private UserRoleRepository userRoleRepo;
 
-	@GetMapping("regPage")
+	@GetMapping("registration")
 	public String regPage() {
-		return "regPage";
+		return "registration";
 	}
 	
 	@PostMapping("regUser")
 	public String regUser(@RequestParam String login, @RequestParam String password, @RequestParam String password2, @RequestParam String email, Model model) {
 		if(!password.equals(password2)) {
 			model.addAttribute("errorMsg", "Пароли не совпадают");
-			return "regPage";
+			return "registration";
 		}
 		User userByLogin = userRepo.findByUserLoginName(login);
 		if (userByLogin != null) {
 			model.addAttribute("errorMsg", "Введенный логин занят");
-			return "regPage";
+			return "registration";
 		}
 		User userByEmail = userRepo.findByEmail(email);
 		if (userByEmail != null) {
 			model.addAttribute("errorMsg", "Введенный email занят");
-			return "regPage";
+			return "registration";
 		}		
 		List<UserRole> roles = userRoleRepo.findByRole("USER");
-		User user = new User(login, password, email);
+		User user = new User(login, password, email, roles);
 		userRepo.save(user);		
 		return "redirect:/login";
 	}
