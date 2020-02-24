@@ -7,17 +7,16 @@ body {
 }
 
 a{
-	color: #fff; /*Белый цвет*/
+	font-size: 20px;
+	color: black;
 }
 a:hover{
+	color: white;
 	text-decoration: none;
 }
 
 b{
-	color: white;
-}
-
-b:hover{
+	font-size: 16px;
 	color: black;
 }
 
@@ -50,7 +49,7 @@ b:hover{
 input[type="text"], input[type="password"]{
 	width: 300px;
 	height: 30px;
-	font-size: 18px;
+	font-size: 16px;
 	margin-bottom: 25px;
 	border-radius: 5px;
 }
@@ -76,7 +75,20 @@ input[type="text"], input[type="password"]{
 
 .label{
 	font-family: Calibri;
-	font-size: 20px;
+	font-size: 16px;
 	font-style: italic;
 	color: #fff;
+}
+
+select{
+	width: 300px;
+	height: 30px;
+	font-size: 16px;
+	margin-bottom: 5px;
+	border-radius: 5px;
+}
+
+textarea{
+	font-family: tahoma;
+	font-size: 16px;
 }
