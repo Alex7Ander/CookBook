@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ValueConstants;
 
 import ru.pavlov.domain.Ingredient;
@@ -117,6 +118,14 @@ public class UserController {
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
 		model.addAttribute("ingredients", ingredients);
 		return "addrecipe";
+	}
+	
+	@GetMapping("getIngrList")
+	public @ResponseBody String getIngrList() {
+		return "<select>\r\n" + 
+				"<option value=\"none\">Морковка</option>\r\n" + 
+				"<option value=\"none\">Капустка</option>\r\n" +
+				"</select>";
 	}
 	
 	@PostMapping("setCurentIngrType")

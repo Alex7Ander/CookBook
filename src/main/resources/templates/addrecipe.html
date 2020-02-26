@@ -6,6 +6,7 @@
 		<link rel="stylesheet" th:href="@{/styles/add_recipe_style.css}" href="../static/styles/add_recipe_style.css" type="text/css">
 		<link rel="stylesheet" th:href="@{/styles/pop_up.css}" href="../static/styles/pop_up.css" type="text/css">
 		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
+		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
 		<script>
 			$(document).ready(function(){
 				//Скрыть PopUp при загрузке страницы    
@@ -104,27 +105,48 @@
 		<button form="saverecipeform" class = "dws-btn" type="submit"> Сохранить </button>
 		
 	<!-- Pop up window for adding ingredient -->
-		<div class="popup" id="add_ingr_popup">
+		<div class="popup" id="add_ingr_popup">	
+			<!-- AJAX script -->
+			<script>
+			function getIngrListFromServer(){
+				req = new asyncRequest()
+				element = document.getElementById('ingrList')
+				alert("Element: " + element);
+				req.onreadystatechange = function() {
+					if (req.readyState == 4) {
+						element.innerHTML = req.responseText
+						if(req.status == 200) {
+							alert("Ответ сервера: " + req.responseText);
+						}
+						else{
+							alert("Error" + req.status);
+						}
+					}
+				}
+				req.open("GET", "/user/getIngrList", true)
+				req.send("type")
+				element.innerHTML = 'Ожидаю ответа сервера...'
+			}
+			</script>
+			
 			<div class="popup-content">
 				<div>
 					<form id="addIngr" method="post" action="addIngrToList"> </form>
 					<b>Выбрать ингридиент</b><br>
 					
-					<form id="setCurentIngrType" method="post" action="setCurentIngrType">
 					<b>Категория ингридиента:</b><br>
 					<select name="type">
 						<option value="none" hidden="">Выберите тип</option>
 						<option th:each="type : ${ingrTypes}"> <p th:text=${type}> - </p> </option>
 					</select>
-					<button type="submit">Выбрать</button>
-					</form>
+					<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/>
 					
 					<br>
 					<b>Ингридиенты:</b><br>
-					<select>
+					<div id="ingrList"><select>
 						<option value="none" hidden="">Выберите игредиент</option>
 						<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
-					</select><br>
+					</select></div><br>
 					<a href="javascript:PopUpHide()">Добавить</a>
 					/
 					<a href="javascript:PopUpHide()">Отмена</a>					
