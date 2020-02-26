@@ -1,5 +1,6 @@
 package ru.pavlov.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,10 @@ public class UserController {
 	@Autowired 
 	private ReviewRepository reviewRepo;
 	
+	
+	private String curentIngrType = null;
+	private List<Ingredient> recipeIngredients = new ArrayList<>();
+	
 	@GetMapping("cookbook")
 	public String cookbook(Model model) {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
@@ -53,7 +58,12 @@ public class UserController {
 	}
 	
 	@GetMapping("addrecipe")
-	public String addrecipe() {
+	public String addrecipe(Model model) {
+		model.addAttribute("recipeIngredients", recipeIngredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);		
+		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
+		model.addAttribute("ingredients", ingredients);
 		return "addrecipe";
 	}
 	
@@ -94,7 +104,31 @@ public class UserController {
 		return "reviewbook";
 	}
 	
-//---------------------------------
+//---------------------------------	
+	@PostMapping("addIngrToList")
+	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) {
+		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
+		if (ingr != null) {
+			this.recipeIngredients.add(ingr);
+		}
+		model.addAttribute("recipeIngredients", recipeIngredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);		
+		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
+		model.addAttribute("ingredients", ingredients);
+		return "addrecipe";
+	}
+	
+	@PostMapping("setCurentIngrType")
+	public String setCurentIngrType(@RequestParam String type, Model model) {
+		this.curentIngrType = type;
+		model.addAttribute("recipeIngredients", recipeIngredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);		
+		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
+		model.addAttribute("ingredients", ingredients);
+		return "addrecipe";
+	}
 	
 	@PostMapping("saverecipe")
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
@@ -108,6 +142,7 @@ public class UserController {
 		recipeRepo.save(recipe);
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
+		this.recipeIngredients.clear();
 		return "cookbook";
 	}
 	

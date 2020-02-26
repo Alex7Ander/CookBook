@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">		
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
+		<title>Книга рецептов</title>
+	</head>
+	
+	<body>
+		<div class = "container">
+			<a href="/user/cookbook"> В книгу рецептов </a><br>
+			<a href="/user/myrecipes"> Мои рецепты </a><br>
+			<a href="/user/addrecipe"> Написать рецепт</a><br>	
+			<a href="/user/ingredients"> Ингридиенты</a><br>		
+			<a href="/user/editpersonal">Редактировать информацию о себе</a><br>
+			<a href="/user/reviewbook">Книга отзывов</a><br>
+			<a href="/logout">Выйти</a><br>
+		</div>				
+					
+		<div class = "container">
+			<b class = "label"> Имя: <span th:text="${user.getName()}"> - </span> </b>
+			<br>
+			<b class = "label"> Фамилия: <span th:text="${user.getSurname()}"> - </span> </b>
+			<br>
+			<b class = "label"> Я живу в: <span th:text="${user.getCity()}"> - </span> </b>
+			<br>
+			<b class = "label"> Темперамент: <span th:text="${user.getTemperament()}"> - </span> </b>
+			<br>
+			<b class = "label"> Телефон: <span th:text="${user.getPhone()}"> - </span> </b>
+			<br>
+			<b class = "label"> E-mail: <span th:text="${user.getEmail()}"> - </span> </b>
+			<br>
+		</div>
+	</body>
+</html>

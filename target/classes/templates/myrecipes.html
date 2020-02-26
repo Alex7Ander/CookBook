@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>CookBook</title>
+		<link rel="stylesheet" href="/styles/style.css" type="text/css">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	</head>	
+	<body>
+		<a class="label" href="personal">На свою страницу</a>
+		<div class = "recipecontainer" th:each="recipe : ${recipes}">
+			<form method="get" action="recipe">
+				<b class="label" name="id"><span th:text="${recipe.id}"> # </span></b>
+				<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
+				<p><span th:text="${recipe.type}"> Категория </span></p><br>
+				<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>			
+				<button class = "dws-btn" type="submit">Подробнее</button>
+				<button class = "dws-btn" type="submit">Редактировать</button>
+				<button class = "dws-btn" type="submit">Удалить</button><br>
+			</form>  
+		</div>
+	</body>
+</html>

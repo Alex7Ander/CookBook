@@ -16,9 +16,10 @@ import javax.persistence.Table;
 @Table(name = "ingredients")
 public class Ingredient {
 	public Ingredient() {}
-	public Ingredient(String name, int protein, int fat, int carbohydrate) {
-		super();
+	public Ingredient(String name, String type, String description, int protein, int fat, int carbohydrate) {
 		this.name = name;
+		this.type = type;
+		this.description = description;
 		this.protein = protein;
 		this.fat = fat;
 		this.carbohydrate = carbohydrate;
@@ -29,10 +30,14 @@ public class Ingredient {
 	private int id;
 	
 	private String name;
+	private String type;
 	private String description;
-	private int protein;
-	private int fat;
-	private int carbohydrate;
+	private double protein;
+	private double fat;
+	private double carbohydrate;
+	
+	//Как связать?
+	//private int currentAmmont;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "ingredient_id"), inverseJoinColumns=@JoinColumn(name = "recipe_id"))
@@ -50,23 +55,41 @@ public class Ingredient {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public int getProtein() {
+	public double getProtein() {
 		return protein;
 	}
-	public void setProtein(int protein) {
+	public void setProtein(double protein) {
 		this.protein = protein;
 	}
-	public int getFat() {
+	public double getFat() {
 		return fat;
 	}
-	public void setFat(int fat) {
+	public void setFat(double fat) {
 		this.fat = fat;
 	}
-	public int getCarbohydrate() {
+	public double getCarbohydrate() {
 		return carbohydrate;
 	}
-	public void setCarbohydrate(int carbohydrate) {
+	public void setCarbohydrate(double carbohydrate) {
 		this.carbohydrate = carbohydrate;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public List<Recipe> getRecipes() {
+		return recipes;
+	}
+	public void setRecipes(List<Recipe> recipes) {
+		this.recipes = recipes;
 	}
 	
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">		
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
+		<title>Книга рецептов</title>
+	</head>
+	
+	<body>								
+		<div class = "container">
+			<form method="post" action="editUser">
+				<a href="personal">Назад, на свою страницу</a><br>
+				<b class = "label"> Имя:  </b> <br>
+				<input type="text" name="name" th:value="${user.name}"> <br>
+				<b class = "label"> Фамилия: </b> <br>
+				<input type="text" name="surname" th:value="${user.surname}"> <br>
+				<b class = "label"> Я живу в: </b> <br>
+				<input type="text" name="city" th:value="${user.city}"> <br>
+				<b class = "label"> Темперамент: </b> <br>
+				<input type="text" name="temperament" th:value="${user.temperament}"> <br>
+				<b class = "label"> Телефон: </b> <br>
+				<input type="text" name="phone" th:value="${user.phone}"><br>
+				<input type="submit" value="Сохранить">
+			</form>
+		</div>
+	</body>
+</html>
