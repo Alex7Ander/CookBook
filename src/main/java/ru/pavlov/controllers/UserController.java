@@ -40,7 +40,6 @@ public class UserController {
 	@Autowired 
 	private ReviewRepository reviewRepo;
 	
-	
 	private String curentIngrType = null;
 	private List<Ingredient> recipeIngredients = new ArrayList<>();
 	
@@ -58,15 +57,7 @@ public class UserController {
 		return "recipe";
 	}
 	
-	@GetMapping("addrecipe")
-	public String addrecipe(Model model) {
-		model.addAttribute("recipeIngredients", recipeIngredients);
-		List<String> ingrTypes = ingrRepo.getIngrTypes();
-		model.addAttribute("ingrTypes", ingrTypes);		
-		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
-		model.addAttribute("ingredients", ingredients);
-		return "addrecipe";
-	}
+
 	
 	@GetMapping("myrecipes")
 	public String myRecipes(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
@@ -104,6 +95,23 @@ public class UserController {
 		model.addAttribute("reviews", reviews);
 		return "reviewbook";
 	}
+		
+	@GetMapping("addrecipe")
+	public String addrecipe(Model model) {
+		model.addAttribute("recipeIngredients", recipeIngredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);		
+		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
+		model.addAttribute("ingredients", ingredients);
+		return "addrecipe";
+	}
+	//AJAX 	
+	@GetMapping("getIngrList")
+	public String getIngrList(@RequestParam String type, Model model) {
+		List<Ingredient> ingredients =  ingrRepo.findByType(type);
+		model.addAttribute("ingredients", ingredients);
+		return "ingrSelectElement";
+	}
 	
 //---------------------------------	
 	@PostMapping("addIngrToList")
@@ -120,13 +128,7 @@ public class UserController {
 		return "addrecipe";
 	}
 	
-	@GetMapping("getIngrList")
-	public @ResponseBody String getIngrList() {
-		return "<select>\r\n" + 
-				"<option value=\"none\">Морковка</option>\r\n" + 
-				"<option value=\"none\">Капустка</option>\r\n" +
-				"</select>";
-	}
+
 	
 	@PostMapping("setCurentIngrType")
 	public String setCurentIngrType(@RequestParam String type, Model model) {
@@ -153,6 +155,27 @@ public class UserController {
 		model.addAttribute("recipes", recipes);
 		this.recipeIngredients.clear();
 		return "cookbook";
+	}
+	
+	@PostMapping("saveIngredient")
+	@ResponseBody
+	public String saveIngredient(@RequestParam String name, 
+									@RequestParam String type, 
+									@RequestParam String descr,
+									@RequestParam String prot, 
+									@RequestParam String fat, 
+									@RequestParam String carbo) {		
+		try {
+			int protein = Integer.parseInt(prot);
+			int fatInt = Integer.parseInt(fat);
+			int carbohydrate = Integer.parseInt(carbo);
+			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			this.ingrRepo.save(ingr);
+			Integer id = ingr.getId();
+			return id.toString();
+		} catch (Exception exp) {
+			return "0";
+		}		
 	}
 	
 	@PostMapping("editUser")

@@ -7,6 +7,7 @@
 		<link rel="stylesheet" th:href="@{/styles/pop_up.css}" href="../static/styles/pop_up.css" type="text/css">
 		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
 		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
+		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>				
 		<script>
 			$(document).ready(function(){
 				//Скрыть PopUp при загрузке страницы    
@@ -55,7 +56,7 @@
 		</div>
 		
 		<div>		
-			<table>
+			<table id="ingrTable">
 				<tr>
 					<th colspan = "3"><b>Ингридиенты</b></th>
 				</tr>
@@ -64,7 +65,6 @@
 					<th><b>Количество (гр/мл)</b></th>
 					<th><b>Управление</b></th>
 				</tr>
-				//recipeIngredients
 				<tr th:each="ingredient : ${recipeIngredients}">
 					<td><span th:text="${ingredient.name}"> - </span></td>
 					<td><input type="text"></input></td>
@@ -105,67 +105,93 @@
 		<button form="saverecipeform" class = "dws-btn" type="submit"> Сохранить </button>
 		
 	<!-- Pop up window for adding ingredient -->
-		<div class="popup" id="add_ingr_popup">	
-			<!-- AJAX script -->
-			<script>
-			function getIngrListFromServer(){
-				req = new asyncRequest()
-				element = document.getElementById('ingrList')
-				alert("Element: " + element);
-				req.onreadystatechange = function() {
-					if (req.readyState == 4) {
-						element.innerHTML = req.responseText
-						if(req.status == 200) {
-							alert("Ответ сервера: " + req.responseText);
-						}
-						else{
-							alert("Error" + req.status);
-						}
-					}
-				}
-				req.open("GET", "/user/getIngrList", true)
-				req.send("type")
-				element.innerHTML = 'Ожидаю ответа сервера...'
-			}
-			</script>
-			
+		<div class="popup" id="add_ingr_popup">				
 			<div class="popup-content">
 				<div>
 					<form id="addIngr" method="post" action="addIngrToList"> </form>
 					<b>Выбрать ингридиент</b><br>
 					
 					<b>Категория ингридиента:</b><br>
-					<select name="type">
+					<select id="ingrType" name="type">
 						<option value="none" hidden="">Выберите тип</option>
-						<option th:each="type : ${ingrTypes}"> <p th:text=${type}> - </p> </option>
+						<option th:each="type : ${ingrTypes}"> <b th:text=${type}> - </b> </option>
 					</select>
-					<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/>
+					<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br>
 					
-					<br>
 					<b>Ингридиенты:</b><br>
-					<div id="ingrList"><select>
+					<div id="ingrList">
+					<select id="ingrName">
 						<option value="none" hidden="">Выберите игредиент</option>
 						<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
-					</select></div><br>
-					<a href="javascript:PopUpHide()">Добавить</a>
+					</select>
+					</div><br>
+					<a href="javascript:addToTableExistingIngr()">Добавить</a>
 					/
 					<a href="javascript:PopUpHide()">Отмена</a>					
 				</div>
 				<div>
 					<form>
-					<b>Добавить новый ингридиент</b><br>	
+					<b>Добавить новый ингридиент</b><br>
+					<b>Имя:</b><br>
+					<input type = "text" id="newIngrName" name = "name" placeholder = "Имя"><br>
+					<b>Тип:</b><br>
+					<input type = "text" id="newIngrType" name = "type" placeholder = "Тип"><br>	
 					<b>Белки:</b><br>
-					<input type = "text" name = "name" placeholder = "Белки / 100гр"><br>
+					<input type = "text" id="newIngrProt" name = "prot" placeholder = "Белки / 100гр"><br>
 					<b>Жиры:</b><br>
-					<input type = "text" name = "name" placeholder = "Жиры / 100 гр"><br>
+					<input type = "text" id="newIngrFat" name = "fat" placeholder = "Жиры / 100 гр"><br>
 					<b>Углеводы:</b><br>
-					<input type = "text" name = "name" placeholder = "Углеводы / 100 гр"><br>
-					<a href="javascript:PopUpHide()">Сохранить новый и добавить его к рецепту</a>
+					<input type = "text" id="newIngrCarbo" name = "carbo" placeholder = "Углеводы / 100 гр"><br>
+					<b>Описание:<b></br>
+					<textarea id="newIngrDesription" name="descr" cols=20 rows=7> - </textarea><br>
+					<a href="javascript:saveNewIngredient()">Сохранить новый и добавить его к рецепту</a>
 					/
 					<a href="javascript:PopUpHide()">Отмена</a>
 					</form>
 				</div>
 			</div>
+			
+			<!-- AJAX script -->
+			<script>
+			function getIngrListFromServer(){
+				req = new asyncRequest();
+				element = document.getElementById('ingrList');
+				req.onreadystatechange = function() {
+					if (req.readyState == 4) {
+						element.innerHTML = req.responseText;
+						if(!req.status == 200) {
+							alert("Error: " + req.status);
+						}
+					}
+				}
+				var select = document.getElementById("ingrType");
+				var selectedValue = select.value;
+				var body = "?type=" + selectedValue;			
+				req.open("GET", "/user/getIngrList" + body);
+				req.send();
+				element.innerHTML = "Ожидаю ответа сервера...";
+			}
+			
+			function saveNewIngredient(){
+				var name = document.getElementById("newIngrName").value;
+				var type = document.getElementById("newIngrType").value; 
+				var descr = document.getElementById("newIngrDesription").value;
+				var prot = document.getElementById("newIngrProt").value;
+				var fat = document.getElementById("newIngrFat").value;
+				var carbo = document.getElementById("newIngrCarbo").value;
+				var ingr = new ingredient(name, type, descr, prot, fat, carbo);
+				ingr.save();
+				if (ingr.isSaved() == true) {
+					ingr.addToTable('ingrTable');
+					PopUpHide();
+				}
+			}
+			
+			function addToTableExistingIngr(){
+			
+			
+			}
+			</script>			
 		</div>
 		
 	</body>

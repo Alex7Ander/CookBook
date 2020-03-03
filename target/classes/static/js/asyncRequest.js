@@ -15,6 +15,5 @@ function asyncRequest(){
 			}			
 		}
 	}
-	alert('asyncRequest done: ' + request)
 	return request
 }
