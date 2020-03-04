@@ -108,7 +108,7 @@ public class UserController {
 	//AJAX 	
 	@GetMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {
-		List<Ingredient> ingredients =  ingrRepo.findByType(type);
+		List<Ingredient> ingredients = ingrRepo.findByType(type); //Ingredient
 		model.addAttribute("ingredients", ingredients);
 		return "ingrSelectElement";
 	}
