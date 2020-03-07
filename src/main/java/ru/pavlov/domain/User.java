@@ -52,7 +52,8 @@ public class User {
 	private String city;
 	private String temperament;
 	private String email;
-	private String phone;	   
+	private String phone;
+	private String avatarPath;
 	private int enabled;
 		
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -143,6 +144,14 @@ public class User {
 	}
 	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
+	}
+
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
 	}
 	
 }

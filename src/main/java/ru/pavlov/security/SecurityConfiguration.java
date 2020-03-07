@@ -34,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.antMatchers("/regPage").permitAll()
 			.antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
 			.antMatchers("/admin/**").hasRole("ADMIN")
-			.antMatchers("/img/**").permitAll()
+			.antMatchers("/img/**", "/uploadimg/**").permitAll()
 			.and().formLogin().loginPage("/login").permitAll().loginProcessingUrl("/login").successHandler(cookbookSuccessHandler())
 			.and().logout().permitAll();
 	}

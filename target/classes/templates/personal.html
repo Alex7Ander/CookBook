@@ -13,7 +13,23 @@
 				-o-background-size: cover;
 				background-size: cover;
 			}
-			
+			.dws-btn{
+				padding: 10px 30px;
+				margin: 5px 0 20px 0;
+				font-family: Calibri;
+				font-size: 24px;
+				font-style: italic;
+				color: #fff;
+				background-color: #008080;
+				border: none;
+				border-bottom: 4px solid #20B2AA;
+				cursor: pointer;
+			}
+			.dws-btn:hover{
+				transition: all 0.7s;
+				background: #fff;
+				color: #2c536C;
+			}
 			.navbar-default {
 				background-color: rgb(128, 128, 0, 0.7);
 				border-color: #27ae60;
@@ -25,18 +41,18 @@
 				color: orange;
 			}
 			.navbar-default .navbar-toggle {
-				border-color: orange;
+				border-color: black;
 			}
 			.navbar-default .navbar-toggle .icon-bar {
-				background-color: orange;
+				background-color: black;
 			}
 			
 			.cookBookContainer{
-				background-color: rgb(128, 128, 0, 0.7);
+				background-color: rgba(134, 134, 11, 0.7);
 				margin: 10px auto 0 auto;
 				text-align: left;
 				border-radius: 0 0 30px 30px;
-				color: yellow;
+				color: rgb(177, 177, 31);
 			}
 		</style>
 	</head>
@@ -78,8 +94,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
-					<img th:src="@{/img/autorisation_ico.png}" src="../static/img/autorisation_ico.png">
-					<button> Изменить фото </button>
+					<img th:src="${avatarPath}" src="../static/img/autorisation_ico.png">
 				</div>
 					
 				<div class="col-md-9  cookBookContainer">

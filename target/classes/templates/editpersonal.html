@@ -6,10 +6,11 @@
 		<title>Книга рецептов</title>
 	</head>
 	
-	<body>								
+	<body>				
 		<div class = "container">
-			<form method="post" action="editUser">
+			<form method="post" enctype="multipart/form-data" action="editUser">
 				<a href="personal">Назад, на свою страницу</a><br>
+				<input type="file" name="avatar">
 				<b class = "label"> Имя:  </b> <br>
 				<input type="text" name="name" th:value="${user.name}"> <br>
 				<b class = "label"> Фамилия: </b> <br>

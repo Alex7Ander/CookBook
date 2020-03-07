@@ -1,9 +1,13 @@
 package ru.pavlov.controllers;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ValueConstants;
+import org.springframework.web.multipart.MultipartFile;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
@@ -28,6 +33,9 @@ import ru.pavlov.security.CookBookUserDetails;
 @RequestMapping("/user/**")
 public class UserController {
 
+	@Value("${upload.path}")
+	private String uploadPath;
+	
 	@Autowired
 	private UserRepository userRepo;
 	
@@ -75,9 +83,18 @@ public class UserController {
 	}
 	
 	@GetMapping("personal")
-	public String personal(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
-		User currentUser = currentUserDetails.getUser();
-		model.addAttribute("user", currentUser);
+	public String personal(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
+		User currentUser = currentUserDetails.getUser();		
+		model.addAttribute("user", currentUser);		
+		String avatarPath = null;
+		if (currentUser.getAvatarPath().length() != 0) {
+			avatarPath = "/uploadimg/" + currentUser.getAvatarPath();
+		} 
+		else {
+			avatarPath = "/uploadimg/No_avatar.png";
+		}		 
+		System.out.println(avatarPath);
+		model.addAttribute("avatarPath", avatarPath);
 		return "personal";
 	}
 	
@@ -127,9 +144,7 @@ public class UserController {
 		model.addAttribute("ingredients", ingredients);
 		return "addrecipe";
 	}
-	
-
-	
+		
 	@PostMapping("setCurentIngrType")
 	public String setCurentIngrType(@RequestParam String type, Model model) {
 		this.curentIngrType = type;
@@ -184,14 +199,35 @@ public class UserController {
 							@RequestParam(required = false, name="city") String city,
 							@RequestParam(required = false, name="temperament") String temperament,
 							@RequestParam(required = false, name="phone") String phone,
-							@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {		
+							@RequestParam("avatar") MultipartFile avatar,
+							@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) throws IOException {		
 		User currentUser = currentUserDetails.getUser();
 		if (name != ValueConstants.DEFAULT_NONE) currentUser.setName(name);
 		if (surname != ValueConstants.DEFAULT_NONE) currentUser.setSurname(surname);
 		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
 		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
-		this.userRepo.setUserInfoById(currentUser.getId(), currentUser.getName(), currentUser.getSurname(), currentUser.getCity(), currentUser.getTemperament(), currentUser.getPhone());
+		this.userRepo.setUserInfoById(currentUser.getId(), 
+				currentUser.getName(), 
+				currentUser.getSurname(), 
+				currentUser.getCity(), 
+				currentUser.getTemperament(), 
+				currentUser.getPhone());		
+		
+		
+		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+				uploadDir.mkdir();
+            }
+            String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
+            String path = uploadPath + "/" + resultFileName;
+            File newFile = new File(path);
+            avatar.transferTo(newFile);
+            currentUser.setAvatarPath(resultFileName);
+            this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
+        }
+		
 		model.addAttribute("user", currentUser);
 		return "personal";
 	}
