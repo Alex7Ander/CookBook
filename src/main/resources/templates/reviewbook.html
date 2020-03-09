@@ -29,7 +29,7 @@
 						<a class="nav-link" href="/user/ingredients">Ингридиенты</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="/user/reviewbook">Книга отзывов</a>
+						<a class="nav-link" href="/user/personal">На свою страницу</a>
 					</li>
 				</ul>
 			</div>
@@ -40,23 +40,10 @@
 					</li>
 				</ul>
 			</div>
-		</nav>		
+		</nav>	
+			
 		<div class = "container">
-			<form method="post" enctype="multipart/form-data" action="editUser">
-				<a href="personal">Назад, на свою страницу</a><br>
-				<input type="file" name="avatar">
-				<b class = "label"> Имя:  </b> <br>
-				<input type="text" name="name" th:value="${user.name}"> <br>
-				<b class = "label"> Фамилия: </b> <br>
-				<input type="text" name="surname" th:value="${user.surname}"> <br>
-				<b class = "label"> Я живу в: </b> <br>
-				<input type="text" name="city" th:value="${user.city}"> <br>
-				<b class = "label"> Темперамент: </b> <br>
-				<input type="text" name="temperament" th:value="${user.temperament}"> <br>
-				<b class = "label"> Телефон: </b> <br>
-				<input type="text" name="phone" th:value="${user.phone}"><br>
-				<input type="submit" value="Сохранить">
-			</form>
+
 		</div>
 		
 		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
