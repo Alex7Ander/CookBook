@@ -214,19 +214,18 @@ public class UserController {
 				currentUser.getTemperament(), 
 				currentUser.getPhone());		
 		
-		
 		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
+			File uploadDir = new File(uploadPath);
+			if (!uploadDir.exists()) {
 				uploadDir.mkdir();
-            }
-            String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
-            String path = uploadPath + "/" + resultFileName;
-            File newFile = new File(path);
-            avatar.transferTo(newFile);
-            currentUser.setAvatarPath(resultFileName);
-            this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
-        }
+			}
+			String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
+			String path = uploadPath + "/" + resultFileName;
+			File newFile = new File(path);
+			avatar.transferTo(newFile);
+			currentUser.setAvatarPath(resultFileName);
+			this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
+		}
 		
 		model.addAttribute("user", currentUser);
 		return "personal";

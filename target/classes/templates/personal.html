@@ -4,41 +4,18 @@
 		<meta charset="utf-8">	
 		<title>Книга рецептов</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">			
 		<style type="text/css">
-			body {
-				background: url(../img/main.jpg) no-repeat center center fixed;
-				-webkit-background-size: cover;
-				-moz-background-size: cover;
-				-o-background-size: cover;
-				background-size: cover;
-			}
-			.dws-btn{
-				padding: 10px 30px;
-				margin: 5px 0 20px 0;
-				font-family: Calibri;
-				font-size: 24px;
-				font-style: italic;
-				color: #fff;
-				background-color: #008080;
-				border: none;
-				border-bottom: 4px solid #20B2AA;
-				cursor: pointer;
-			}
-			.dws-btn:hover{
-				transition: all 0.7s;
-				background: #fff;
-				color: #2c536C;
-			}
 			.navbar-default {
 				background-color: rgb(128, 128, 0, 0.7);
-				border-color: #27ae60;
+				border-color: black;
 			}
 			.navbar-default .navbar-brand {
-				color: orange;
+				color: black;
 			}
 			.navbar-default .navbar-nav > li > a {
-				color: orange;
+				color: black;
 			}
 			.navbar-default .navbar-toggle {
 				border-color: black;
@@ -52,52 +29,62 @@
 				margin: 10px auto 0 auto;
 				text-align: left;
 				border-radius: 0 0 30px 30px;
-				color: rgb(177, 177, 31);
+				color: b;
+			}
+			
+			.card{
+				background-color: rgba(134, 134, 11, 0.3);
 			}
 		</style>
 	</head>
 	
 	<body>
-		<nav style="background-color: rgb(128, 128, 0, 0.7)" class="navbar navbar-expand-lg navbar-default navbar-fixed-top" > 
-			<a class="navbar-brand" href="#">CookBook</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item ">
-						<a class="nav-link" href="/user/cookbook">В книгу рецептов</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/editpersonal">Редактировать информацию о себе</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/addrecipe">Написать рецепт</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/ingredients">Ингридиенты</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/reviewbook">Книга отзывов</a>
-					</li>
-				</ul>
+		<div class = "container-fluid">
+			<div class="row">
+				<div class="col">
+					<nav style="background-color: rgb(128, 128, 0, 0.7)" class="navbar navbar-expand-lg navbar-default navbar-fixed-top" > 
+						<a class="navbar-brand" href="#">CookBook</a>
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav mr-auto">
+								<li class="nav-item ">
+									<a class="nav-link" href="/user/cookbook">В книгу рецептов</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/editpersonal">Редактировать информацию о себе</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/addrecipe">Написать рецепт</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/ingredients">Ингридиенты</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/reviewbook">Книга отзывов</a>
+								</li>
+							</ul>
+						</div>
+						<div style="float: left">
+							<ul class="navbar-nav mr-auto">
+								<li class="nav-item">
+									<a class="nav-link" href="/logout">Выход</a>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
 			</div>
-			<div style="float: left">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="/logout">Выход</a>
-					</li>
-				</ul>
-			</div>
-		</nav>
+		</div>
 		
-		
+		<div class = "container-md">
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
 					<img th:src="${avatarPath}" src="../static/img/autorisation_ico.png">
 				</div>
 					
-				<div class="col-md-9  cookBookContainer">
+				<div class="col-md-9 cookBookContainer">
 					<b class = "label"> Имя: <span th:text="${user.getName()}"> - </span> </b> <br>
 					<b class = "label"> Фамилия: <span th:text="${user.getSurname()}"> - </span> </b> <br>
 					<b class = "label"> Я живу в: <span th:text="${user.getCity()}"> - </span> </b> <br>
@@ -123,10 +110,78 @@
 					<input type = "text" name = "tagline">
 				</div>
 				<div class="col-md-3 cookBookContainer">
-					<input type="submit" value="Искать">
+					<input type="submit" class="dws-btn" value="Искать">
 				</div>
-			<div>
-		
+			</div>
+
+			<div class="row">
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+				<div class="card" style="width: 25%;">
+					<img src="..." class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title">Название карточки</h5>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+					</div>
+				</div>
+			</div>
+		</div>
 		
 		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
