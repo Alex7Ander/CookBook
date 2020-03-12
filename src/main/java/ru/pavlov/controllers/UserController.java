@@ -129,9 +129,10 @@ public class UserController {
 		model.addAttribute("ingredients", ingredients);
 		return "ingrSelectElement";
 	}
-	
+		
 //---------------------------------	
-	@PostMapping("addIngrToList")
+	@GetMapping("addIngrToList")
+	@ResponseBody
 	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) {
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		if (ingr != null) {
@@ -142,7 +143,7 @@ public class UserController {
 		model.addAttribute("ingrTypes", ingrTypes);		
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
 		model.addAttribute("ingredients", ingredients);
-		return "addrecipe";
+		return ingr.getName() + "_" + ingr.getCarbohydrate();
 	}
 		
 	@PostMapping("setCurentIngrType")
