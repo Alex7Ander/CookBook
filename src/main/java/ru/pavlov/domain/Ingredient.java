@@ -26,7 +26,7 @@ public class Ingredient {
 	}
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private int id;
 	
 	private String name;
@@ -36,11 +36,8 @@ public class Ingredient {
 	private double fat;
 	private double carbohydrate;
 	
-	//Как связать?
-	//private int currentAmmont;
-	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "ingredient_id"), inverseJoinColumns=@JoinColumn(name = "recipe_id"))
+	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "ingredientId"), inverseJoinColumns=@JoinColumn(name = "recipeId"))
 	private List<Recipe> recipes;
 	
 	public int getId() {

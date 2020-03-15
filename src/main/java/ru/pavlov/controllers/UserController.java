@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
@@ -30,7 +31,7 @@ import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
-@RequestMapping("/user/**")
+@RequestMapping("/user/**")  
 public class UserController {
 
 	@Value("${upload.path}")
@@ -49,7 +50,8 @@ public class UserController {
 	private ReviewRepository reviewRepo;
 	
 	private String curentIngrType = null;
-	private List<Ingredient> recipeIngredients = new ArrayList<>();
+	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
+	private List<MultipartFile> newRecipePhotos = new ArrayList<>();
 	
 	@GetMapping("cookbook")
 	public String cookbook(Model model) {
@@ -65,12 +67,10 @@ public class UserController {
 		return "recipe";
 	}
 	
-
-	
 	@GetMapping("myrecipes")
 	public String myRecipes(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
 		User currentUser = currentUserDetails.getUser();
-		List<Recipe> myRecipes = recipeRepo.findByUserId(currentUser.getId());
+		List<Recipe> myRecipes = currentUser.getRecipes();
 		model.addAttribute("recipes", myRecipes);
 		return "myrecipes";
 	}
@@ -115,7 +115,7 @@ public class UserController {
 		
 	@GetMapping("addrecipe")
 	public String addrecipe(Model model) {
-		model.addAttribute("recipeIngredients", recipeIngredients);
+		model.addAttribute("recipeIngredients", newRecipeIngredients);
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);		
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
@@ -136,9 +136,9 @@ public class UserController {
 	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) {
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		if (ingr != null) {
-			this.recipeIngredients.add(ingr);
+			this.newRecipeIngredients.add(ingr);
 		}
-		model.addAttribute("recipeIngredients", recipeIngredients);
+		model.addAttribute("recipeIngredients", newRecipeIngredients);
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);		
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
@@ -149,7 +149,7 @@ public class UserController {
 	@PostMapping("setCurentIngrType")
 	public String setCurentIngrType(@RequestParam String type, Model model) {
 		this.curentIngrType = type;
-		model.addAttribute("recipeIngredients", recipeIngredients);
+		model.addAttribute("recipeIngredients", newRecipeIngredients);
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);		
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
@@ -161,15 +161,38 @@ public class UserController {
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
 								@RequestParam String name, 
 								@RequestParam String type, 
-								@RequestParam String tagline, 
+								@RequestParam String tagline,
+								@RequestParam String youtubeLink,
 								@RequestParam String text, 
-								Model model) {
-		Long userId= currentUserDetails.getUser().getId();
-		Recipe recipe = new Recipe(userId, name, type, tagline, text, null);
+								Model model) throws IOException {
+		User currentUser = currentUserDetails.getUser();
+		List<RecipePhoto> photos = new ArrayList<>();
+		
+		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, this.newRecipeIngredients);
+		
+		for (MultipartFile file:this.newRecipePhotos) {
+			if (file != null && !file.getOriginalFilename().isEmpty()) {
+				File uploadDir = new File(uploadPath);
+				if (!uploadDir.exists()) {
+					uploadDir.mkdir();
+				}
+				
+				String newFolderName = uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + type + "_" + name;
+				File newFolder = new File(newFolderName);
+				newFolder.mkdir();
+				
+				String resultFileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
+				String photoPath = uploadPath + "/" + resultFileName;
+				File newPhotoFile = new File(photoPath);
+				file.transferTo(newPhotoFile);
+				photos.add(new RecipePhoto(newPhotoFile.getAbsolutePath()));
+			}
+		}
+		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
-		this.recipeIngredients.clear();
+		this.newRecipeIngredients.clear();
 		return "cookbook";
 	}
 	
@@ -200,7 +223,7 @@ public class UserController {
 							@RequestParam(required = false, name="city") String city,
 							@RequestParam(required = false, name="temperament") String temperament,
 							@RequestParam(required = false, name="phone") String phone,
-							@RequestParam("avatar") MultipartFile avatar,
+							@RequestParam(required = false, name="avatar") MultipartFile avatar,
 							@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) throws IOException {		
 		User currentUser = currentUserDetails.getUser();
 		if (name != ValueConstants.DEFAULT_NONE) currentUser.setName(name);
@@ -226,9 +249,15 @@ public class UserController {
 			avatar.transferTo(newFile);
 			currentUser.setAvatarPath(resultFileName);
 			this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
-		}
-		
+		}		
 		model.addAttribute("user", currentUser);
 		return "personal";
+	}
+	
+	@GetMapping("addRecipePhoto")
+	@ResponseBody
+	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) {
+		this.newRecipePhotos.add(photo);
+		return "";
 	}
 }

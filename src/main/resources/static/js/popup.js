@@ -1,15 +1,13 @@
 $(document).ready(function(){
     //Скрыть PopUp при загрузке страницы    
-    PopUpHide();
+    PopUpHide("add_ingr_popup");
+	PopUpHide("add_photo_popup");
 });
 //Функция отображения PopUp
-function PopUpShow(){
-    $("#add_ingr_popup").show();
+function PopUpShow(id){
+    $("#"+id).show();
 }
 //Функция скрытия PopUp
-function PopUpHide(){
-    $("#add_ingr_popup").hide();
-}
-function DeleteIngr(){
-    
+function PopUpHide(id){
+    $("#"+id).hide();
 }

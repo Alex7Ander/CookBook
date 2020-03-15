@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -17,26 +19,33 @@ public class Recipe {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;	
+	private Long id;
 	
-	private String type;
 	private String name;
+	private String type;
 	private String tagline;
 	private String text;
+	private String youtubeLink;
 	
-	private Long userId;
+	@ManyToOne
+	@JoinColumn(name="userId")
+	private User cooker;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipe_id"), inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipeId"), inverseJoinColumns = @JoinColumn(name = "ingredientId"))
 	private List<Ingredient> ingredients;
+	
+	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
+	private List<RecipePhoto> photos;
 	
 	public Recipe() {}
 
-	public Recipe(Long userId, String name, String type, String tagline, String text, List<Ingredient> ingredients) {
-		this.userId = userId;
+	public Recipe(User cooker, String name, String type, String tagline, String youtubeLink, String text, List<Ingredient> ingredients) {
+		this.cooker = cooker;
 		this.type = type;
 		this.name = name;
 		this.tagline = tagline;
+		this.youtubeLink = youtubeLink;
 		this.text = text;
 		this.ingredients = ingredients;
 	}
@@ -72,12 +81,12 @@ public class Recipe {
 		this.text = text;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public User getUserId() {
+		return this.cooker;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setUserId(User cooker) {
+		this.cooker = cooker;
 	}
 
 	public List<Ingredient> getIngredients() {
@@ -86,6 +95,22 @@ public class Recipe {
 
 	public void setIngredients(List<Ingredient> ingredients) {
 		this.ingredients = ingredients;
+	}
+
+	public String getYoutubeLink() {
+		return youtubeLink;
+	}
+
+	public void setYoutubeLink(String youtubeLink) {
+		this.youtubeLink = youtubeLink;
+	}
+
+	public List<RecipePhoto> getPhotos() {
+		return photos;
+	}
+
+	public void setPhotos(List<RecipePhoto> photos) {
+		this.photos = photos;
 	}
 		
 }

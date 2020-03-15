@@ -11,14 +11,38 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
 @Entity
 @Table(name = "cookbook_users")
 public class User {
-	public User(){		
-	}
+
+	@Id
+    @GeneratedValue(strategy = GenerationType.AUTO)    
+    private Long id;
+	@Column(name = "login", unique = true)
+	private String userLoginName;
+    private String password; 
+	
+    private String name;
+	private String surname;
+	private String city;
+	private String temperament;
+	private String email;
+	private String phone;
+	private String avatarPath;
+	private int enabled;
+		
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns=@JoinColumn(name = "roleId"))
+	private List<UserRole> roles;
+	
+	@OneToMany(mappedBy="cooker", fetch=FetchType.LAZY)
+	private List<Recipe> recipes = new ArrayList<>();
+	
+	public User(){}
 	
 	public User(String userLoginName, String password, String name, String surname, String city, String temperament,
 			String email, String phone, int enabled) {
@@ -39,26 +63,6 @@ public class User {
 		this.email = email;
 		this.roles = roles;
 	}
-
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)    
-    private Long id;
-	@Column(name = "login", unique = true)
-	private String userLoginName;
-    private String password; 
-	
-    private String name;
-	private String surname;
-	private String city;
-	private String temperament;
-	private String email;
-	private String phone;
-	private String avatarPath;
-	private int enabled;
-		
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns=@JoinColumn(name = "role_id"))
-	private List<UserRole> roles;
 	
 	public Long getId() {
 		return id;
@@ -152,6 +156,14 @@ public class User {
 
 	public void setAvatarPath(String avatarPath) {
 		this.avatarPath = avatarPath;
+	}
+
+	public List<Recipe> getRecipes() {
+		return recipes;
+	}
+
+	public void setRecipes(List<Recipe> recipes) {
+		this.recipes = recipes;
 	}
 	
 }

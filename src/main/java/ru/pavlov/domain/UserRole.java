@@ -23,7 +23,7 @@ public class UserRole {
 	private String role;
 	
 	@ManyToMany
-	@JoinTable(name="users_roles", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+	@JoinTable(name="users_roles", joinColumns = @JoinColumn(name = "roleId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 	private List<User> users;
 	
 	public UserRole() {}
