@@ -207,9 +207,9 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-md-3">
-							<form action="" method="get" enctype="multipart/form-data" onsubmit="return sendPhoto();">
-								<input type="file" id="photoLoader" value="Загрузить фото" onchange="uploadFileToPage(event)">	
-								<input type="submit"> Добавить фото </input> <!-- a href="javascript:sendPhoto()" --> 
+							<form action="" method="get" enctype="multipart/form-data"> <!--  onsubmit="returnsendPhoto() -->
+								<input type="file" id="photoLoader" value="Загрузить фото" onchange="uploadFileToPage(event)">
+								<input type="button" class= "dws-btn" value="Load" onclick="addPhotoToPhotoList();"> Добавить фото </input> <!-- a href="javascript:sendPhoto()" --> 
 								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
 							</form>
 						</div>
@@ -221,6 +221,18 @@
 			</div>
 		</div>
 
+		<script>
+			function addPhotoToPhotoList(){
+				var element = document.getElementById('photoList');
+				var newPhotoCard = document.createElement('div');
+				newPhotoCard.className="card";
+				element.append(newPhotoCard);
+				var b = document.createElement("b");
+				b.innerText="TEXT";
+				newPhotoCard.append(b); 
+				PopUpHide('add_photo_popup');
+			}
+		</script>
 		<!-- my AJAX scripts -->
 					
 		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
