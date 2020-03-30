@@ -97,7 +97,7 @@
 						<b>Название:</b><br>
 						<input type = "text" name = "name" placeholder = "Название рецепта"><br>
 						<b>Категория:</b><br>
-						<select>
+						<select name = "type">
 							<option>Горячие блюда</option>
 							<option>Гарниры</option>
 							<option>Закуски</option>
@@ -109,7 +109,7 @@
 						<b>Слоган:</b><br>
 						<input type = "text" name = "tagline" placeholder = "Слоган"><br>	
 						<b>Ссылка на youtube:</b><br>
-						<input form="saverecipeform" type = "text" name="youtubelink" placeholder = "https://www.youtube.com/..."></input><br>				
+						<input form="saverecipeform" type = "text" name="youtubeLink" placeholder = "https://www.youtube.com/..."></input><br>				
 					</form>
 				</div>
 				<div class="col-md-9">
@@ -136,7 +136,7 @@
 			<div class="row">
 				<div class="col-md-12">
 					<b>Алгоритм: </b><br>
-					<textarea name="text" style="width: 100%; " rows=10>Итак, </textarea>					
+					<textarea form="saverecipeform" name="text" style="width: 100%; " rows=10>Итак, </textarea>					
 				</div>
 			</div>
 			
@@ -145,7 +145,9 @@
 				<!-- <a> href="javascript:PopUpShow('add_photo_popup')">Добавить фото</a> -->
 			</div>
 			
-			<div class="row" id="photoList"> </div>
+			<div class="row" id="photoList"> 
+				<b>Вы не загрузили еще ни одного фото</b><br>
+			</div>
 
 			<div class="row">
 				<button form="saverecipeform" class = "dws-btn" type="submit"> Сохранить </button>
@@ -224,6 +226,9 @@
 		</div>
 
 		<script>
+
+			let photoArray = new Array();
+
 			function addPhotoToPhotoList(){
 				var element = document.getElementById('photoList');
 				var newPhotoCard = document.createElement('div');
@@ -232,14 +237,12 @@
 				
 				// Image
 				var image = document.createElement('img');
-				var photoPath = document.getElementById('uploadedPhoto').src;				
+				var photoPath = document.getElementById('uploadedPhoto').src;
+				photoArray.push(photoPath);				
 				image.src = photoPath;
 				image.className = "mageContainer";
 				newPhotoCard.append(image);
 				// Delete link
-
-				//input type="button" class= "dws-btn" value="Добавить фото"
-
 				var deleteBtn = document.createElement('input');
 				deleteBtn.type="button";
 				deleteBtn.value = "Удалить";

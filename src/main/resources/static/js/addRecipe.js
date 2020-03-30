@@ -69,4 +69,4 @@ function sendPhoto(){
 function uploadFileToPage(event) {
     var output  = document.getElementById('uploadedPhoto');
     output.src = URL.createObjectURL(event.target.files[0]);
-  };
+};

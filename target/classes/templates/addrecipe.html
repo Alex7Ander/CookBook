@@ -37,6 +37,12 @@
 			
 			.card{
 				background-color: rgba(134, 134, 11, 0.5);
+				width: 25%;
+				height: 400px;
+			}
+
+			.imageContainer{
+				height: 75%;
 			}
 		</style>
 	
@@ -91,7 +97,7 @@
 						<b>Название:</b><br>
 						<input type = "text" name = "name" placeholder = "Название рецепта"><br>
 						<b>Категория:</b><br>
-						<select>
+						<select name = "type">
 							<option>Горячие блюда</option>
 							<option>Гарниры</option>
 							<option>Закуски</option>
@@ -103,7 +109,7 @@
 						<b>Слоган:</b><br>
 						<input type = "text" name = "tagline" placeholder = "Слоган"><br>	
 						<b>Ссылка на youtube:</b><br>
-						<input form="saverecipeform" type = "text" name="youtubelink" placeholder = "https://www.youtube.com/..."></input><br>				
+						<input form="saverecipeform" type = "text" name="youtubeLink" placeholder = "https://www.youtube.com/..."></input><br>				
 					</form>
 				</div>
 				<div class="col-md-9">
@@ -130,19 +136,17 @@
 			<div class="row">
 				<div class="col-md-12">
 					<b>Алгоритм: </b><br>
-					<textarea name="text" style="width: 100%; " rows=10>Итак, </textarea>					
+					<textarea form="saverecipeform" name="text" style="width: 100%; " rows=10>Итак, </textarea>					
 				</div>
 			</div>
 			
-			<div class="row">	
-				<a href="javascript:PopUpShow('add_photo_popup')">Добавить фото</a>
+			<div class="row">
+				<input type="button" value="Добавить фото" class = "dws-btn" onclick="PopUpShow('add_photo_popup');">	
+				<!-- <a> href="javascript:PopUpShow('add_photo_popup')">Добавить фото</a> -->
 			</div>
 			
-			<div class="row" id="photoList">
-				<div class="card" style="width: 25%;">
-					<img th:src="${avatarPath}" src="../static/img/autorisation_ico.png"><br>					
-					<a href="#" class="btn btn-primary">Удалить</a>
-				</div>				
+			<div class="row" id="photoList"> 
+				<b>Вы не загрузили еще ни одного фото</b><br>
 			</div>
 
 			<div class="row">
@@ -209,7 +213,7 @@
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data"> <!--  onsubmit="returnsendPhoto() -->
 								<input type="file" id="photoLoader" value="Загрузить фото" onchange="uploadFileToPage(event)">
-								<input type="button" class= "dws-btn" value="Load" onclick="addPhotoToPhotoList();"> Добавить фото </input> <!-- a href="javascript:sendPhoto()" --> 
+								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList();"><!-- a href="javascript:sendPhoto()" --> 
 								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
 							</form>
 						</div>
@@ -222,19 +226,38 @@
 		</div>
 
 		<script>
+
+			let photoArray = new Array();
+
 			function addPhotoToPhotoList(){
 				var element = document.getElementById('photoList');
 				var newPhotoCard = document.createElement('div');
 				newPhotoCard.className="card";
 				element.append(newPhotoCard);
-				var b = document.createElement("b");
-				b.innerText="TEXT";
-				newPhotoCard.append(b); 
+				
+				// Image
+				var image = document.createElement('img');
+				var photoPath = document.getElementById('uploadedPhoto').src;
+				photoArray.push(photoPath);				
+				image.src = photoPath;
+				image.className = "mageContainer";
+				newPhotoCard.append(image);
+				// Delete link
+				var deleteBtn = document.createElement('input');
+				deleteBtn.type="button";
+				deleteBtn.value = "Удалить";
+				deleteBtn.className = "btn btn-primary";
+				deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
+				newPhotoCard.append(deleteBtn);
 				PopUpHide('add_photo_popup');
 			}
+
+			function deletePhotoCard(){
+				var thisCard = parentNode;
+				alert(thisCard);
+			}
 		</script>
-		<!-- my AJAX scripts -->
-					
+
 		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
 		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
 		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>				
