@@ -254,10 +254,27 @@ public class UserController {
 		return "personal";
 	}
 	
-	@GetMapping("addRecipePhoto")
+	@PostMapping("addRecipePhoto")
 	@ResponseBody
-	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) {
+	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
+		String name = photo.getName();
+		System.out.println("Photo uploaded. Its name is: " + name);
 		this.newRecipePhotos.add(photo);
+		
+		/*
+		  //Ненужный код, который использовался лишь для проверки, что файл приходит.
+		  //Убрать когда метод будет полностью дописан!!!!
+		if (photo != null && !photo.getOriginalFilename().isEmpty()) {
+			File uploadDir = new File(uploadPath);
+			if (!uploadDir.exists()) {
+				uploadDir.mkdir();
+			}
+			String resultFileName = UUID.randomUUID().toString() + "." + photo.getOriginalFilename();
+			String path = uploadPath + "/" + resultFileName;
+			File newFile = new File(path);
+			photo.transferTo(newFile);
+		}	
+		*/
 		return "";
 	}
 }

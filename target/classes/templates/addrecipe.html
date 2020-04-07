@@ -45,8 +45,19 @@
 				height: 75%;
 			}
 		</style>
-	
+
+		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+		<!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+				
+		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
+		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
+		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}" src="../static/js/popup.js"></script>
+		<script th:src="@{/js/addRecipe.js}" src="../static/js/addRecipe.js" ></script>
 	</head>
+
 	<body>
 		<!-- Navigation -->
 		<div class = "container-fluid">
@@ -146,7 +157,7 @@
 			</div>
 			
 			<div class="row" id="photoList"> 
-				<b>Вы не загрузили еще ни одного фото</b><br>
+
 			</div>
 
 			<div class="row">
@@ -212,8 +223,8 @@
 					<div class="row">
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data"> <!--  onsubmit="returnsendPhoto() -->
-								<input type="file" id="photoLoader" value="Загрузить фото" onchange="uploadFileToPage(event)">
-								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList();"><!-- a href="javascript:sendPhoto()" --> 
+								<input type="file" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
+								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"><!-- a href="javascript:sendPhoto()" --> 
 								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
 							</form>
 						</div>
@@ -226,30 +237,53 @@
 		</div>
 
 		<script>
-
 			let photoArray = new Array();
+			let currentlyUploadedPhoto;
 
-			function addPhotoToPhotoList(){
-				var element = document.getElementById('photoList');
-				var newPhotoCard = document.createElement('div');
-				newPhotoCard.className="card";
-				element.append(newPhotoCard);
-				
-				// Image
-				var image = document.createElement('img');
-				var photoPath = document.getElementById('uploadedPhoto').src;
-				photoArray.push(photoPath);				
-				image.src = photoPath;
-				image.className = "mageContainer";
-				newPhotoCard.append(image);
-				// Delete link
-				var deleteBtn = document.createElement('input');
-				deleteBtn.type="button";
-				deleteBtn.value = "Удалить";
-				deleteBtn.className = "btn btn-primary";
-				deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
-				newPhotoCard.append(deleteBtn);
-				PopUpHide('add_photo_popup');
+			function getCurrentLyUploadedPhoto(event){
+				let photoFileLoader = document.getElementById('photoLoader');
+				currentlyUploadedPhoto = photoFileLoader.files[0];
+				let output  = document.getElementById('uploadedPhoto');
+    			output.src = URL.createObjectURL(currentlyUploadedPhoto); // event.target.files[0]
+			}
+
+			function addPhotoToPhotoList(event){
+				event.stopPropagation(); // остановка всех текущих JS событий
+				event.preventDefault();  // остановка дефолтного события для текущего элемента
+				var photoData = new FormData();
+				photoData.append('photo', currentlyUploadedPhoto);
+				alert(currentlyUploadedPhoto);
+				$.ajax({type: "POST", url: "/user/addRecipePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+					success: function(respond, status, jqXHR){
+						if( typeof respond.error === 'undefined' ){
+							var element = document.getElementById('photoList');
+							var newPhotoCard = document.createElement('div');
+							newPhotoCard.className="card";
+							element.append(newPhotoCard);	
+							// Image
+							var image = document.createElement('img');
+							var photoPath = document.getElementById('uploadedPhoto').src;
+							photoArray.push(photoPath);	
+							image.src = photoPath;
+							image.className = "mageContainer";
+							newPhotoCard.append(image);
+							// Delete link
+							var deleteBtn = document.createElement('input');
+							deleteBtn.type="button";
+							deleteBtn.value = "Удалить";
+							deleteBtn.className = "btn btn-primary";
+							deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
+							newPhotoCard.append(deleteBtn);
+							PopUpHide('add_photo_popup');
+						}
+						else{
+							alert('Error: ' + respond.data);
+						}
+					}, 
+					error: function(respond, status, jqXHR){
+						alert('Не удалось загрузить фото на сервер: ' + status);
+					}
+				});
 			}
 
 			function deletePhotoCard(){
@@ -257,15 +291,6 @@
 				alert(thisCard);
 			}
 		</script>
-
-		<script th:src="@{/js/jquery-3.4.1.js}" src="../static/js/jquery-3.4.1.js"></script>
-		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
-		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>				
-		<script th:src="@{/js/popup.js}" src="../static/js/popup.js"></script>
-		<script th:src="@{/js/addRecipe.js}" src="../static/js/addRecipe.js" ></script>
-		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
 
 	</body>
 </html>
