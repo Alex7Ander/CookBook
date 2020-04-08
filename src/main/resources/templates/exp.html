@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Main</title>
+		<meta charset="utf-8">
+		<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<h2>Example</h2>
+		<div>
+			<h5>Div block</h5>
+			<img src="../static/img/autorisation_ico.png">
+			<input type="button" value="Delete DIV" onClick="deleteDiv()">
+		</div>
+		
+		<script>
+			function deleteDiv(){
+				document.body.removeChild(event.target.parentNode);
+			}
+		</script>
+	</body>
+</html>

@@ -62,5 +62,4 @@ function ingredient(name, type, descr, prot, fat, carbo){
 		req.open("GET", "/user/addIngrToList"+body);
 		req.send();
 	}
-
 }

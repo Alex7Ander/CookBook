@@ -3,7 +3,9 @@ package ru.pavlov.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class UserController {
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
-	private List<MultipartFile> newRecipePhotos = new ArrayList<>();
+	private Map<Integer, MultipartFile> newRecipePhotos = new HashMap<>();
 	
 	@GetMapping("cookbook")
 	public String cookbook(Model model) {
@@ -157,66 +159,6 @@ public class UserController {
 		return "addrecipe";
 	}
 	
-	@PostMapping("saverecipe")
-	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
-								@RequestParam String name, 
-								@RequestParam String type, 
-								@RequestParam String tagline,
-								@RequestParam String youtubeLink,
-								@RequestParam String text, 
-								Model model) throws IOException {
-		User currentUser = currentUserDetails.getUser();
-		List<RecipePhoto> photos = new ArrayList<>();
-		
-		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, this.newRecipeIngredients);
-		
-		for (MultipartFile file:this.newRecipePhotos) {
-			if (file != null && !file.getOriginalFilename().isEmpty()) {
-				File uploadDir = new File(uploadPath);
-				if (!uploadDir.exists()) {
-					uploadDir.mkdir();
-				}
-				
-				String newFolderName = uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + type + "_" + name;
-				File newFolder = new File(newFolderName);
-				newFolder.mkdir();
-				
-				String resultFileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
-				String photoPath = uploadPath + "/" + resultFileName;
-				File newPhotoFile = new File(photoPath);
-				file.transferTo(newPhotoFile);
-				photos.add(new RecipePhoto(newPhotoFile.getAbsolutePath()));
-			}
-		}
-		recipe.setPhotos(photos);
-		recipeRepo.save(recipe);
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.addAttribute("recipes", recipes);
-		this.newRecipeIngredients.clear();
-		return "cookbook";
-	}
-	
-	@PostMapping("saveIngredient")
-	@ResponseBody
-	public String saveIngredient(@RequestParam String name, 
-									@RequestParam String type, 
-									@RequestParam String descr,
-									@RequestParam String prot, 
-									@RequestParam String fat, 
-									@RequestParam String carbo) {		
-		try {
-			int protein = Integer.parseInt(prot);
-			int fatInt = Integer.parseInt(fat);
-			int carbohydrate = Integer.parseInt(carbo);
-			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
-			this.ingrRepo.save(ingr);
-			Integer id = ingr.getId();
-			return id.toString();
-		} catch (Exception exp) {
-			return "0";
-		}		
-	}
-	
 	@PostMapping("editUser")
 	public String edituser(@RequestParam(required = false, name="name") String name, 
 							@RequestParam(required = false, name="surname") String surname,
@@ -257,13 +199,12 @@ public class UserController {
 	@PostMapping("addRecipePhoto")
 	@ResponseBody
 	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
-		String name = photo.getName();
-		System.out.println("Photo uploaded. Its name is: " + name);
-		this.newRecipePhotos.add(photo);
-		
+		Integer hashCode = photo.hashCode();
+		System.out.println("Photo uploaded. Its code is: " + hashCode.toString());
+		this.newRecipePhotos.put(hashCode, photo);		
 		/*
-		  //Ненужный код, который использовался лишь для проверки, что файл приходит.
-		  //Убрать когда метод будет полностью дописан!!!!
+		//Ненужный код, который использовался лишь для проверки, что файл приходит.
+		//Убрать когда метод будет полностью дописан!!!!
 		if (photo != null && !photo.getOriginalFilename().isEmpty()) {
 			File uploadDir = new File(uploadPath);
 			if (!uploadDir.exists()) {
@@ -275,6 +216,80 @@ public class UserController {
 			photo.transferTo(newFile);
 		}	
 		*/
-		return "";
+		return hashCode.toString();
+	}
+	
+	@PostMapping("deleteRecipePhoto")
+	@ResponseBody
+	public String deleteRecipePhoto(@RequestParam String code) {
+		Integer reqCode = null;
+		try {
+			reqCode = Integer.parseInt(code);
+			this.newRecipePhotos.remove(reqCode);
+		} 
+		catch(NumberFormatException nfExp) {
+			return "";
+		}		
+		return "0";
+	}
+	
+	@PostMapping("saverecipe")
+	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
+								@RequestParam String name, 
+								@RequestParam String type, 
+								@RequestParam String tagline,
+								@RequestParam String youtubeLink,
+								@RequestParam String text, 
+								Model model) throws IOException {
+		User currentUser = currentUserDetails.getUser();
+		List<RecipePhoto> photos = new ArrayList<>();
+		
+		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, this.newRecipeIngredients);
+		for (Integer photoKey : this.newRecipePhotos.keySet()) {
+			MultipartFile file = this.newRecipePhotos.get(photoKey);
+			if (file != null && !file.getOriginalFilename().isEmpty()) {
+				File uploadDir = new File(uploadPath);
+				if (!uploadDir.exists()) {
+					uploadDir.mkdir();
+				}
+				
+				String newFolderName = uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + type + "_" + name;
+				File newFolder = new File(newFolderName);
+				newFolder.mkdir();
+				
+				String resultFileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
+				String photoPath = uploadPath + "/" + resultFileName;
+				File newPhotoFile = new File(photoPath);
+				file.transferTo(newPhotoFile);
+				photos.add(new RecipePhoto(newPhotoFile.getAbsolutePath()));
+			}
+		}
+		recipe.setPhotos(photos);
+		recipeRepo.save(recipe);
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.addAttribute("recipes", recipes);
+		this.newRecipeIngredients.clear();
+		return "cookbook";
+	}
+	
+	@PostMapping("saveIngredient")
+	@ResponseBody
+	public String saveIngredient(@RequestParam String name, 
+								 @RequestParam String type, 
+								 @RequestParam String descr,
+								 @RequestParam String prot, 
+								 @RequestParam String fat, 
+								 @RequestParam String carbo) {		
+		try {
+			int protein = Integer.parseInt(prot);
+			int fatInt = Integer.parseInt(fat);
+			int carbohydrate = Integer.parseInt(carbo);
+			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			this.ingrRepo.save(ingr);
+			Integer id = ingr.getId();
+			return id.toString();
+		} catch (Exception exp) {
+			return "0";
+		}		
 	}
 }
