@@ -13,7 +13,7 @@ function ingredient(name, type, descr, prot, fat, carbo){
 				if(req.responseText == '0'){
 					saved = new Boolean(false);
 				}
-				else{
+				else {
 					saved = new Boolean(true);
 				}			
 				if(!req.status == 200) {
@@ -31,19 +31,47 @@ function ingredient(name, type, descr, prot, fat, carbo){
 		return saved;
 	}
 
-	this.addToTable = function(id){
-		var tbody = document.getElementById(id).getElementsByTagName("TBODY")[0];
-		var row = document.createElement("TR");		
+	this.addToTable = function(tableId){
+		var tbody = document.getElementById(tableId).getElementsByTagName("TBODY")[0];
+		var row = document.createElement("TR");	
+
+		var resultCalText = document.createElement('span');
+		var volumeInput = document.createElement('input');
+		volumeInput.oninput = function() {
+			var resultCalValue = this.getCalorificValue() * volumeInput.value;
+			resultCalText.innerHTML = "<b>" + resultCalValue + "</b>";
+		}
+		var deleteBtn = document.createElement('input')
+		deleteBtn.type = 'button';
+		deleteBtn.value= 'Удалить';
+		deleteBtn.setAttribute('onclick', 'this.deleteFromTable()');
+
 		var col1 = document.createElement("TD");
 		col1.appendChild(document.createTextNode(this.name));
+
 		var col2 = document.createElement("TD");
-		col2.appendChild(document.createElement('input'));
+		col2.appendChild(document.createTextNode(this.getCalorificValue()));
+
 		var col3 = document.createElement("TD");
-		col3.appendChild(document.createElement('button'));		
+		col3.appendChild(volumeInput);
+
+		var col4 = document.createElement("TD");
+		col4.appendChild(calText);
+
+		var col5 = document.createElement("TD");		
+		col5.appendChild(deleteBtn);	
+
 		row.appendChild(col1);
 		row.appendChild(col2);
 		row.appendChild(col3);
+		row.appendChild(col4);
+		row.appendChild(col5);
 		tbody.appendChild(row);    
+	}
+
+	this.deleteFromTable = function(){
+		var ch = event.target.parentNode;
+		ch.remove();
 	}
 	
 	this.getDataFromServer = function(name, type){
@@ -57,10 +85,15 @@ function ingredient(name, type, descr, prot, fat, carbo){
 				}
 				alert("Data from server: " + req.responseText);
 			}
+			this = JSON.parse(req.responseText);
 		}
 		var body = "?name=" + this.name + "&type=" + this.type;
 		req.open("GET", "/user/addIngrToList"+body);
 		req.send();
 	}
 
+	this.getCalorificValue = function(){
+		var calorificValue = this.fat*9 + this.carbo*4 + this.prot*4;
+		return calorificValue;
+	}
 }

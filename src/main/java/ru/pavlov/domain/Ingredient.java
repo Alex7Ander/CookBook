@@ -12,6 +12,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Table(name = "ingredients")
 public class Ingredient {
@@ -31,9 +33,12 @@ public class Ingredient {
 	
 	private String name;
 	private String type;
+	@JsonProperty("descr")
 	private String description;
+	@JsonProperty("prot")
 	private double protein;
 	private double fat;
+	@JsonProperty("carbo")
 	private double carbohydrate;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
