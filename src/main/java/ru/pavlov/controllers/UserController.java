@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.RecipePhoto;
@@ -135,7 +138,7 @@ public class UserController {
 //---------------------------------	
 	@GetMapping("addIngrToList")
 	@ResponseBody
-	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) {
+	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) throws JsonProcessingException {
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		if (ingr != null) {
 			this.newRecipeIngredients.add(ingr);
@@ -145,7 +148,9 @@ public class UserController {
 		model.addAttribute("ingrTypes", ingrTypes);		
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
 		model.addAttribute("ingredients", ingredients);
-		return ingr.getName() + "_" + ingr.getCarbohydrate();
+		ObjectMapper jsonCreator = new ObjectMapper();
+		String jsonResponse = jsonCreator.writeValueAsString(ingr);
+		return jsonResponse;
 	}
 		
 	@PostMapping("setCurentIngrType")

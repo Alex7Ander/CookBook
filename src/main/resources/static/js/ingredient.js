@@ -1,11 +1,12 @@
 function ingredient(name, type, descr, prot, fat, carbo){
+
 	this.name=name;
 	this.type=type;
 	this.descr=descr;
 	this.prot=prot;
 	this.fat=fat;
 	this.carbo=carbo;
-	
+
 	this.save = function() {
 		var req = new asyncRequest();
 		req.onreadystatechange = function() {
@@ -73,7 +74,7 @@ function ingredient(name, type, descr, prot, fat, carbo){
 		var ch = event.target.parentNode;
 		ch.remove();
 	}
-	
+
 	this.getDataFromServer = function(name, type){
 		this.name = name;
 		this.type = type; 
@@ -83,9 +84,8 @@ function ingredient(name, type, descr, prot, fat, carbo){
 				if(!req.status == 200) {
 					alert("Error: " + req.status);
 				}
-				alert("Data from server: " + req.responseText);
+				let newObject =  JSON.parse(req.responseText);
 			}
-			this = JSON.parse(req.responseText);
 		}
 		var body = "?name=" + this.name + "&type=" + this.type;
 		req.open("GET", "/user/addIngrToList"+body);
