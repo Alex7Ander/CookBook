@@ -14,6 +14,5 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 	
 	@Query(value="SELECT DISTINCT type FROM ingredients", nativeQuery=true)
 	public List<String> getIngrTypes();
-	
-		
+			
 }
