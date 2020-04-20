@@ -1,6 +1,7 @@
 package ru.pavlov.controllers;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class UserController {
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
-	private Map<Integer, MultipartFile> newRecipePhotos = new HashMap<>();
+	private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
 	
 	@GetMapping("cookbook")
 	public String cookbook(Model model) {
@@ -206,21 +207,8 @@ public class UserController {
 	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
 		Integer hashCode = photo.hashCode();
 		System.out.println("Photo uploaded. Its code is: " + hashCode.toString());
-		this.newRecipePhotos.put(hashCode, photo);		
-		/*
-		//Ненужный код, который использовался лишь для проверки, что файл приходит.
-		//Убрать когда метод будет полностью дописан!!!!
-		if (photo != null && !photo.getOriginalFilename().isEmpty()) {
-			File uploadDir = new File(uploadPath);
-			if (!uploadDir.exists()) {
-				uploadDir.mkdir();
-			}
-			String resultFileName = UUID.randomUUID().toString() + "." + photo.getOriginalFilename();
-			String path = uploadPath + "/" + resultFileName;
-			File newFile = new File(path);
-			photo.transferTo(newFile);
-		}	
-		*/
+		byte[] byteArray = photo.getBytes();
+		this.newRecipePhotos.put(hashCode, byteArray);		
 		return hashCode.toString();
 	}
 	
@@ -251,22 +239,20 @@ public class UserController {
 		
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, this.newRecipeIngredients);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
-			MultipartFile file = this.newRecipePhotos.get(photoKey);
-			if (file != null && !file.getOriginalFilename().isEmpty()) {
-				File uploadDir = new File(uploadPath);
+			byte[] byteArray = this.newRecipePhotos.get(photoKey);
+			if (byteArray.length != 0) {				
+				String recipePhotoFolder = uploadPath + name + "_" + type + "_" + UUID.randomUUID().toString();
+				File uploadDir = new File(recipePhotoFolder);
 				if (!uploadDir.exists()) {
 					uploadDir.mkdir();
 				}
+				String resultFullPhotoName = recipePhotoFolder + "/" + UUID.randomUUID().toString() + ".jpg";
+				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
+				fos.write(byteArray);
+				fos.close();
 				
-				String newFolderName = uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + type + "_" + name;
-				File newFolder = new File(newFolderName);
-				newFolder.mkdir();
-				
-				String resultFileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
-				String photoPath = uploadPath + "/" + resultFileName;
-				File newPhotoFile = new File(photoPath);
-				file.transferTo(newPhotoFile);
-				photos.add(new RecipePhoto(newPhotoFile.getAbsolutePath()));
+				RecipePhoto uploadedPhoto = new RecipePhoto(resultFullPhotoName);
+				photos.add(uploadedPhoto);
 			}
 		}
 		recipe.setPhotos(photos);
