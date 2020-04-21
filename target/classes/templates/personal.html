@@ -110,74 +110,20 @@
 					<input type = "text" name = "tagline">
 				</div>
 				<div class="col-md-3 cookBookContainer">
-					<input type="submit" class="dws-btn" value="Искать">
+					<input type="submit" class="dws-btn" value="Поиск">
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
+				<div class="card" style="width: 25%;" th:each="recipe : ${recipes}">
 					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
-					</div>
-				</div>
-				<div class="card" style="width: 25%;">
-					<img src="..." class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">Название карточки</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Переход куда-нибудь</a>
+						<form method="get" th:action="recipe">
+							<input type="hidden" name="recipeId" th:value="${recipe.id}">
+							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
+							<p><span th:text="${recipe.type}"> Категория </span></p><br>
+							<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>			
+							<button class = "dws-btn" type="submit">Подробнее</button><br>
+						</form> 
 					</div>
 				</div>
 			</div>

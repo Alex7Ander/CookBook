@@ -6,41 +6,78 @@
 		<title>Рецепт</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
+		<style type="text/css">
+			.navbar-default {
+				background-color: rgb(128, 128, 0, 0.7);
+				border-color: black;
+			}
+			.navbar-default .navbar-brand {
+				color: black;
+			}
+			.navbar-default .navbar-nav > li > a {
+				color: black;
+			}
+			.navbar-default .navbar-toggle {
+				border-color: black;
+			}
+			.navbar-default .navbar-toggle .icon-bar {
+				background-color: black;
+			}
+			
+			.cookBookContainer{
+				background-color: rgba(134, 134, 11, 0.7);
+				margin: 10px auto 0 auto;
+				text-align: left;
+				border-radius: 0 0 30px 30px;
+				color: b;
+			}
+			
+			.card{
+				background-color: rgba(134, 134, 11, 0.3);
+			}
+		</style>
 	</head>
 
 	<body>
-		<nav style="background-color: rgb(128, 128, 0, 0.7)" class="navbar navbar-expand-lg navbar-default navbar-fixed-top" > 
-			<a class="navbar-brand" href="#">CookBook</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item ">
-						<a class="nav-link" href="/user/cookbook">В книгу рецептов</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/personal">На свою страницу</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/addrecipe">Написать рецепт</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/ingredients">Ингридиенты</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/user/reviewbook">Книга отзывов</a>
-					</li>
-				</ul>
+		<div class = "container-fluid">
+			<div class="row">
+				<div class="col">
+					<nav style="background-color: rgb(128, 128, 0, 0.7)" class="navbar navbar-expand-lg navbar-default navbar-fixed-top" > 
+						<a class="navbar-brand" href="#">CookBook</a>
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav mr-auto">
+								<li class="nav-item ">
+									<a class="nav-link" href="/user/cookbook">В книгу рецептов</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/personal">На свою страницу</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/addrecipe">Написать рецепт</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/ingredients">Ингридиенты</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="/user/reviewbook">Книга отзывов</a>
+								</li>
+							</ul>
+						</div>
+						<div style="float: left">
+							<ul class="navbar-nav mr-auto">
+								<li class="nav-item">
+									<a class="nav-link" href="/logout">Выход</a>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
 			</div>
-			<div style="float: left">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="/logout">Выход</a>
-					</li>
-				</ul>
-			</div>
-		</nav>
+		</div>
+	
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-3">					
@@ -49,23 +86,20 @@
 					<b>Категория:</b> <b><span th:text="${recipe.type}"> - </span></b><br>
 					<b>Слоган:</b> <b><span th:text="${recipe.tagline}"> - </span></b><br>	
 				</div>
-				<div  class="col-md-3">
-					<iframe width="560" height="315" src="https://www.youtube.com/embed/faewx63QeYg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
-				</div>
 				<div class="col-md-6">
+					<h4>Ингредиенты</h4><br>
 					<table id="ingrTable">
 						<tr>
-							<th><b>Ингридиенты</b></th>
-							<th><b>Количество (гр/мл)</b></th>
+							<td>Ингридиент</td>
+							<td>Количество (гр/мл)</td>
 						</tr>
-						<!--
-						<tr>
-							<td><b>Ингридиенты</b></td>
-							<td><b>Количество (гр/мл)</b></td>
-							<td><b>Управление</b></td>
-						</tr>
-						-->
+						<tr th:each="ingredient : ${ingredients}">
+							<th><span th:text="${ingredient.name}"></th>
+						</tr>	
 					</table>
+				</div>
+				<div  class="col-md-3">
+					<iframe width="560" height="315" th:src="${recipe.youtubeLink}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
 				</div>
 			</div>
 		</div>

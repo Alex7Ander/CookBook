@@ -5,10 +5,11 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.User;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Integer>  {
 	public List<Recipe> findByType(String type);
 	public List<Recipe> findByName(String type);
-	//public List<Recipe> findByUserId(Long userId);
+	public List<Recipe> findByCooker(User cooker);
 	public Recipe findById(Long id);
 }

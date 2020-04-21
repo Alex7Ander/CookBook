@@ -70,6 +70,8 @@ public class UserController {
 	public String recipe(@RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
 		model.addAttribute("recipe", recipe);
+		List<Ingredient> ingredients = recipe.getIngredients();
+		model.addAttribute("ingredients", ingredients);
 		return "recipe";
 	}
 	
@@ -93,14 +95,16 @@ public class UserController {
 		User currentUser = currentUserDetails.getUser();		
 		model.addAttribute("user", currentUser);		
 		String avatarPath = null;
-		if (currentUser.getAvatarPath().length() != 0) {
+		if (currentUser.getAvatarPath() != null) {
 			avatarPath = "/uploadimg/" + currentUser.getAvatarPath();
 		} 
 		else {
 			avatarPath = "/uploadimg/No_avatar.png";
 		}		 
-		System.out.println(avatarPath);
 		model.addAttribute("avatarPath", avatarPath);
+		
+		Iterable<Recipe> recipes = recipeRepo.findByCooker(currentUser);
+		model.addAttribute("recipes", recipes);
 		return "personal";
 	}
 	
