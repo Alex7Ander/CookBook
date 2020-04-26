@@ -44,7 +44,6 @@
 			.imageContainer{
 				height: 75%;
 			}
-
 		</style>
 
 		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
@@ -53,9 +52,9 @@
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
 	
 		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
-		<script th:src="@{/js/addRecipe.js}" src="../static/js/addRecipe.js" ></script>
-		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>				
-		<script th:src="@{/js/popup.js}" src="../static/js/popup.js"></script>	
+		<script th:src="@{/js/addRecipe.js}"    src="../static/js/addRecipe.js" ></script>
+		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>	
 	</head>
 
 	<body>
@@ -232,94 +231,7 @@
 		</div>
 
 		<script>
-			let currentlyUploadedPhoto;
-			var count = 0;
-			function getCurrentLyUploadedPhoto(event){
-				let photoFileLoader = document.getElementById('photoLoader');
-				currentlyUploadedPhoto = photoFileLoader.files[0];
-				let output  = document.getElementById('uploadedPhoto');
-    			output.src = URL.createObjectURL(currentlyUploadedPhoto); // event.target.files[0]
-			}
-
-			function addPhotoToPhotoList(event){
-				event.stopPropagation(); // остановка всех текущих JS событий
-				event.preventDefault();  // остановка дефолтного события для текущего элемента
-				let photoData = new FormData();
-				photoData.append('photo', currentlyUploadedPhoto);
-				$.ajax({type: "POST", url: "/user/addRecipePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
-					success: function(respond, status, jqXHR){
-						if( typeof respond.error === 'undefined' ){
-							showUploadedPhotoOnMainPage(respond);							
-						}
-						else{
-							alert('Error: ' + respond.data);
-						}
-					}, 
-					error: function(respond, status, jqXHR){
-						alert('Не удалось загрузить фото на сервер: ' + status);
-					},
-					complete: function(){
-						//showUploadedPhotoOnMainPage('respond');
-						PopUpHide('add_photo_popup');
-					}
-				});
-			}
-
-			function showUploadedPhotoOnMainPage(code){
-				var element = document.getElementById('photoList');
-				var newPhotoCard = document.createElement('div');
-				newPhotoCard.id = count;
-				newPhotoCard.className = "card";
-				element.append(newPhotoCard);	
-				// Image
-				var image = document.createElement('img');
-				var photoPath = document.getElementById('uploadedPhoto').src;
-				image.src = photoPath;
-				image.className = "imageContainer";
-				newPhotoCard.append(image);
-				// Hidden input with hashcode
-				var codeInput = document.createElement('input');
-				codeInput.type = "hidden";
-				codeInput.id="hidden_" + count;
-				codeInput.className = "hiddenInput";
-				codeInput.value = code;
-				newPhotoCard.append(codeInput);
-				// Delete link
-				var deleteBtn = document.createElement('input');
-				deleteBtn.type="button";
-				deleteBtn.value = "Удалить";
-				deleteBtn.className = "btn btn-primary";
-				deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
-				deleteBtn.id = count;
-				newPhotoCard.append(deleteBtn);
-				count++;
-			}
-
-			function deletePhotoCard(){
-				let ch = event.target.parentNode;
-				let index = ch.id;
-				let currentHiddenInput = document.getElementById("hidden_" + index);
-				let code = currentHiddenInput.value;
-
-				let photoData = new FormData();
-				photoData.append('code', code);
-				
-				$.ajax({type: "POST", url: "/user/deleteRecipePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
-					success: function(respond, status, jqXHR) {
-						if (typeof respond.error === 'undefined') {	
-							let parent = document.getElementById('photoList');
-							parent.removeChild(ch);	
-							alert('Фотография успешно удалена');						
-						}
-						else {
-							alert('Error: ' + respond.data);
-						}
-					}, 
-					error: function(respond, status, jqXHR) {
-						alert('Ошибка при удалении фотографии: ' + status);
-					}
-				});
-			}
+			
 		</script>
 	</body>
 </html>
