@@ -125,11 +125,11 @@
 				<div class="col-md-9">
 					<table id="ingrTable">
 						<tr>
-							<th><b>Ингридиенты</b></th>
-							<th><b>Калорийность / 100 гр</b></th>							
-							<th><b>Количество (гр/мл)</b></th>
-							<th><b>Калорийность</b></th>
-							<th><b>Удаление</b></th>
+							<th>Ингридиенты</th>
+							<th>Калорийность / 100 гр</th>							
+							<th>Количество (гр/мл)</th>
+							<th>Калорийность</th>
+							<th>Удаление</th>
 						</tr>
 						<tr>
 							<th colspan="5"><a href="javascript:PopUpShow('add_ingr_popup')">Добавить</a></th>
@@ -216,9 +216,9 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-md-3">
-							<form action="" method="get" enctype="multipart/form-data"> <!--  onsubmit="returnsendPhoto() -->
-								<input type="file" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
-								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"><!-- a href="javascript:sendPhoto()" --> 
+							<form action="" method="get" enctype="multipart/form-data">
+								<input type="file" class= "dws-btn" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
+								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
 								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
 							</form>
 						</div>

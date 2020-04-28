@@ -143,7 +143,7 @@ public class UserController {
 //---------------------------------	
 	@GetMapping("addIngrToList")
 	@ResponseBody
-	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model) throws JsonProcessingException {
+	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model){
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		if (ingr != null) {
 			this.newRecipeIngredients.add(ingr);
@@ -154,8 +154,15 @@ public class UserController {
 		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
 		model.addAttribute("ingredients", ingredients);
 		ObjectMapper jsonCreator = new ObjectMapper();
-		String jsonResponse = jsonCreator.writeValueAsString(ingr);
-		return jsonResponse;
+		try {
+			String jsonResponse = jsonCreator.writeValueAsString(ingr);
+			return jsonResponse;
+		}
+		catch(JsonProcessingException jpExp) {
+			System.out.println(jpExp.getMessage());
+			//jpExp.printStackTrace();
+			return "{name:'Error'}";
+		}		
 	}
 		
 	@PostMapping("setCurentIngrType")

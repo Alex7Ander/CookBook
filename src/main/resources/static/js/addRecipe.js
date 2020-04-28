@@ -1,9 +1,11 @@
-var ingredientsMap = new Map();
+var ingredientsMap = new Map(); //Списко ингредиентов
  
-let currentlyUploadedPhoto;
-var count = 0;
+let currentlyUploadedPhoto;  //последнее загруженное фото
+var photoCount = 0;  //Порядковый индекс загруженной фотографии
 
-//
+/*
+Управление фотографиями
+*/
 function getCurrentLyUploadedPhoto(event){
 	let photoFileLoader = document.getElementById('photoLoader');
 	currentlyUploadedPhoto = photoFileLoader.files[0];
@@ -29,7 +31,6 @@ function addPhotoToPhotoList(event){
 			alert('Не удалось загрузить фото на сервер: ' + status);
 		},
 		complete: function(){
-			//showUploadedPhotoOnMainPage('respond');
 			PopUpHide('add_photo_popup');
 		}
 	});
@@ -38,7 +39,7 @@ function addPhotoToPhotoList(event){
 function showUploadedPhotoOnMainPage(code){
 	var element = document.getElementById('photoList');
 	var newPhotoCard = document.createElement('div');
-	newPhotoCard.id = count;
+	newPhotoCard.id = photoCount;
 	newPhotoCard.className = "card";
 	element.append(newPhotoCard);	
 	// Image
@@ -50,7 +51,7 @@ function showUploadedPhotoOnMainPage(code){
 	// Hidden input with hashcode
 	var codeInput = document.createElement('input');
 	codeInput.type = "hidden";
-	codeInput.id="hidden_" + count;
+	codeInput.id="hidden_" + photoCount;
 	codeInput.className = "hiddenInput";
 	codeInput.value = code;
 	newPhotoCard.append(codeInput);
@@ -60,14 +61,14 @@ function showUploadedPhotoOnMainPage(code){
 	deleteBtn.value = "Удалить";
 	deleteBtn.className = "btn btn-primary";
 	deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
-	deleteBtn.id = count;
+	deleteBtn.id = photoCount;
 	newPhotoCard.append(deleteBtn);
-	count++;
+	photoCount++;
 }
 
 function deletePhotoCard(){
-	let ch = event.target.parentNode;
-	let index = ch.id;
+	let currentPhotoCard = event.target.parentNode;
+	let index = currentPhotoCard.id;
 	let currentHiddenInput = document.getElementById("hidden_" + index);
 	let code = currentHiddenInput.value;
 
@@ -78,7 +79,7 @@ function deletePhotoCard(){
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
 				let parent = document.getElementById('photoList');
-				parent.removeChild(ch);	
+				currentPhotoCard.remove();
 				alert('Фотография успешно удалена');						
 			}
 			else {
@@ -91,6 +92,10 @@ function deletePhotoCard(){
 	});
 }
 
+
+/*
+Управление списком ингредиентов
+*/
 function getIngrListFromServer(){
     req = new asyncRequest();
     element = document.getElementById('ingrList');
@@ -145,6 +150,7 @@ function addExistingIngrToTable(){
 		volumeInput.oninput = function() {
 			var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
 			resultCalText.innerHTML = "<b>" + resultCalValue + "</b>";
+			ingredientsMap.set(ingr.name, volumeInput.value);
 		}
 		var deleteBtn = document.createElement('input')
 		deleteBtn.type = 'button';
@@ -180,28 +186,16 @@ function addExistingIngrToTable(){
 }
 
 function deleteIngrFromTable(){
-	var ch = event.target.parentNode;	
-	var ingrName = ch.getElementByTagName('input').value;
-	ingredientsMap.delete(ingrName);
-	ch.parentNode.remove();
+	var currentLine = event.target.parentNode.parentNode;
+	var currentIngrName = currentLine.childNodes[0].innerText;
+	ingredientsMap.delete(currentIngrName);
+	currentLine.remove();
 }
 
-function sendPhoto(){
-    var req = new asyncRequest();
-    req.onreadystatechange = function() {
-        if (req.readyState == 4) {			
-            if(req.status != 200) {
-                alert("Error: " + req.status);
-            }
-        }
-    }
-    var inputFile = document.getElementById('photoLoader');
-    var body = "photo=" + inputFile.value;	
-    req.open("Get", "/user/addRecipePhoto?"+body, false);
-    req.send();
-}
+/*
+Сохранение рецепта
+*/
 
-function uploadFileToPage(event) {
-    var output  = document.getElementById('uploadedPhoto');
-    output.src = URL.createObjectURL(event.target.files[0]);
-};
+function saveRecipe(event){
+	
+}
