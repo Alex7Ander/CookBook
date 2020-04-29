@@ -92,7 +92,6 @@ function deletePhotoCard(){
 	});
 }
 
-
 /*
 Управление списком ингредиентов
 */
@@ -142,20 +141,30 @@ function addExistingIngrToTable(){
 		//Adding line to table
 		var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 		var row = document.createElement("TR");	
-		var resultCalText = document.createElement('span');
-		var volumeInput = document.createElement('input');
-		var hiddenNameInput = document.createElement('input');
-		hiddenNameInput.setAttribute('type', 'hidden');
-		hiddenNameInput.setAttribute('value', ingr.name);
+
+		//Поле с итоговой калорийностью для ингредиента
+		var resultCalorificValueField = document.createElement('b'); //span
+
+		//Поле для ввода количества ингредиента
+		var volumeInput = document.createElement('input'); 
+		volumeInput.setAttribute('form', 'saverecipeform');
+		volumeInput.setAttribute('name', ingr.name);
+		/*
+		volumeInput.form = "saverecipeform";
+		volumeInput.name = ingr.name;
+		*/
 		volumeInput.oninput = function() {
 			var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
-			resultCalText.innerHTML = "<b>" + resultCalValue + "</b>";
+			resultCalorificValueField.innerText = resultCalValue;  //resultCalorificValueField.innerHTML = "<b>" + resultCalValue + "</b>";
 			ingredientsMap.set(ingr.name, volumeInput.value);
 		}
-		var deleteBtn = document.createElement('input')
+
+		//Кнопка удаления мнгредиента
+		var deleteBtn = document.createElement('input'); 
 		deleteBtn.type = 'button';
 		deleteBtn.value= 'Удалить';
 		deleteBtn.setAttribute('onclick', 'deleteIngrFromTable()');
+
 		var col1 = document.createElement("TD");
 		col1.appendChild(document.createTextNode(ingr.name));
 		var col2 = document.createElement("TD");
@@ -163,7 +172,7 @@ function addExistingIngrToTable(){
 		var col3 = document.createElement("TD");
 		col3.appendChild(volumeInput);
 		var col4 = document.createElement("TD");
-		col4.appendChild(resultCalText);
+		col4.appendChild(resultCalorificValueField);
 		var col5 = document.createElement("TD");		
 		col5.appendChild(deleteBtn);	
 		
@@ -197,5 +206,28 @@ function deleteIngrFromTable(){
 */
 
 function saveRecipe(event){
-	
+	event.preventDefault();
+	var recipeData = new FormData(saverecipeform);
+	for(let ingr of ingredientsMap.keys()){
+		recipeData.append(ingr, ingredientsMap.get(ingr));
+	}
+
+	var request = new XMLHttpRequest();
+	request.open("POST", "/user/saverecipe");
+	request.send(recipeData);
+	/*
+	$.ajax({type: "POST", url: "/user/saverecipe", cache: false, contentType: false, processData : false, data: recipeData,
+		success: function(respond, status, jqXHR) {
+			if (typeof respond.error === 'undefined') {	
+				alert('Рецепт успешно сохранен');						
+			}
+			else {
+				alert('Error: ' + respond.data);
+			}
+		}, 
+		error: function(respond, status, jqXHR) {
+			alert('Ошибка при сохранении рецепта: ' + status);
+		}
+	});
+	*/
 }

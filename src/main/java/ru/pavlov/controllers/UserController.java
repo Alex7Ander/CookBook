@@ -238,13 +238,23 @@ public class UserController {
 	}
 	
 	@PostMapping("saverecipe")
+	//@ResponseBody
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
-								@RequestParam String name, 
+								@RequestParam Map<String, String> allParametrs,
+								Model model) throws IOException {
+		
+		for (String key: allParametrs.keySet()) {
+			System.out.println(key + ": " + allParametrs.get(key));
+		}
+		System.out.println("-----------------------------------");
+		/*
+		 						@RequestParam String name, 
 								@RequestParam String type, 
 								@RequestParam String tagline,
 								@RequestParam String youtubeLink,
-								@RequestParam String text, 
-								Model model) throws IOException {
+								@RequestParam String text,
+		 */
+		/*
 		User currentUser = currentUserDetails.getUser();
 		List<RecipePhoto> photos = new ArrayList<>();
 		
@@ -270,7 +280,7 @@ public class UserController {
 		recipeRepo.save(recipe);
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
-		this.newRecipeIngredients.clear();
+		this.newRecipeIngredients.clear();*/
 		return "cookbook";
 	}
 	

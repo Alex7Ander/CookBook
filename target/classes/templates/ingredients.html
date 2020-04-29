@@ -45,8 +45,7 @@
 			<form method="get" th:action="recipe">
 				<input type="hidden" name="recipeId" th:value="${ingredient.id}">
 				<b class="label"><span th:text="${ingredient.name}"> Название </span></b><br>
-				<p><span th:text="${ingredient.type}"> Категория </span></p><br>
-				<p><span th:text="${ingredient.tagline}"> Слоган </span></p><br>			
+				<p><span th:text="${ingredient.type}"> Категория </span></p><br>			
 				<button class = "dws-btn" type="submit">Подробнее</button><br>
 			</form>  
 		</div>
