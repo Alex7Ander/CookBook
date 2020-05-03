@@ -1,5 +1,6 @@
 package ru.pavlov.domain;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,8 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -29,25 +28,24 @@ public class Recipe {
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
-	private User cooker;
+	private User recipeAuther;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipeId"), inverseJoinColumns = @JoinColumn(name = "ingredientId"))
-	private List<Ingredient> ingredients;
+	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
+	private Set<IngredientVolume> ingredients;
 	
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
 	
 	public Recipe() {}
 
-	public Recipe(User cooker, String name, String type, String tagline, String youtubeLink, String text, List<Ingredient> ingredients) {
-		this.cooker = cooker;
+	public Recipe(User recipeAuther, String name, String type, String tagline, String youtubeLink, String text, Set<IngredientVolume> ingredientsVolume) {
+		this.recipeAuther = recipeAuther;
 		this.type = type;
 		this.name = name;
 		this.tagline = tagline;
 		this.youtubeLink = youtubeLink;
 		this.text = text;
-		this.ingredients = ingredients;
+		this.ingredients = ingredientsVolume;
 	}
 
 	public Long getId() {
@@ -81,19 +79,19 @@ public class Recipe {
 		this.text = text;
 	}
 
-	public User getUserId() {
-		return this.cooker;
+	public User getRecipeAuther() {
+		return this.recipeAuther;
 	}
 
-	public void setUserId(User cooker) {
-		this.cooker = cooker;
+	public void setRecipeAuther(User recipeAuther) {
+		this.recipeAuther = recipeAuther;
 	}
 
-	public List<Ingredient> getIngredients() {
+	public Set<IngredientVolume> getIngredients() {
 		return ingredients;
 	}
 
-	public void setIngredients(List<Ingredient> ingredients) {
+	public void setIngredients(Set<IngredientVolume> ingredients) {
 		this.ingredients = ingredients;
 	}
 

@@ -10,6 +10,6 @@ import ru.pavlov.domain.User;
 public interface RecipeRepository extends JpaRepository<Recipe, Integer>  {
 	public List<Recipe> findByType(String type);
 	public List<Recipe> findByName(String type);
-	public List<Recipe> findByCooker(User cooker);
+	public List<Recipe> findByRecipeAuther(User recipeAuther);
 	public Recipe findById(Long id);
 }

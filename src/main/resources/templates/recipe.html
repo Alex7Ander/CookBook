@@ -82,11 +82,12 @@
 			<div class="row">
 				<div class="col-md-3">					
 					<h4>Основная информация</h4><br>
-					<b>Название:</b> <b class="label"> <span th:text="${recipe.name}"> - </span> </b><br>
-					<b>Категория:</b> <b><span th:text="${recipe.type}"> - </span></b><br>
-					<b>Слоган:</b> <b><span th:text="${recipe.tagline}"> - </span></b><br>	
+					<b class="label"> Название:</b> <b> <span th:text="${recipe.name}"> - </span> </b><br>
+					<b class="label"> Категория:</b> <b><span th:text="${recipe.type}"> - </span></b><br>
+					<b class="label"> Слоган:</b> <b><span th:text="${recipe.tagline}"> - </span></b><br>	
+					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать"></div>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
 					<table id="ingrTable">
 						<tr>
@@ -95,12 +96,25 @@
 						</tr>
 						<tr th:each="ingredient : ${ingredients}">
 							<th><span th:text="${ingredient.name}"></th>
+							<th><span th:text="${ingredient.volume}"></th>
 						</tr>	
 					</table>
-				</div>
-				<div  class="col-md-3">
-					<iframe width="560" height="315" th:src="${recipe.youtubeLink}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
-				</div>
+					<b class="label">Калорийность: </b><b> - </b> <br>
+					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать список ингредиентов"></div><br>
+					<b class="label"> Процедура приготовления:</b><br>
+					<b><span th:text="${recipe.text}"> - </span></b>
+					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать"></div>
+				</div>	
+
+				<!-- PHOTOS -->
+				<div class="col-md-12">
+					<div class="card" style="width: 25%;" th:each="photo : ${recipePhotos}">
+						<div class="card-body">
+							<img class="card-img-top" th:src="${photo.photoPath}"/>
+						</div>
+					</div>
+				</div>	
+
 			</div>
 		</div>
 

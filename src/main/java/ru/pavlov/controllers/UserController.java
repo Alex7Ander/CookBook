@@ -5,8 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.pavlov.domain.Ingredient;
+import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
+import ru.pavlov.repos.IngredientVolumeRepository;
+import ru.pavlov.repos.RecipePhotoRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
@@ -52,6 +57,12 @@ public class UserController {
 	@Autowired
 	private IngredientRepository ingrRepo;
 	
+	@Autowired
+	private IngredientVolumeRepository ingrVolumeRepo;
+	
+	@Autowired
+	private RecipePhotoRepository recipePhotoRepo;	
+	
 	@Autowired 
 	private ReviewRepository reviewRepo;
 	
@@ -66,25 +77,27 @@ public class UserController {
 		return "cookbook";
 	}
 	
+	
 	@GetMapping("recipe")
-	public String recipe(@RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
+	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
-		model.addAttribute("recipe", recipe);
-		List<Ingredient> ingredients = recipe.getIngredients();
+		
+		User currentUser = currentUserDetails.getUser();
+		if (recipe.getRecipeAuther() == currentUser) {
+			model.addAttribute("editable", "true");
+		}
+		model.addAttribute("recipe", recipe);	
+		
+		Set<IngredientVolume> ingredients = recipe.getIngredients();
 		model.addAttribute("ingredients", ingredients);
+		
+		List<RecipePhoto> recipePhotos = recipe.getPhotos();
+		model.addAttribute("recipePhotos", recipePhotos);
 		return "recipe";
 	}
 	
-	@GetMapping("myrecipes")
-	public String myRecipes(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
-		User currentUser = currentUserDetails.getUser();
-		List<Recipe> myRecipes = currentUser.getRecipes();
-		model.addAttribute("recipes", myRecipes);
-		return "myrecipes";
-	}
-	
 	@GetMapping("ingredients")
-	public String ingredients(Model model) {
+	public String ingredients( Model model) {		
 		List<Ingredient> ingredients = ingrRepo.findAll();
 		model.addAttribute("ingredients", ingredients);
 		return "ingredients";
@@ -103,7 +116,7 @@ public class UserController {
 		}		 
 		model.addAttribute("avatarPath", avatarPath);
 		
-		Iterable<Recipe> recipes = recipeRepo.findByCooker(currentUser);
+		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
 		return "personal";
 	}
@@ -160,7 +173,6 @@ public class UserController {
 		}
 		catch(JsonProcessingException jpExp) {
 			System.out.println(jpExp.getMessage());
-			//jpExp.printStackTrace();
 			return "{name:'Error'}";
 		}		
 	}
@@ -241,46 +253,66 @@ public class UserController {
 	//@ResponseBody
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
 								@RequestParam Map<String, String> allParametrs,
-								Model model) throws IOException {
+								Model model) throws IOException {		
+		User currentUser = currentUserDetails.getUser();	
+		//Main recipe info
+		String name = allParametrs.get("name");
+		allParametrs.remove("name");
+		String type = allParametrs.get("type");
+		allParametrs.remove("type");
+		String tagline = allParametrs.get("tagline");
+		allParametrs.remove("tagline");
+		String youtubeLink = allParametrs.get("youtubeLink");
+		allParametrs.remove("youtubeLink");
+		String text = allParametrs.get("text");
+		allParametrs.remove("text");
 		
-		for (String key: allParametrs.keySet()) {
-			System.out.println(key + ": " + allParametrs.get(key));
+		Set<IngredientVolume> ingredients = new HashSet<>();
+		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
+		
+		//Ingredients of recipe and their volume		
+		for (String ingredientName : allParametrs.keySet()) {
+			Double volume = null;
+			try {
+				volume = Double.parseDouble(allParametrs.get(ingredientName));
+			} catch(NumberFormatException nfExp) {
+				System.out.println("Ошибка перевода строки в число");
+				System.out.println("");
+				volume = 0.0;
+			} 
+			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);
+			
+			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
+			ingredients.add(ingrVolume);
 		}
-		System.out.println("-----------------------------------");
-		/*
-		 						@RequestParam String name, 
-								@RequestParam String type, 
-								@RequestParam String tagline,
-								@RequestParam String youtubeLink,
-								@RequestParam String text,
-		 */
-		/*
-		User currentUser = currentUserDetails.getUser();
-		List<RecipePhoto> photos = new ArrayList<>();
 		
-		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, this.newRecipeIngredients);
+		//Photos saving 
+		List<RecipePhoto> photos = new ArrayList<>();
+		String recipePhotoFolder = uploadPath + name + "_" + type + "_" + UUID.randomUUID().toString();
+		File uploadDir = new File(recipePhotoFolder);
+		if (!uploadDir.exists()) {
+			uploadDir.mkdir();
+		}
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
-			if (byteArray.length != 0) {				
-				String recipePhotoFolder = uploadPath + name + "_" + type + "_" + UUID.randomUUID().toString();
-				File uploadDir = new File(recipePhotoFolder);
-				if (!uploadDir.exists()) {
-					uploadDir.mkdir();
-				}
+			if (byteArray.length != 0) {												
 				String resultFullPhotoName = recipePhotoFolder + "/" + UUID.randomUUID().toString() + ".jpg";
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
 				fos.close();
 				
-				RecipePhoto uploadedPhoto = new RecipePhoto(resultFullPhotoName);
+				RecipePhoto uploadedPhoto = new RecipePhoto(resultFullPhotoName, recipe);
 				photos.add(uploadedPhoto);
 			}
 		}
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
+		recipePhotoRepo.saveAll(photos);
+		ingrVolumeRepo.saveAll(ingredients);
+				
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
-		this.newRecipeIngredients.clear();*/
+		this.newRecipeIngredients.clear();
 		return "cookbook";
 	}
 	
