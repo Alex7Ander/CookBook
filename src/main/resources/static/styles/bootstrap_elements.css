@@ -1,0 +1,28 @@
+			.navbar-default {
+				background-color: rgb(128, 128, 0, 0.7);
+				border-color: black;
+			}
+			.navbar-default .navbar-brand {
+				color: black;
+			}
+			.navbar-default .navbar-nav > li > a {
+				color: black;
+			}
+			.navbar-default .navbar-toggle {
+				border-color: black;
+			}
+			.navbar-default .navbar-toggle .icon-bar {
+				background-color: black;
+			}
+			
+			.cookBookContainer{
+				background-color: rgba(134, 134, 11, 0.7);
+				margin: 10px auto 0 auto;
+				text-align: left;
+				border-radius: 0 0 30px 30px;
+				color: b;
+			}
+			
+			.card{
+				background-color: rgba(134, 134, 11, 0.3);
+			}

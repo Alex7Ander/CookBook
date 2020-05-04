@@ -7,54 +7,8 @@
 		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
 		<title>Новый рецепт</title>	
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-		
-		<style type="text/css">
-			.navbar-default {
-				background-color: rgb(128, 128, 0, 0.7);
-				border-color: black;
-			}
-			.navbar-default .navbar-brand {
-				color: black;
-			}
-			.navbar-default .navbar-nav > li > a {
-				color: black;
-			}
-			.navbar-default .navbar-toggle {
-				border-color: black;
-			}
-			.navbar-default .navbar-toggle .icon-bar {
-				background-color: black;
-			}
-			
-			.cookBookContainer{
-				background-color: rgba(134, 134, 11, 0.7);
-				margin: 10px auto 0 auto;
-				text-align: left;
-				border-radius: 0 0 30px 30px;
-				color: b;
-			}
-			
-			.card{
-				background-color: rgba(134, 134, 11, 0.5);
-				width: 25%;
-				height: 400px;
-			}
-
-			.imageContainer{
-				height: 75%;
-			}
-		</style>
-
-		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
-		<!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
-		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
-	
-		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
-		<script th:src="@{/js/addRecipe.js}"    src="../static/js/addRecipe.js" ></script>
-		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
-		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>	
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">		
+		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
 	</head>
 
 	<body>
@@ -102,7 +56,7 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-3">
-					<form id="saverecipeform" method="post" action="saverecipe"> <!-- onsubmit="saveRecipe(event)" -->					
+					<form id="saverecipeform" method="post" action="saverecipe">				
 						<h4>Основная информация</h4><br>
 						<b>Название:</b><br>
 						<input type = "text" name = "name" placeholder = "Название рецепта"><br>
@@ -119,7 +73,7 @@
 						<b>Слоган:</b><br>
 						<input type = "text" name = "tagline" placeholder = "Слоган"><br>	
 						<b>Ссылка на youtube:</b><br>
-						<input form="saverecipeform" type = "text" name="youtubeLink" placeholder = "https://www.youtube.com/..."></input><br>				
+						<input type = "text" name="youtubeLink" placeholder = "https://www.youtube.com/..."></input><br>				
 					</form>
 				</div>
 				<div class="col-md-9">
@@ -147,7 +101,6 @@
 			
 			<div class="row">
 				<input type="button" value="Добавить фото" class = "dws-btn" onclick="PopUpShow('add_photo_popup');">	
-				<!-- <a> href="javascript:PopUpShow('add_photo_popup')">Добавить фото</a> -->
 			</div>
 			
 			<div class="row" id="photoList"> 
@@ -155,7 +108,7 @@
 			</div>
 
 			<div class="row">
-				<button form="saverecipeform" class = "dws-btn" type="submit"> Сохранить </button>
+				<input type="submit" value="Сохранить" class = "dws-btn" form="saverecipeform">
 			</div>
 		</div>	
 		
@@ -210,7 +163,8 @@
 				</div>
 			</div>
 		</div>	
-		<!-- For photo loading -->
+
+		<!-- Pop up windpw for photo loading -->
 		<div class="popup" id="add_photo_popup">
 			<div class="popup-content">
 				<div class="container-fluid">
@@ -230,8 +184,13 @@
 			</div>
 		</div>
 
-		<script>
-			
-		</script>
+		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+	
+		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
+		<script th:src="@{/js/addRecipe.js}"    src="../static/js/addRecipe.js" ></script>
+		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>	
 	</body>
 </html>

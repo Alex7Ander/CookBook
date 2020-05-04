@@ -287,7 +287,7 @@ public class UserController {
 		}
 		
 		//Photos saving 
-		List<RecipePhoto> photos = new ArrayList<>();
+		List<RecipePhoto> photos = new ArrayList<>();		
 		String recipePhotoFolder = uploadPath + name + "_" + type + "_" + UUID.randomUUID().toString();
 		File uploadDir = new File(recipePhotoFolder);
 		if (!uploadDir.exists()) {

@@ -1,5 +1,3 @@
-var ingredientsMap = new Map(); //Списко ингредиентов
- 
 let currentlyUploadedPhoto;  //последнее загруженное фото
 var photoCount = 0;  //Порядковый индекс загруженной фотографии
 
@@ -149,17 +147,13 @@ function addExistingIngrToTable(){
 		var volumeInput = document.createElement('input'); 
 		volumeInput.setAttribute('form', 'saverecipeform');
 		volumeInput.setAttribute('name', ingr.name);
-		/*
-		volumeInput.form = "saverecipeform";
-		volumeInput.name = ingr.name;
-		*/
+
 		volumeInput.oninput = function() {
 			var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
-			resultCalorificValueField.innerText = resultCalValue;  //resultCalorificValueField.innerHTML = "<b>" + resultCalValue + "</b>";
-			ingredientsMap.set(ingr.name, volumeInput.value);
+			resultCalorificValueField.innerText = resultCalValue;
 		}
 
-		//Кнопка удаления мнгредиента
+		//Кнопка удаления ингредиента
 		var deleteBtn = document.createElement('input'); 
 		deleteBtn.type = 'button';
 		deleteBtn.value= 'Удалить';
@@ -183,9 +177,6 @@ function addExistingIngrToTable(){
 		row.appendChild(col4);
 		row.appendChild(col5);
 		tbody.appendChild(row);
-
-		//Adding ingredient to map
-		ingredientsMap.set(ingr.name, 0);
     }
     catch(e){
 		alert("Ошибка при попытке добавить ингредиент");
@@ -197,37 +188,6 @@ function addExistingIngrToTable(){
 function deleteIngrFromTable(){
 	var currentLine = event.target.parentNode.parentNode;
 	var currentIngrName = currentLine.childNodes[0].innerText;
-	ingredientsMap.delete(currentIngrName);
 	currentLine.remove();
 }
 
-/*
-Сохранение рецепта
-*/
-
-function saveRecipe(event){
-	event.preventDefault();
-	var recipeData = new FormData(saverecipeform);
-	for(let ingr of ingredientsMap.keys()){
-		recipeData.append(ingr, ingredientsMap.get(ingr));
-	}
-
-	var request = new XMLHttpRequest();
-	request.open("POST", "/user/saverecipe");
-	request.send(recipeData);
-	/*
-	$.ajax({type: "POST", url: "/user/saverecipe", cache: false, contentType: false, processData : false, data: recipeData,
-		success: function(respond, status, jqXHR) {
-			if (typeof respond.error === 'undefined') {	
-				alert('Рецепт успешно сохранен');						
-			}
-			else {
-				alert('Error: ' + respond.data);
-			}
-		}, 
-		error: function(respond, status, jqXHR) {
-			alert('Ошибка при сохранении рецепта: ' + status);
-		}
-	});
-	*/
-}

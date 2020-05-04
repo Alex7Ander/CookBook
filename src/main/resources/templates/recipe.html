@@ -4,38 +4,10 @@
 		<meta charset="utf-8">
 		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
 		<title>Рецепт</title>
+		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
-		<style type="text/css">
-			.navbar-default {
-				background-color: rgb(128, 128, 0, 0.7);
-				border-color: black;
-			}
-			.navbar-default .navbar-brand {
-				color: black;
-			}
-			.navbar-default .navbar-nav > li > a {
-				color: black;
-			}
-			.navbar-default .navbar-toggle {
-				border-color: black;
-			}
-			.navbar-default .navbar-toggle .icon-bar {
-				background-color: black;
-			}
-			
-			.cookBookContainer{
-				background-color: rgba(134, 134, 11, 0.7);
-				margin: 10px auto 0 auto;
-				text-align: left;
-				border-radius: 0 0 30px 30px;
-				color: b;
-			}
-			
-			.card{
-				background-color: rgba(134, 134, 11, 0.3);
-			}
-		</style>
+		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
 	</head>
 
 	<body>
@@ -85,7 +57,7 @@
 					<b class="label"> Название:</b> <b> <span th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span th:text="${recipe.tagline}"> - </span></b><br>	
-					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать"></div>
+					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="PopUpShow('edit_mainInfo_popup');"></div>
 				</div>
 				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
@@ -100,27 +72,130 @@
 						</tr>	
 					</table>
 					<b class="label">Калорийность: </b><b> - </b> <br>
-					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать список ингредиентов"></div><br>
+					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать список ингредиентов" onclick="PopUpShow('edit_ingr_list_popup');"></div><br>
 					<b class="label"> Процедура приготовления:</b><br>
 					<b><span th:text="${recipe.text}"> - </span></b>
 					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать"></div>
 				</div>	
-
-				<!-- PHOTOS -->
+			</div>
+			<!-- PHOTOS -->
+			<div class="row">
 				<div class="col-md-12">
 					<div class="card" style="width: 25%;" th:each="photo : ${recipePhotos}">
 						<div class="card-body">
 							<img class="card-img-top" th:src="${photo.photoPath}"/>
 						</div>
+					</div>					
+				</div>	
+				<input type="button" value="Добавить фото" class = "dws-btn" onclick="PopUpShow('add_photo_popup');">								
+			</div>
+		</div>
+
+		<!-- Pop up window for editing main info -->
+		<div class="popup" id="edit_mainInfo_popup">			
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-3">
+						<div class="popup-content">
+							<b>Название: </b><input type="text" id="editName"><br>
+							<b>Категория:</b><br>
+							<select name = "type">
+								<option>Горячие блюда</option>
+								<option>Гарниры</option>
+								<option>Закуски</option>
+								<option>Салаты</option>
+								<option>Десерты</option>
+								<option>Напитки</option>
+								<option>Fast food</option>
+							</select><br>
+							<b>Слоган: </b><input type="text" id="editTagLine"><br>
+							<b>Ссылка на youtube: </b><input type="text" id="editYoutubeLink"><br>
+							<a href="javascript:editMainInfo()">Cохранить изменения</a>
+							/
+							<a href="javascript:PopUpHide('edit_mainInfo_popup')">Отмена</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Pop up window for adding ingredient -->
+		<div class="popup" id="edit_ingr_list_popup">
+			<div class="popup-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-3">										
+							<form id="addIngr" method="post" action="addIngrToList"> 
+								<b>Выбрать ингридиент</b><br>
+								<b>Категория ингридиента:</b><br>
+								<select id="ingrType" name="type">
+									<option value="none" hidden="">Выберите тип</option>
+									<option th:each="type : ${ingrTypes}"> <b th:text=${type}> - </b> </option>
+								</select>
+								<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br>
+								<b>Ингридиенты:</b><br>
+								<div id="ingrList">
+									<select id="ingrName">
+										<option value="none" hidden="">Выберите игредиент</option>
+										<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
+									</select>
+								</div><br>
+								<a href="javascript:addExistingIngrToTable()">Добавить</a>
+								/
+								<a href="javascript:PopUpHide('edit_ingr_list_popup')">Отмена</a>	
+							</form>				
+						</div>
+						<div class="col-md-9">
+							<form>
+								<b>Добавить новый ингридиент</b><br>
+								<b>Имя:</b><br>
+								<input type= "text" id="newIngrName" name= "name" placeholder= "Имя"><br>
+								<b>Тип:</b><br>
+								<input type= "text" id="newIngrType" name= "type" placeholder= "Тип"><br>	
+								<b>Белки:</b><br>
+								<input type= "text" id="newIngrProt" name= "prot" placeholder= "Белки / 100гр"><br>
+								<b>Жиры:</b><br>
+								<input type= "text" id="newIngrFat" name= "fat" placeholder= "Жиры / 100 гр"><br>
+								<b>Углеводы:</b><br>
+								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр"><br>
+								<b>Описание:<b></br>
+								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
+								<a href="javascript:saveNewIngredient()">Сохранить новый и добавить его к рецепту</a>
+								/
+								<a href="javascript:PopUpHide('add_ingr_popup')">Отмена</a>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Pop up window for adding new photo -->
+		<div class="popup" id="add_photo_popup">
+			<div class="popup-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-3">
+							<form action="" method="get" enctype="multipart/form-data">
+								<input type="file" class= "dws-btn" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
+								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
+								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
+							</form>
+						</div>
+						<div class="col-md-9">
+							<img th:src="@{/img/food_template.jpg}" src="../static/img/food_template.jpg" id="uploadedPhoto" width="100%">
+						</div>
 					</div>
 				</div>	
-
 			</div>
 		</div>
 
 		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+		<script th:src="@{/js/recipe.js}"       src="../static/js/recipe.js" ></script>
+		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>	
 	</body>
 	
 </html>
