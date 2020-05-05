@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">	
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
 		<title>Рецепт</title>
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="../static/styles/style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/table.css}"  href="../static/styles/table.css" type="text/css">
 		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
@@ -61,22 +62,21 @@
 					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="startEditMainInfo();"></div>
 				</div>
 				<div class="col-md-9">
+					<b class="label"> Процедура приготовления:</b><br>
+					<b><span id="text" th:text="${recipe.text}"> - </span></b>
 					<h4>Ингредиенты</h4><br>
 					<table id="ingrTable">
 						<tr>
-							<td>Ингридиент</td>
-							<td>Количество (гр/мл)</td>
+							<th>Ингридиент</th>
+							<th>Количество (гр/мл)</th>
 						</tr>
 						<tr th:each="ingredient : ${ingredients}">
-							<th><span th:text="${ingredient.name}"></th>
-							<th><span th:text="${ingredient.volume}"></th>
+							<td><span th:text="${ingredient.name}"></td>
+							<td><span th:text="${ingredient.volume}"></td>
 						</tr>	
 					</table>
 					<b class="label">Калорийность: </b><b> - </b> <br>
 					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать список ингредиентов" onclick="PopUpShow('edit_ingr_list_popup');"></div><br>
-					<b class="label"> Процедура приготовления:</b><br>
-					<b><span id="text" th:text="${recipe.text}"> - </span></b>
-					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать"></div>
 				</div>	
 			</div>
 			<!-- PHOTOS -->
