@@ -23,11 +23,6 @@ public class RecipePhoto {
 	
 	public RecipePhoto() {}
 	
-	/*
-	public RecipePhoto(String photoPath) {
-		this.photoPath = photoPath;
-	}
-	*/
 	public RecipePhoto(String photoPath, Recipe recipe) {
 		this.photoPath = photoPath;
 		this.recipe = recipe;

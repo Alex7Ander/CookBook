@@ -1,6 +1,12 @@
 let currentlyUploadedPhoto;  //последнее загруженное фото
 var photoCount = 0;  //Порядковый индекс загруженной фотографии
 
+$(document).ready(function(){
+    //Скрыть PopUp при загрузке страницы    
+    PopUpHide("add_ingr_popup");
+	PopUpHide("add_photo_popup");
+});
+
 /*
 Управление фотографиями
 */
@@ -190,4 +196,3 @@ function deleteIngrFromTable(){
 	var currentIngrName = currentLine.childNodes[0].innerText;
 	currentLine.remove();
 }
-
