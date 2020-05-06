@@ -61,7 +61,7 @@ textarea{
 .recipecontainer{
 	width: 500px;
 	height: 250px;
-	background-color: rgb(128, 128, 0, 0.7);
+	background-color: #E8E6D1(128, 128, 0, 0.7);
 	margin: 10px auto 0 auto;
 	text-align: center;
 	border-radius: 0 0 30px 0px;
@@ -74,17 +74,17 @@ textarea{
 	font-family: Calibri;
 	font-size: 24px;
 	font-style: italic;
-	color: #fff;
-	background-color: #008080;
+	color: black;
+	background-color: #E8E6D1; /*#008080;*/
 	border: none;
-	border-bottom: 4px solid #20B2AA;
+	border-bottom: 4px solid  #B9B29F;/* #20B2AA;*/
 	cursor: pointer;
 }
 
 .dws-btn:hover{
 	transition: all 0.7s;
-	background: #fff;
-	color: #2c536C;
+	background: rgb(102, 100, 30);
+	color: #E8E6D1; /* #2c536C;*/
 }
 
 .label{

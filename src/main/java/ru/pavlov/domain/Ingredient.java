@@ -41,12 +41,7 @@ public class Ingredient {
 	private double fat;
 	@JsonProperty("carbo")
 	private double carbohydrate;
-	/*
-	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "ingredientId"), inverseJoinColumns=@JoinColumn(name = "recipeId"))
-	private List<Recipe> recipes;
-	*/
+
 	public int getId() {
 		return id;
 	}
@@ -89,12 +84,4 @@ public class Ingredient {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	/*
-	public List<Recipe> getRecipes() {
-		return recipes;
-	}
-	public void setRecipes(List<Recipe> recipes) {
-		this.recipes = recipes;
-	}
-	*/
 }

@@ -3,7 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" th:href="@{/styles/style.css}" href="../static/styles/style.css" type="text/css">
-		<link rel="stylesheet" th:href="@{/styles/add_recipe_style.css}" href="../static/styles/add_recipe_style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/table.css}" href="../static/styles/table.css" type="text/css">
+		<!--link rel="stylesheet" th:href="@{/styles/add_recipe_style.css}" href="../static/styles/add_recipe_style.css" type="text/css"-->
 		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
 		<title>Новый рецепт</title>	
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -89,13 +90,8 @@
 							<th colspan="5"><a href="javascript:PopUpShow('add_ingr_popup')">Добавить</a></th>
 						<tr>
 					</table>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-md-12">
 					<b>Процедура приготовления: </b><br>
-					<textarea form="saverecipeform" name="text" style="width: 100%; " rows=10>Итак, </textarea>					
+					<textarea form="saverecipeform" name="text" style="width: 100%; " rows=10>Итак, </textarea>	
 				</div>
 			</div>
 			

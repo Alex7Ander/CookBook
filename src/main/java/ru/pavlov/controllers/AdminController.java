@@ -16,7 +16,7 @@ public class AdminController {
 	@Autowired
 	private UserRepository userRepo;
 	
-	@GetMapping("adminpage")
+	@GetMapping("users")
 	public String adminPage(Model model) {
 		Iterable<User> users = userRepo.findAll();
 		model.addAttribute("users", users);

@@ -163,6 +163,7 @@ function addExistingIngrToTable(){
 		var deleteBtn = document.createElement('input'); 
 		deleteBtn.type = 'button';
 		deleteBtn.value= 'Удалить';
+		deleteBtn.class= 'dws-btn';
 		deleteBtn.setAttribute('onclick', 'deleteIngrFromTable()');
 
 		var col1 = document.createElement("TD");

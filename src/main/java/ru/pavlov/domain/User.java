@@ -38,10 +38,7 @@ public class User {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns=@JoinColumn(name = "roleId"))
 	private List<UserRole> roles;
-	/*
-	@OneToMany(mappedBy="cooker", fetch=FetchType.LAZY)
-	private List<Recipe> recipes = new ArrayList<>();
-	*/
+
 	public User(){}
 	
 	public User(String userLoginName, String password, String name, String surname, String city, String temperament,
@@ -157,13 +154,16 @@ public class User {
 	public void setAvatarPath(String avatarPath) {
 		this.avatarPath = avatarPath;
 	}
-/*
-	public List<Recipe> getRecipes() {
-		return recipes;
+	
+	@Override
+	public boolean equals(Object user) {
+		User usr = (User) user;		
+		if(usr.getId() == this.id) {
+			return true;
+		}
+		else {
+			return false;
+		}		
 	}
 
-	public void setRecipes(List<Recipe> recipes) {
-		this.recipes = recipes;
-	}
-*/	
 }

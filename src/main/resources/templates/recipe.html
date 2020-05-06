@@ -59,7 +59,7 @@
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
-					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="startEditMainInfo();"></div>
+					<div th:if="${editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="startEditMainInfo();"></div>
 				</div>
 				<div class="col-md-9">
 					<b class="label"> Процедура приготовления:</b><br>
@@ -69,26 +69,42 @@
 						<tr>
 							<th>Ингридиент</th>
 							<th>Количество (гр/мл)</th>
+							<th>Удалить</th>
 						</tr>
+						<tr th:if="${editable}" colspan="3"><a href="javascript:PopUpShow('edit_ingr_list_popup')">Добавить</a></tr>
 						<tr th:each="ingredient : ${ingredients}">
-							<td><span th:text="${ingredient.name}"></td>
-							<td><span th:text="${ingredient.volume}"></td>
+							<td><span th:text="${ingredient.name}"></span></td>
+							<td><span th:id="${ingredient.name}+Volume" th:text="${ingredient.volume}"></span></td>
+							<td><input th:if="${editable}" type="button" class="dws-btn" th:id="${ingredient.name}+DeleteBtn" value="Удалить"></td>
 						</tr>	
 					</table>
-					<b class="label">Калорийность: </b><b> - </b> <br>
-					<div th:if="@{editable}"><input type="button" class="dws-btn" value="Редактировать список ингредиентов" onclick="PopUpShow('edit_ingr_list_popup');"></div><br>
+					<b class="label">Калорийность:</b> <b> - </b> <br>
+					<input th:if="${editable}" type="button" class="dws-btn" id="saveChangesForIngrListBtn" value="Сохранить изменения" onclick="editIngredientsList()">	
 				</div>	
 			</div>
+
 			<!-- PHOTOS -->
 			<div class="row">
-				<div class="col-md-12">
-					<div class="card" style="width: 25%;" th:each="photo : ${recipePhotos}">
-						<div class="card-body">
-							<img class="card-img-top" th:src="${photo.photoPath}"/>
+				<div class="col-md-12">				
+					<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+						<div class="carousel-inner" th:each="photo:${recipePhotos}"> <!--  -->
+							<div class="carousel-item active">
+								<img class="d-block w-100" th:src="@{/img/} + ${photo.photoPath}" alt="Первый слайд"> <!--  -->
+							</div>							
 						</div>
-					</div>					
-				</div>	
-				<input type="button" value="Добавить фото" class = "dws-btn" onclick="PopUpShow('add_photo_popup');">								
+
+						<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+							<span class="sr-only">Previous</span>
+						</a>
+
+						<a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+							<span class="carousel-control-next-icon" aria-hidden="true"></span>
+							<span class="sr-only">Next</span>
+						</a>
+					</div>
+					<input th:if="${editable}" type="button" value="Добавить фото" class = "dws-btn" onclick="PopUpShow('add_photo_popup');">	
+				</div>							
 			</div>
 		</div>
 

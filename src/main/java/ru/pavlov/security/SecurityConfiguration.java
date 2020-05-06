@@ -32,7 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 			//.anyRequest().authenticated()		
 			.antMatchers("/regPage").permitAll()
-			.antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+			.antMatchers("/user/**", "/recipe/**", "/ingredient/**").hasAnyRole("ADMIN", "USER")
 			.antMatchers("/admin/**").hasRole("ADMIN")
 			.antMatchers("/img/**", "/uploadimg/**").permitAll()
 			.and().formLogin().loginPage("/login").permitAll().loginProcessingUrl("/login").successHandler(cookbookSuccessHandler())

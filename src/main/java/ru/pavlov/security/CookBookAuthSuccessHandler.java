@@ -57,7 +57,7 @@ public class CookBookAuthSuccessHandler implements AuthenticationSuccessHandler 
             return "/user/personal";
         } 
         else if (isAdmin) {
-            return "/admin/adminpage";
+            return "/admin/users";
         } 
         else {
             throw new IllegalStateException();

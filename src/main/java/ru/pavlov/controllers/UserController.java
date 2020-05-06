@@ -77,25 +77,6 @@ public class UserController {
 		return "cookbook";
 	}
 	
-	
-	@GetMapping("recipe")
-	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
-		Recipe recipe = recipeRepo.findById(recipeId);
-		
-		User currentUser = currentUserDetails.getUser();
-		if (recipe.getRecipeAuther() == currentUser) {
-			model.addAttribute("editable", "true");
-		}
-		model.addAttribute("recipe", recipe);	
-		
-		Set<IngredientVolume> ingredients = recipe.getIngredients();
-		model.addAttribute("ingredients", ingredients);
-		
-		List<RecipePhoto> recipePhotos = recipe.getPhotos();
-		model.addAttribute("recipePhotos", recipePhotos);
-		return "recipe";
-	}
-	
 	@GetMapping("ingredients")
 	public String ingredients( Model model) {		
 		List<Ingredient> ingredients = ingrRepo.findAll();
@@ -288,20 +269,23 @@ public class UserController {
 		
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();		
-		String recipePhotoFolder = uploadPath + name + "_" + type + "_" + UUID.randomUUID().toString();
-		File uploadDir = new File(recipePhotoFolder);
+		String recipePhotoFolder = name + "_" + type + "_" + UUID.randomUUID().toString();  //name of the folder with photos
+		String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
+		File uploadDir = new File(recipePhotoFolderFullPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
-			if (byteArray.length != 0) {												
-				String resultFullPhotoName = recipePhotoFolder + "/" + UUID.randomUUID().toString() + ".jpg";
+			if (byteArray.length != 0) {	
+				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
+				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName;  //name for saving in database
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
 				fos.close();
 				
-				RecipePhoto uploadedPhoto = new RecipePhoto(resultFullPhotoName, recipe);
+				RecipePhoto uploadedPhoto = new RecipePhoto(dbPhotoName, recipe);
 				photos.add(uploadedPhoto);
 			}
 		}

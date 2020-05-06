@@ -88,7 +88,7 @@
 			<div class="row">
 				<div class="card" style="width: 25%;" th:each="recipe : ${recipes}">
 					<div class="card-body">
-						<form method="get" th:action="recipe">
+						<form method="get" action="/recipe/show">
 							<input type="hidden" name="recipeId" th:value="${recipe.id}">
 							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
 							<p><span th:text="${recipe.type}"> Категория </span></p><br>
