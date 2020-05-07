@@ -118,11 +118,11 @@
 							<form id="addIngr" method="post" action="addIngrToList"> 
 								<b>Выбрать ингридиент</b><br>
 								<b>Категория ингридиента:</b><br>
-								<select id="ingrType" name="type">
+								<select id="ingrType" name="type" onchange="getIngrListFromServer()">
 									<option value="none" hidden="">Выберите тип</option>
 									<option th:each="type : ${ingrTypes}"> <b th:text=${type}> - </b> </option>
 								</select>
-								<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br>
+								<!--input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br-->
 								<b>Ингридиенты:</b><br>
 								<div id="ingrList">
 									<select id="ingrName">
@@ -132,7 +132,7 @@
 								</div><br>
 								<a href="javascript:addExistingIngrToTable()">Добавить</a>
 								/
-								<a href="javascript:PopUpHide('add_ingr_popup')">Отмена</a>	
+								<a href="javascript:hideIngredientWindow()">Отмена</a>	
 							</form>				
 						</div>
 						<div class="col-md-9">
@@ -152,7 +152,7 @@
 								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
 								<a href="javascript:saveNewIngredient()">Сохранить новый и добавить его к рецепту</a>
 								/
-								<a href="javascript:PopUpHide('add_ingr_popup')">Отмена</a>
+								<a href="javascript:hideIngredientWindow()">Отмена</a>
 							</form>
 						</div>
 					</div>
@@ -167,7 +167,7 @@
 					<div class="row">
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data">
-								<input type="file" class= "dws-btn" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
+								<input type="file" class= "dws-btn" id="photoLoader" value="Загрузить фото" onchange="getCurrentlyUploadedPhoto(event)">
 								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
 								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
 							</form>
@@ -184,9 +184,10 @@
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
 	
-		<script th:src="@{/js/asyncRequest.js}" src="../static/js/asyncRequest.js"></script>
-		<script th:src="@{/js/addRecipe.js}"    src="../static/js/addRecipe.js" ></script>
-		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
-		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>	
+		<script th:src="@{/js/asyncRequest.js}" 		src="../static/js/asyncRequest.js"></script>		
+		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}"        		src="../static/js/popup.js"></script>
+		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>	
+		<script th:src="@{/js/addRecipe.js}"    		src="../static/js/addRecipe.js" ></script>
 	</body>
 </html>

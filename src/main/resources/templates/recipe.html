@@ -69,13 +69,13 @@
 						<tr>
 							<th>Ингридиент</th>
 							<th>Количество (гр/мл)</th>
-							<th>Удалить</th>
+							<th></th>
 						</tr>
-						<tr th:if="${editable}" colspan="3"><a href="javascript:PopUpShow('edit_ingr_list_popup')">Добавить</a></tr>
+						<tr th:if="${editable}" colspan="3"><a href="javascript:showIngredientWindow()">Добавить</a></tr>
 						<tr th:each="ingredient : ${ingredients}">
 							<td><span th:text="${ingredient.name}"></span></td>
 							<td><span th:id="${ingredient.name}+Volume" th:text="${ingredient.volume}"></span></td>
-							<td><input th:if="${editable}" type="button" class="dws-btn" th:id="${ingredient.name}+DeleteBtn" value="Удалить"></td>
+							<td></td><a th:if="${editable}" th:id="${ingredient.name}+DeleteBtn" href="javascript:deleteIngredient()">Удалить</a></td>
 						</tr>	
 					</table>
 					<b class="label">Калорийность:</b> <b> - </b> <br>

@@ -1,10 +1,11 @@
 $(document).ready(function(){
-    //Скрыть PopUp при загрузке страницы    
+    //Hide PopUp windows
 	PopUpHide("edit_mainInfo_popup");
 	PopUpHide("edit_ingr_list_popup");
 	PopUpHide("add_photo_popup");
 });
 
+/*Prepare for editing*/
 function startEditMainInfo(){
 	var recipeName = document.getElementById('name').innerText;
 	document.getElementById('editName').value = recipeName;
@@ -14,7 +15,6 @@ function startEditMainInfo(){
 	document.getElementById('editTagline').value = recipeTagline;
 	var recipeText = document.getElementById('text').innerText;
 	document.getElementById('editText').value = recipeText;
-
 	PopUpShow('edit_mainInfo_popup');
 }
 
@@ -22,6 +22,25 @@ function startEditIngredientsList(){
 
 }
 
+/*Editing procedures*/
+function 
+
+function deleteIngrFromTable(){
+	var currentLine = event.target.parentNode.parentNode;
+	currentLine.remove();
+}
+
+
+function addNewPhoto(){
+
+}
+
+function deletePhoto(){
+
+}
+
+
+/*Saving results of editing*/
 function editMainInfo(){	
 	var id = document.getElementById('id').value;
 	var newName = document.getElementById('editName').value;
@@ -62,10 +81,6 @@ function editIngredientsList(){
 
 }
 
-function addNewPhoto(){
-
-}
-
-function deletePhoto(){
+function editPhotoList(){
 
 }

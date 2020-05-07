@@ -1,16 +1,22 @@
 let currentlyUploadedPhoto;  //последнее загруженное фото
 var photoCount = 0;  //Порядковый индекс загруженной фотографии
 
+//PopUp windows
+var ingredientsPopUpWindow; //= new IngredientsPopUpWindow("add_ingr_popup");
+var photoUploadPopUpWindow; //= new PhotoUploadPopUpWindow("add_photo_popup");
+
 $(document).ready(function(){
-    //Скрыть PopUp при загрузке страницы    
-    PopUpHide("add_ingr_popup");
-	PopUpHide("add_photo_popup");
+	//Скрыть PopUp при загрузке страницы  
+	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup"); 
+	photoUploadPopUpWindow = new PhotoUploadPopUpWindow("add_photo_popup"); 
+	ingredientsPopUpWindow.hideWindow();
+	photoUploadPopUpWindow.hideWindow();
 });
 
 /*
 Управление фотографиями
 */
-function getCurrentLyUploadedPhoto(event){
+function getCurrentlyUploadedPhoto(event){
 	let photoFileLoader = document.getElementById('photoLoader');
 	currentlyUploadedPhoto = photoFileLoader.files[0];
 	let output  = document.getElementById('uploadedPhoto');
@@ -99,71 +105,41 @@ function deletePhotoCard(){
 /*
 Управление списком ингредиентов
 */
+function showIngredientWindow(){
+	ingredientsPopUpWindow.showWindow();
+}
+
+function hideIngredientWindow(){
+	ingredientsPopUpWindow.hideWindow();
+}
+
 function getIngrListFromServer(){
-    req = new asyncRequest();
-    element = document.getElementById('ingrList');
-    req.onreadystatechange = function() {
-        if (req.readyState == 4) {
-            element.innerHTML = req.responseText;
-            if(!req.status == 200) {
-                alert("Error: " + req.status);
-            }
-        }
-    }
-    var select = document.getElementById("ingrType");
-    var selectedValue = select.value;
-    var body = "?type=" + selectedValue;			
-    req.open("GET", "/user/getIngrList" + body);
-    req.send();
-    element.innerHTML = "Список ингредиентов загружается...";
+	ingredientsPopUpWindow.getIngrListFromServer();
 }
 
 function saveNewIngredient(){
-    var name = document.getElementById("newIngrName").value;
-    var type = document.getElementById("newIngrType").value; 
-    var descr = document.getElementById("newIngrDesription").value;
-    var prot = document.getElementById("newIngrProt").value;
-    var fat = document.getElementById("newIngrFat").value;
-    var carbo = document.getElementById("newIngrCarbo").value;
-    var ingr = new ingredient(name, type, descr, prot, fat, carbo);
-    ingr.save();
-    if (ingr.isSaved() == true) {
-        ingr.addToTable('ingrTable');
-        PopUpHide('add_ingr_popup');
-    }
+	ingredientsPopUpWindow.saveNewIngredient();
 }
 
 function addExistingIngrToTable(){
     try{
-		var ingr = new ingredient();
-		var selectType = document.getElementById("ingrType");
-		var cType = selectType.value;
-		var selectName = document.getElementById("ingrName");
-		var cName = selectName.value;
-		ingr.getDataFromServer(cName, cType);
-
+		var ingr = ingredientsPopUpWindow.getIngredient();
 		//Adding line to table
 		var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 		var row = document.createElement("TR");	
-
 		//Поле с итоговой калорийностью для ингредиента
-		var resultCalorificValueField = document.createElement('b'); //span
-
+		var resultCalorificValueField = document.createElement('b');
 		//Поле для ввода количества ингредиента
 		var volumeInput = document.createElement('input'); 
 		volumeInput.setAttribute('form', 'saverecipeform');
 		volumeInput.setAttribute('name', ingr.name);
-
 		volumeInput.oninput = function() {
 			var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
 			resultCalorificValueField.innerText = resultCalValue;
 		}
-
 		//Кнопка удаления ингредиента
-		var deleteBtn = document.createElement('input'); 
-		deleteBtn.type = 'button';
+		var deleteBtn = document.createElement('a'); 
 		deleteBtn.value= 'Удалить';
-		deleteBtn.class= 'dws-btn';
 		deleteBtn.setAttribute('onclick', 'deleteIngrFromTable()');
 
 		var col1 = document.createElement("TD");
@@ -177,7 +153,6 @@ function addExistingIngrToTable(){
 		var col5 = document.createElement("TD");		
 		col5.appendChild(deleteBtn);	
 		
-
 		row.appendChild(col1);
 		row.appendChild(col2);
 		row.appendChild(col3);
@@ -189,11 +164,10 @@ function addExistingIngrToTable(){
 		alert("Ошибка при попытке добавить ингредиент");
     }
     //Closing pop-up window
-    PopUpHide('add_ingr_popup');		
+    ingredientsPopUpWindow.hide();		
 }
 
 function deleteIngrFromTable(){
 	var currentLine = event.target.parentNode.parentNode;
-	var currentIngrName = currentLine.childNodes[0].innerText;
 	currentLine.remove();
 }
