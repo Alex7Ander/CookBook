@@ -124,11 +124,12 @@
 								</select>
 								<!--input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br-->
 								<b>Ингридиенты:</b><br>
+								<select id="ingrName">
+									<option value="none" hidden="">Выберите игредиент</option>
+									<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
+								</select>
 								<div id="ingrList">
-									<select id="ingrName">
-										<option value="none" hidden="">Выберите игредиент</option>
-										<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
-									</select>
+
 								</div><br>
 								<a href="javascript:addExistingIngrToTable()">Добавить</a>
 								/

@@ -122,7 +122,7 @@ function saveNewIngredient(){
 }
 
 function addExistingIngrToTable(){
-    try{
+	try{
 		var ingr = ingredientsPopUpWindow.getIngredient();
 		//Adding line to table
 		var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
@@ -138,9 +138,10 @@ function addExistingIngrToTable(){
 			resultCalorificValueField.innerText = resultCalValue;
 		}
 		//Кнопка удаления ингредиента
-		var deleteBtn = document.createElement('a'); 
-		deleteBtn.value= 'Удалить';
-		deleteBtn.setAttribute('onclick', 'deleteIngrFromTable()');
+		var deleteBtn = document.createElement('input'); 
+		deleteBtn.setAttribute("type", "button");
+		deleteBtn.setAttribute("value", "Удалить");
+		deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
 
 		var col1 = document.createElement("TD");
 		col1.appendChild(document.createTextNode(ingr.name));
@@ -160,11 +161,11 @@ function addExistingIngrToTable(){
 		row.appendChild(col5);
 		tbody.appendChild(row);
     }
-    catch(e){
+	catch(e){
 		alert("Ошибка при попытке добавить ингредиент");
-    }
+	}
     //Closing pop-up window
-    ingredientsPopUpWindow.hide();		
+	ingredientsPopUpWindow.hideWindow();		
 }
 
 function deleteIngrFromTable(){

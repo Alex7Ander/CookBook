@@ -55,7 +55,7 @@
 			<div class="row">
 				<div class="col-md-3">					
 					<h4>Основная информация</h4><br>
-					<input type="hidden" id="id" th:value="${recipe.id}">
+					<input type="hidden" id="recipeId" th:value="${recipe.id}">
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
@@ -71,11 +71,14 @@
 							<th>Количество (гр/мл)</th>
 							<th></th>
 						</tr>
-						<tr th:if="${editable}" colspan="3"><a href="javascript:showIngredientWindow()">Добавить</a></tr>
+						<tr th:if="${editable}" colspan="3"><a href="javascript:addNewIngredient()">Добавить</a></tr>
 						<tr th:each="ingredient : ${ingredients}">
 							<td><span th:text="${ingredient.name}"></span></td>
-							<td><span th:id="${ingredient.name}+Volume" th:text="${ingredient.volume}"></span></td>
-							<td></td><a th:if="${editable}" th:id="${ingredient.name}+DeleteBtn" href="javascript:deleteIngredient()">Удалить</a></td>
+							<td>
+								<b th:id="${ingredient.name}+Volume" th:text="${ingredient.volume}" th:attr="onclick=|showVolumeTextField('${ingredient.name}')|"></b>
+								<input type="text" hidden="true"; th:id="${ingredient.name}+VolumeTextField" th:attr="onchange=|showVolumeSpan('${ingredient.name}')|">
+							</td>
+							<td><input type="button" th:if="${editable}" th:id="${ingredient.name}+DeleteBtn" onclick="deleteIngredient()" value="Удалить"></td>
 						</tr>	
 					</table>
 					<b class="label">Калорийность:</b> <b> - </b> <br>
@@ -143,7 +146,7 @@
 		</div>
 
 		<!-- Pop up window for adding ingredient -->
-		<div class="popup" id="edit_ingr_list_popup">
+		<div class="popup" id="add_ingr_popup">
 			<div class="popup-content">
 				<div class="container-fluid">
 					<div class="row">
@@ -165,7 +168,7 @@
 								</div><br>
 								<a href="javascript:addExistingIngrToTable()">Добавить</a>
 								/
-								<a href="javascript:PopUpHide('edit_ingr_list_popup')">Отмена</a>	
+								<a href="javascript:hideAddIngredientWindow()">Отмена</a>	
 							</form>				
 						</div>
 						<div class="col-md-9">
@@ -185,7 +188,7 @@
 								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
 								<a href="javascript:saveNewIngredient()">Сохранить новый и добавить его к рецепту</a>
 								/
-								<a href="javascript:PopUpHide('add_ingr_popup')">Отмена</a>
+								<a href="javascript:hideAddIngredientWindow()">Отмена</a>
 							</form>
 						</div>
 					</div>
@@ -216,9 +219,10 @@
 		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-		<script th:src="@{/js/popup.js}"        src="../static/js/popup.js"></script>
-		<script th:src="@{/js/recipe.js}"       src="../static/js/recipe.js" ></script>
-		<script th:src="@{/js/ingredient.js}"   src="../static/js/ingredient.js"></script>				
+		<script th:src="@{/js/popup.js}"        		src="../static/js/popup.js"></script>
+		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
+		<script th:src="@{/js/recipe.js}"       		src="../static/js/recipe.js" ></script>
+		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredient.js"></script>				
 			
 	</body>
 	

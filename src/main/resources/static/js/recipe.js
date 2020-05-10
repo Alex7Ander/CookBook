@@ -1,86 +1,131 @@
+var editRecipeMainInfoWindow;
+var addIngredientWindow;
+var photoUploadWindow;
+
 $(document).ready(function(){
-    //Hide PopUp windows
-	PopUpHide("edit_mainInfo_popup");
-	PopUpHide("edit_ingr_list_popup");
-	PopUpHide("add_photo_popup");
+	editRecipeMainInfoWindow = new EditRecipeMainInfoPopUpWindow("edit_mainInfo_popup");
+	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup");
+	photoUploadWindow = new PhotoUploadPopUpWindow("add_photo_popup");	
+	//Hide PopUp windows
+	editRecipeMainInfoWindow.hideWindow();
+	addIngredientWindow.hideWindow();addIngredientWindow
+	photoUploadWindow.hideWindow();
 });
 
-/*Prepare for editing*/
+/*Working with main info*/
 function startEditMainInfo(){
-	var recipeName = document.getElementById('name').innerText;
-	document.getElementById('editName').value = recipeName;
-	var recipeType = document.getElementById('type').innerText;
-	document.getElementById('editType').value = recipeType;
-	var recipeTagline = document.getElementById('tagline').innerText;
-	document.getElementById('editTagline').value = recipeTagline;
-	var recipeText = document.getElementById('text').innerText;
-	document.getElementById('editText').value = recipeText;
-	PopUpShow('edit_mainInfo_popup');
+	var name = document.getElementById('name').value;
+	var type = document.getElementById('type').innerText;
+	var tagline = document.getElementById('tagline').innerText;
+	var text = document.getElementById('text').innerText;
+	editRecipeMainInfoWindow.setRecipeValues(name, type, tagline, text);
+	editRecipeMainInfoWindow.showWindow();
+}
+function editMainInfo(){	
+	var recipeId = document.getElementById('id').value;
+	var done = editRecipeMainInfoWindow.editMainInfo(recipeId);
+	if (done===true){
+		document.getElementById('name').innerText = editRecipeMainInfoWindow.getNewName();
+		document.getElementById('type').innerText = editRecipeMainInfoWindow.getNewType();
+		document.getElementById('tagline').innerText = editRecipeMainInfoWindow.getNewTagline();
+		document.getElementById('text').innerText = editRecipeMainInfoWindow.getNewText();
+		alert("Изменения успешно сохранены!");
+	}
+	else{
+		alert("Произошла ошибка при попытке внести изменения!");
+	}
+	editRecipeMainInfoWindow.hide();
+}
+function hideEditRecipeMainInfoWindow(){
+	this.editRecipeMainInfoWindow.hideWindow();
 }
 
-function startEditIngredientsList(){
 
+
+/* Working with ingredients list */
+function showAddIngredientWindow(){
+	addIngredientWindow.showWindow();
 }
+function hideAddIngredientWindow(){
+	addIngredientWindow.hideWindow();
+}
+function addExistingIngrToTable(){
+	var ingr = addIngredientWindow.getIngredient();
+	//Adding line to table
+	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
+	var row = document.createElement("TR");	
+	//Поле с итоговой калорийностью для ингредиента
+	var resultCalorificValueField = document.createElement('b');
+	//Поле для ввода количества ингредиента
+	var volumeInput = document.createElement('input'); 
+	volumeInput.setAttribute('form', 'saverecipeform');
+	volumeInput.setAttribute('name', ingr.name);
+	volumeInput.oninput = function() {
+		var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
+		resultCalorificValueField.innerText = resultCalValue;
+	}
+	//Кнопка удаления ингредиента
+	var deleteBtn = document.createElement('input'); 
+	deleteBtn.setAttribute("type", "button");
+	deleteBtn.setAttribute("value", "Удалить");
+	deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
 
-/*Editing procedures*/
-function 
-
-function deleteIngrFromTable(){
+	var col1 = document.createElement("TD");
+	col1.appendChild(document.createTextNode(ingr.name));
+	var col2 = document.createElement("TD");
+	col2.appendChild(document.createTextNode(ingr.getCalorificValue()));
+	var col3 = document.createElement("TD");
+	col3.appendChild(volumeInput);
+	var col4 = document.createElement("TD");
+	col4.appendChild(resultCalorificValueField);
+	var col5 = document.createElement("TD");		
+	col5.appendChild(deleteBtn);	
+	
+	row.appendChild(col1);
+	row.appendChild(col2);
+	row.appendChild(col3);
+	row.appendChild(col4);
+	row.appendChild(col5);
+	tbody.appendChild(row);
+}
+function deleteIngredient(){
 	var currentLine = event.target.parentNode.parentNode;
 	currentLine.remove();
 }
+function showVolumeTextField(ingredientName){
+	var textField = document.getElementById(ingredientName + "VolumeTextField");
+	var label =  document.getElementById(ingredientName + "Volume");
+	textField.hidden = false;
+	textField.value = label.innerHTML;
+	label.hidden = true;
+}
+function showVolumeSpan(ingredientName){
+	var textField = document.getElementById(ingredientName + "VolumeTextField");
+	var label =  document.getElementById(ingredientName + "Volume");		
+	var newValue = textField.value;
+	if (isNaN(newValue)==true){
+		alert("Вы ввели значение, не являющееся числом");
+	}
+	else{
+		label.hidden = false;
+		label.innerText = newValue;
+		textField.hidden = true;
+	}
+}
 
 
+/* 
+	Working with photos 
+*/
+function showPhotoUploadWindow(){
+	photoUploadWindow.showWindow();
+}
+function hidePhotoUploadWindow(){
+	photoUploadWindow.hideWindow();
+}
 function addNewPhoto(){
-
+	//
 }
-
 function deletePhoto(){
-
-}
-
-
-/*Saving results of editing*/
-function editMainInfo(){	
-	var id = document.getElementById('id').value;
-	var newName = document.getElementById('editName').value;
-	var newType = document.getElementById('editType').value;
-	var newTagline = document.getElementById('editTagline').value
-	var newText = document.getElementById('editText').value;
-
-	var mainInfoData = new FormData();
-	mainInfoData.append("id", id);
-	mainInfoData.append("name", newName);
-	mainInfoData.append("type", newType);
-	mainInfoData.append("tagline", newTagline);
-	mainInfoData.append("text", newText);
-
-	$.ajax({type: "POST", url: "/recipe/editMainInfo", cache: false, dataType: 'json', contentType: false, processData: false, data: mainInfoData,
-		success: function(respond, status, jqXHR) {
-			if (typeof respond.error === 'undefined') {	
-				document.getElementById('name').innerText = newName;
-				document.getElementById('type').innerText = newType;
-				document.getElementById('tagline').innerText = newTagline;
-				document.getElementById('text').innerText = newText;
-				alert('Изменения успешно сохранены');						
-			}
-			else {
-				alert('Произошла ошибка при сохранении: ' + respond.data);
-			}
-		}, 
-		error: function(respond, status, jqXHR) {
-			alert('Произошла ошибка при сохранении: ' + status);
-		},
-		complete: function(){
-			PopUpHide('edit_mainInfo_popup');
-		}
-	});	
-}
-
-function editIngredientsList(){
-
-}
-
-function editPhotoList(){
 
 }
