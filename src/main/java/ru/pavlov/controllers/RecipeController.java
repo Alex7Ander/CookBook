@@ -19,18 +19,47 @@ import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.User;
+import ru.pavlov.repos.IngredientRepository;
+import ru.pavlov.repos.IngredientVolumeRepository;
+import ru.pavlov.repos.RecipePhotoRepository;
 import ru.pavlov.repos.RecipeRepository;
+import ru.pavlov.repos.ReviewRepository;
+import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
 @RequestMapping("/recipe/**")
 public class RecipeController {
 	@Autowired
+	private UserRepository userRepo;
+	
+	@Autowired
 	private RecipeRepository recipeRepo;
+	
+	@Autowired
+	private IngredientRepository ingrRepo;
+	
+	@Autowired
+	private IngredientVolumeRepository ingrVolumeRepo;
+	
+	@Autowired
+	private RecipePhotoRepository recipePhotoRepo;	
+	
+	@Autowired 
+	private ReviewRepository reviewRepo;
 	
 	@GetMapping("show")
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
+		
+		double totalRecipeCalorie = 0;
+		for (IngredientVolume ingr : recipe.getIngredients()) {
+			totalRecipeCalorie += ingr.getResultCalorie();
+		}
+		model.addAttribute("totalRecipeCalorie", totalRecipeCalorie);
+		
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);
 		
 		User currentUser = currentUserDetails.getUser();
 		if (recipe.getRecipeAuther().equals(currentUser)) {
@@ -41,13 +70,12 @@ public class RecipeController {
 		}
 		model.addAttribute("recipe", recipe);	
 		
-		Set<IngredientVolume> ingredients = recipe.getIngredients();
+		List<IngredientVolume> ingredients = recipe.getIngredients();
 		model.addAttribute("ingredients", ingredients);
 		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
 		
-		System.out.println("---\n" + recipe.getName() + "photos:");
 		for (RecipePhoto rp : recipePhotos) {
 			System.out.println(rp.getPhotoPath());
 		}		
@@ -76,12 +104,54 @@ public class RecipeController {
 		return "{}";
 	}
 	
-	@PostMapping("editIngredientList")
+	@PostMapping("addNewIngredient")
 	@ResponseBody
-	public String editIngredientList() {
+	public String addIngredient(@RequestParam long recipeId,
+			 @RequestParam String name, 
+			 @RequestParam String type, 
+			 @RequestParam String descr,
+			 @RequestParam String prot, 
+			 @RequestParam String fat, 
+			 @RequestParam String carbo) {
 		return "";
 	}
 	
+	@PostMapping("addExistingIngredient")
+	@ResponseBody
+	public String addExistingIngredient() {
+		return "";
+	}
 	
+	@PostMapping("deleteIngredient")
+	@ResponseBody
+	public String deleteIngredient(@RequestParam long recipeId, @RequestParam long ingredientId) {
+		Recipe recipe = recipeRepo.findById(recipeId);		
+		List<IngredientVolume> currenRecipeIngredients = recipe.getIngredients();
+		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientId);
+		for(IngredientVolume ingredietnFromList : currenRecipeIngredients) {
+			if(ingredietnFromList.equals(currentIngredient)) {
+				ingrVolumeRepo.delete(ingredietnFromList);
+				recipeRepo.save(recipe);
+				break;
+			}
+		}
+		return "{}";
+	}
 	
+	@PostMapping("editIngredientVolume")
+	@ResponseBody
+	public String editIngredientVolume(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double newValue) {
+		Recipe recipe = recipeRepo.findById(recipeId);		
+		List<IngredientVolume> currenRecipeIngredients = recipe.getIngredients();
+		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientId);
+		for(IngredientVolume ingredietnFromList : currenRecipeIngredients) {
+			if(ingredietnFromList.equals(currentIngredient)) {
+				ingredietnFromList.setVolume(newValue);
+				ingrVolumeRepo.save(ingredietnFromList);
+				break;
+			}
+		}		
+		return "{}";
+	}
+		
 }

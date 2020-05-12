@@ -13,8 +13,9 @@ class PopUpWindow{
 
 class IngredientsPopUpWindow extends PopUpWindow{
 
-    constructor(id){
+    constructor(id, addingToMainTableFunction){
         super(id);
+        this.addingFunction = addingToMainTableFunction;
         this.ingrTypeSelect = document.getElementById("ingrType");
         this.ingrListSelect = document.getElementById("ingrName");
 
@@ -75,15 +76,24 @@ class IngredientsPopUpWindow extends PopUpWindow{
         var ingr = new ingredient(name, type, descr, prot, fat, carbo);
         ingr.save();
         if (ingr.isSaved() == true) {
-            ingr.addToTable('ingrTable');
+            try{
+                this.addingFunction(ingr);
+            }
+            catch{
+                console.log("Отсутствует таблица для сохранения byuhtlbtynf");
+            }
             this.hide();
         }
+    }
+    addExistingIngrToRecipe(){
+        var ingr = this.getIngredient();
+        this.addingFunction(ingr);
     }
 
     getIngredient(){
         var ingr = new ingredient();
-		var selectedType = this.getSelectedIngrType();
-		var selectedName = this.getSelectedIngrName();
+        var selectedType = this.getSelectedIngrType();
+        var selectedName = this.getSelectedIngrName();
         ingr.getDataFromServer(selectedName, selectedType);
         return ingr;
     }

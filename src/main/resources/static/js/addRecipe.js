@@ -2,8 +2,8 @@ let currentlyUploadedPhoto;  //последнее загруженное фот�
 var photoCount = 0;  //Порядковый индекс загруженной фотографии
 
 //PopUp windows
-var ingredientsPopUpWindow; //= new IngredientsPopUpWindow("add_ingr_popup");
-var photoUploadPopUpWindow; //= new PhotoUploadPopUpWindow("add_photo_popup");
+var ingredientsPopUpWindow; 
+var photoUploadPopUpWindow; 
 
 $(document).ready(function(){
 	//Скрыть PopUp при загрузке страницы  
@@ -41,7 +41,7 @@ function addPhotoToPhotoList(event){
 			alert('Не удалось загрузить фото на сервер: ' + status);
 		},
 		complete: function(){
-			PopUpHide('add_photo_popup');
+			photoUploadPopUpWindow.hideWindow();
 		}
 	});
 }

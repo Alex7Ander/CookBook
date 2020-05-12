@@ -26,6 +26,7 @@ public class Ingredient {
 		this.protein = protein;
 		this.fat = fat;
 		this.carbohydrate = carbohydrate;
+		this.calorie = this.fat * 9 + this.protein * 4 + this.carbohydrate * 4;
 	}
 	
 	@Id
@@ -41,6 +42,8 @@ public class Ingredient {
 	private double fat;
 	@JsonProperty("carbo")
 	private double carbohydrate;
+
+	private double calorie;
 
 	public int getId() {
 		return id;
@@ -83,5 +86,11 @@ public class Ingredient {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public double getCalorie() {
+		return calorie;
+	}
+	public void setCalorie(double calorie) {
+		this.calorie = calorie;
 	}
 }

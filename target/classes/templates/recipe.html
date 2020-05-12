@@ -69,19 +69,29 @@
 						<tr>
 							<th>Ингридиент</th>
 							<th>Количество (гр/мл)</th>
+							<th>Калорийность (гр/мл)</th>
 							<th></th>
-						</tr>
-						<tr th:if="${editable}" colspan="3"><a href="javascript:addNewIngredient()">Добавить</a></tr>
+						</tr>		
+
 						<tr th:each="ingredient : ${ingredients}">
-							<td><span th:text="${ingredient.name}"></span></td>
 							<td>
-								<b th:id="${ingredient.name}+Volume" th:text="${ingredient.volume}" th:attr="onclick=|showVolumeTextField('${ingredient.name}')|"></b>
-								<input type="text" hidden="true"; th:id="${ingredient.name}+VolumeTextField" th:attr="onchange=|showVolumeSpan('${ingredient.name}')|">
+								<span th:text="${ingredient.name}"></span>
+								<input type="hidden" th:id="${ingredient.id}">
 							</td>
-							<td><input type="button" th:if="${editable}" th:id="${ingredient.name}+DeleteBtn" onclick="deleteIngredient()" value="Удалить"></td>
-						</tr>	
+							<td>
+								<b th:id="${ingredient.id}+Volume" th:text="${ingredient.volume}" th:attr="onclick=|showVolumeTextField('${ingredient.id}')|"></b>
+								<input type="text" hidden="true" th:id="${ingredient.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredient.id}')|">
+							</td>
+							<td>
+								<input type="hidden" th:id="${ingredient.id}+CalorieFactor" th:value="${ingredient.getIngredient().calorie}">
+								<b th:id="${ingredient.id}+Calorie" th:text="${ingredient.resultCalorie}"></b>
+							</td>
+							<td><input type="button" th:if="${editable}" th:id="${ingredient.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${recipe.id}', '${ingredient.id}')|" value="Удалить"></td>
+						</tr>
+
+						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
 					</table>
-					<b class="label">Калорийность:</b> <b> - </b> <br>
+					<b class="label">Итоговая калорийность: </b> <b th:text="${totalRecipeCalorie}"> - </b><br>
 					<input th:if="${editable}" type="button" class="dws-btn" id="saveChangesForIngrListBtn" value="Сохранить изменения" onclick="editIngredientsList()">	
 				</div>	
 			</div>
@@ -154,11 +164,10 @@
 							<form id="addIngr" method="post" action="addIngrToList"> 
 								<b>Выбрать ингридиент</b><br>
 								<b>Категория ингридиента:</b><br>
-								<select id="ingrType" name="type">
+								<select id="ingrType" name="type" onchange="getIngrListFromServer()">
 									<option value="none" hidden="">Выберите тип</option>
 									<option th:each="type : ${ingrTypes}"> <b th:text=${type}> - </b> </option>
 								</select>
-								<input type="button" onclick="getIngrListFromServer()" value="Выбрать"/><br>
 								<b>Ингридиенты:</b><br>
 								<div id="ingrList">
 									<select id="ingrName">
@@ -166,7 +175,7 @@
 										<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
 									</select>
 								</div><br>
-								<a href="javascript:addExistingIngrToTable()">Добавить</a>
+								<a href="javascript:addExistingIngrToRecipe()">Добавить</a>
 								/
 								<a href="javascript:hideAddIngredientWindow()">Отмена</a>	
 							</form>				
@@ -186,7 +195,7 @@
 								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр"><br>
 								<b>Описание:<b></br>
 								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
-								<a href="javascript:saveNewIngredient()">Сохранить новый и добавить его к рецепту</a>
+								<a href="javascript:addNewIngredienttoRecipe()">Сохранить новый и добавить его к рецепту</a>
 								/
 								<a href="javascript:hideAddIngredientWindow()">Отмена</a>
 							</form>

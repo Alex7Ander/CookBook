@@ -31,14 +31,14 @@ public class Recipe {
 	private User recipeAuther;
 	
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
-	private Set<IngredientVolume> ingredients;
+	private List<IngredientVolume> ingredients;
 	
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
 	
 	public Recipe() {}
 
-	public Recipe(User recipeAuther, String name, String type, String tagline, String youtubeLink, String text, Set<IngredientVolume> ingredientsVolume) {
+	public Recipe(User recipeAuther, String name, String type, String tagline, String youtubeLink, String text, List<IngredientVolume> ingredientsVolume) {
 		this.recipeAuther = recipeAuther;
 		this.type = type;
 		this.name = name;
@@ -87,11 +87,11 @@ public class Recipe {
 		this.recipeAuther = recipeAuther;
 	}
 
-	public Set<IngredientVolume> getIngredients() {
+	public List<IngredientVolume> getIngredients() {
 		return ingredients;
 	}
 
-	public void setIngredients(Set<IngredientVolume> ingredients) {
+	public void setIngredients(List<IngredientVolume> ingredients) {
 		this.ingredients = ingredients;
 	}
 

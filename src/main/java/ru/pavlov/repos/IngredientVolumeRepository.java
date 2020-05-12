@@ -5,4 +5,5 @@ import ru.pavlov.domain.IngredientVolume;
 
 public interface IngredientVolumeRepository extends JpaRepository<IngredientVolume, Long> {
 
+	IngredientVolume findById(long id);
 }

@@ -25,6 +25,7 @@ public class IngredientVolume {
 	private Recipe recipe;
 	
 	private Double volume;
+	private Double resultCalorie;
 	
 	public IngredientVolume() {}
 	
@@ -32,6 +33,7 @@ public class IngredientVolume {
 		this.ingredient = ingredient;
 		this.volume = volume;
 		this.recipe = recipe;
+		this.resultCalorie = this.volume * this.ingredient.getCalorie() / 100;
 	}
 	
 	public Long getId() {
@@ -54,5 +56,29 @@ public class IngredientVolume {
 	}
 	public String getName() {
 		return this.ingredient.getName();
+	}
+
+	public Double getResultCalorie() {
+		return resultCalorie;
+	}
+
+	public void setResultCalorie(Double resultCalorie) {
+		this.resultCalorie = resultCalorie;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		try {
+			IngredientVolume otherIngredientVolume = (IngredientVolume)o;
+			if (otherIngredientVolume.id == this.id) {
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		catch(ClassCastException ccExp) {
+			return false;
+		}
 	}
 }

@@ -248,7 +248,7 @@ public class UserController {
 		String text = allParametrs.get("text");
 		allParametrs.remove("text");
 		
-		Set<IngredientVolume> ingredients = new HashSet<>();
+		List<IngredientVolume> ingredients = new ArrayList<>();
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
 		
 		//Ingredients of recipe and their volume		
@@ -300,6 +300,7 @@ public class UserController {
 		return "cookbook";
 	}
 	
+	/*	
 	@PostMapping("saveIngredient")
 	@ResponseBody
 	public String saveIngredient(@RequestParam String name, 
@@ -320,4 +321,5 @@ public class UserController {
 			return "0";
 		}		
 	}
+	*/
 }
