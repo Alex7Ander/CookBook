@@ -39,7 +39,7 @@ public class IngredientController {
 			int carbohydrate = Integer.parseInt(carbo);
 			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
 			this.ingrRepo.save(ingr);
-			Integer id = ingr.getId();
+			Long id = ingr.getId();
 			return id.toString();
 		} catch (Exception exp) {
 			return "0";

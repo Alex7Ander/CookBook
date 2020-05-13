@@ -4,7 +4,7 @@ var photoUploadWindow;
 
 $(document).ready(function(){
 	editRecipeMainInfoWindow = new EditRecipeMainInfoPopUpWindow("edit_mainInfo_popup");
-	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToRecipe);
+	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable);
 	photoUploadWindow = new PhotoUploadPopUpWindow("add_photo_popup");	
 	//Hide PopUp windows
 	editRecipeMainInfoWindow.hideWindow();
@@ -55,37 +55,54 @@ function addNewIngredienttoRecipe(){
 	addIngredientWindow.saveNewIngredient();
 }
 
-function addIngrToRecipe(ingr){
-	//var ingr = addIngredientWindow.getIngredient();
+function addIngrToTable(ingredientVolume){ 
 	//Adding line to table
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
+
 	//Поле с итоговой калорийностью для ингредиента
 	var resultCalorificValueField = document.createElement('b');
-	//Поле для ввода количества ингредиента
-	var volumeInput = document.createElement('input'); 
-	volumeInput.setAttribute('form', 'saverecipeform');
-	volumeInput.setAttribute('name', ingr.name);
-	volumeInput.oninput = function() {
-		var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
-		resultCalorificValueField.innerText = resultCalValue;
+
+	//Поле с количеством ингредиента и поле для редактирования
+	var volumeTextField = document.createElement('input');
+	volumeTextField.setAttribute("type", "text");
+	volumeTextField.id = ingredientVolume.id + "VolumeTextField";
+	volumeTextField.oninput = function() {
+		resultCalorificValueField.innerText = ingredientVolume.calorie * volumeTextField.value / 100;
 	}
+	var volumeLabel = document.createElement('b');
+	volumeLabel.hidden= true;
+	volumeLabel.id = ingredientVolume.id + "Volume";
+
 	//Кнопка удаления ингредиента
 	var deleteBtn = document.createElement('input'); 
 	deleteBtn.setAttribute("type", "button");
 	deleteBtn.setAttribute("value", "Удалить");
-	deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
+	deleteBtn.setAttribute("id", ingredientVolume.id + "DeleteBtn");
+	deleteBtn.onclick = function(){
+		event.target.parentNode.parentNode.remove();
+	}
+
+	//Кнопка сохранения
+	var saveBtn = document.createElement('input'); 
+	saveBtn.setAttribute("type", "button");
+	saveBtn.setAttribute("value", "Сохранить");
+	var recipeId = document.getElementById("recipeId").value;
+	saveBtn.onclick = function(){
+		saveIngredientInRecipe(recipeId, ingredientVolume.id, volumeTextField.value);
+		event.target.parentNode.remove();		
+	}
 
 	var col1 = document.createElement("TD");
-	col1.appendChild(document.createTextNode(ingr.name));
+	col1.appendChild(document.createTextNode(ingredientVolume.name));
 	var col2 = document.createElement("TD");
-	col2.appendChild(document.createTextNode(ingr.getCalorificValue()));
+	col2.appendChild(volumeTextField);
 	var col3 = document.createElement("TD");
-	col3.appendChild(volumeInput);
+	col3.appendChild(resultCalorificValueField);
 	var col4 = document.createElement("TD");
-	col4.appendChild(resultCalorificValueField);
+	col4.appendChild(deleteBtn);
 	var col5 = document.createElement("TD");		
-	col5.appendChild(deleteBtn);	
+	col5.appendChild(saveBtn);	
 	
 	row.appendChild(col1);
 	row.appendChild(col2);
@@ -94,49 +111,72 @@ function addIngrToRecipe(ingr){
 	row.appendChild(col5);
 	tbody.appendChild(row);
 }
-function deleteIngredient(recipeId, ingredientId){	 
+function saveIngredientInRecipe(recipeId, ingredientId, volume){
 	var ingredientData = new FormData();
 	ingredientData.append("recipeId", recipeId);
 	ingredientData.append("ingredientId", ingredientId);
-	$.ajax({type: "POST", url: "/recipe/deleteIngredient", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+	ingredientData.append("volume", volume);
+	$.ajax({type: "POST", url: "/recipe/addExistingIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
-				var currentLine = event.target.parentNode.parentNode;
-				currentLine.remove();
-				alert('Игредиент успешно удалена');						
+				//Переназначение кнопок
+				var ingredientVolumeId = respond.ingredientVolumeId;
+				var deleteBtn = $("#" + ingredientVolumeId + "DeleteBtn");
+				deleteBtn.bind('click', deleteIngredient);
+				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
+				$("#" + ingredientVolumeId + "Volume").bind('click', showVolumeTextField);
+				$("#" + ingredientVolumeId + "VolumeTxtField").attr('hidden', true);
+				$("#" + ingredientVolumeId + "VolumeTxtField").bind('change', changeIngredientVolume);
+				alert('Игредиент успешно добавлен');						
 			}
-			else {
-				alert('Ошибка при удалении ингердиента на сервере: ' + respond.data);
+		}, 
+		error: function(respond, status, jqXHR) {
+			alert(respond.responseText);
+			alert('Ошибка при добавлении ингердиента на сервере: ' + status);
+		}
+	});
+}
+function deleteIngredient(recipeId, ingredientVolumeId){	 
+	var ingredientData = new FormData();
+	ingredientData.append("recipeId", recipeId);
+	ingredientData.append("ingredientVolumeId", ingredientVolumeId);
+	var response = $.ajax({type: "POST", url: "/recipe/deleteIngredient", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		success: function(respond, status, jqXHR) {
+			if (typeof respond.error === 'undefined') {
+				$("#" + ingredientVolumeId).closest("tr").remove();
+				alert('Игредиент успешно удален');						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
 			alert('Ошибка при удалении ингердиента на сервере: ' + status);
 		}
 	});
+	var recipeInfo = JSON.parse(response.responseText);
+
 }
-function showVolumeTextField(ingredientId){
-	$("#" + ingredientId + "VolumeTextField").attr('hidden', false);
-	var value = $("#" + ingredientId + "Volume").text();
-	$("#" + ingredientId + "VolumeTextField").attr('value', value);
-	$("#" + ingredientId + "Volume").attr('hidden', true);
+function showVolumeTextField(ingredientVolumeId){
+	$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', false);
+	var value = $("#" + ingredientVolumeId + "Volume").text();
+	$("#" + ingredientVolumeId + "VolumeTextField").attr('value', value);
+	$("#" + ingredientVolumeId + "Volume").attr('hidden', true);
 }
-function changeIngredientVolume(recipeId, ingredientId){	
-	var newValue = $("#" + ingredientId + "VolumeTextField").prop("value");
+function changeIngredientVolume(recipeId, ingredientVolumeId){	
+	var newValue = $("#" + ingredientVolumeId + "VolumeTextField").prop("value");
 	if (isNaN(newValue)==true){
 		alert("Вы ввели значение, не являющееся числом");
 	}
 	else{
-		var ingredientData = new FormData();
+		var ingredientData = new FormData(); 
 		ingredientData.append("recipeId", recipeId);
-		ingredientData.append("ingredientId", ingredientId);
+		ingredientData.append("ingredientVolumeId", ingredientVolumeId);
 		ingredientData.append("newValue", newValue);
 		$.ajax({type: "POST", url: "/recipe/editIngredientVolume", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
 			success: function(respond, status, jqXHR) {``
 				if (typeof respond.error === 'undefined') {	
-					$("#" + ingredientId + "Volume").text(newValue);
-					var calorieFactor = $("#" + ingredientId + "CalorieFactor").prop("value");
+					$("#" + ingredientVolumeId + "Volume").text(newValue);
+					var calorieFactor = $("#" + ingredientVolumeId + "CalorieFactor").prop("value");
 					var calorieValue = calorieFactor * newValue / 100;
-					$("#" + ingredientId + "Calorie").text(calorieValue);						
+					$("#" + ingredientVolumeId + "Calorie").text(calorieValue);						
 				}
 				else {
 					alert('Ошибка при редактирования значения на сервере: ' + respond.data);
@@ -146,8 +186,8 @@ function changeIngredientVolume(recipeId, ingredientId){
 				alert('Ошибка при редактирования значения на сервере: ' + status);
 			},
 			complete: function(){
-				$("#" + ingredientId + "Volume").attr('hidden', false);
-				$("#" + ingredientId + "VolumeTextField").attr('hidden', true);
+				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
+				$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', true);
 			}
 		});
 	}
@@ -175,4 +215,3 @@ function addNewPhoto(){
 function deletePhoto(){
 
 }
-

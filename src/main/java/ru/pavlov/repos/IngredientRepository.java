@@ -9,6 +9,7 @@ import ru.pavlov.domain.Ingredient;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
+	public Ingredient findById(long id);
 	public Ingredient findByName(String name);
 	public Ingredient findByNameAndType(String name, String type);
 	public List<Ingredient> findByType(String type);

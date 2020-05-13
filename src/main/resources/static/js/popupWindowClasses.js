@@ -88,6 +88,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
     addExistingIngrToRecipe(){
         var ingr = this.getIngredient();
         this.addingFunction(ingr);
+        this.hideWindow();
     }
 
     getIngredient(){

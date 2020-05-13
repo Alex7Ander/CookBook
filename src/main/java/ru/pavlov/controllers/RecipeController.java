@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.RecipePhoto;
@@ -28,7 +29,7 @@ import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
-@RequestMapping("/recipe/**")
+@RequestMapping("/recipe/**")  
 public class RecipeController {
 	@Autowired
 	private UserRepository userRepo;
@@ -51,10 +52,16 @@ public class RecipeController {
 	@GetMapping("show")
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
+		model.addAttribute("recipe", recipe);
 		
 		double totalRecipeCalorie = 0;
 		for (IngredientVolume ingr : recipe.getIngredients()) {
-			totalRecipeCalorie += ingr.getResultCalorie();
+			try {
+				totalRecipeCalorie += ingr.getResultCalorie();
+			}			
+			catch(NullPointerException npExp) {
+				npExp.printStackTrace();
+			}
 		}
 		model.addAttribute("totalRecipeCalorie", totalRecipeCalorie);
 		
@@ -67,11 +74,10 @@ public class RecipeController {
 		}
 		else {
 			model.addAttribute("editable", false);
-		}
-		model.addAttribute("recipe", recipe);	
+		}			
 		
-		List<IngredientVolume> ingredients = recipe.getIngredients();
-		model.addAttribute("ingredients", ingredients);
+		List<IngredientVolume> ingredientsVolumes = recipe.getIngredients();
+		model.addAttribute("ingredientsVolumes", ingredientsVolumes);
 		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
@@ -118,32 +124,43 @@ public class RecipeController {
 	
 	@PostMapping("addExistingIngredient")
 	@ResponseBody
-	public String addExistingIngredient() {
-		return "";
+	public String addExistingIngredient(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double volume) {
+		Recipe recipe = recipeRepo.findById(recipeId);
+		Ingredient ingredient = ingrRepo.findById(ingredientId);
+		
+		IngredientVolume ingrVolume = new IngredientVolume(ingredient, volume, recipe);
+		ingrVolumeRepo.save(ingrVolume);
+		Long ingredientVolumeId = ingrVolume.getId();
+		
+		System.out.println("В рецепт " + recipe.getName() + " добавлене ингредиент " + ingrVolume.getName() + 
+				".\nИдентификатор записи в тблице ingredientVolume - " + ingredientVolumeId.toString());
+		
+		recipe.getIngredients().add(ingrVolume);
+		recipeRepo.save(recipe);
+		return "{\"message\": \"success\", \"ingredientVolumeId\" : \""+ingredientVolumeId.toString()+"\"}";
 	}
 	
 	@PostMapping("deleteIngredient")
 	@ResponseBody
-	public String deleteIngredient(@RequestParam long recipeId, @RequestParam long ingredientId) {
+	public String deleteIngredient(@RequestParam long recipeId, @RequestParam long ingredientVolumeId) {
 		Recipe recipe = recipeRepo.findById(recipeId);		
-		List<IngredientVolume> currenRecipeIngredients = recipe.getIngredients();
-		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientId);
-		for(IngredientVolume ingredietnFromList : currenRecipeIngredients) {
-			if(ingredietnFromList.equals(currentIngredient)) {
-				ingrVolumeRepo.delete(ingredietnFromList);
-				recipeRepo.save(recipe);
+		List<IngredientVolume> currentRecipeIngredientsVolumes = recipe.getIngredients();
+		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientVolumeId);
+		for(IngredientVolume ingredientFromList : currentRecipeIngredientsVolumes) {
+			if(ingredientFromList.equals(currentIngredient)) {
+				ingrVolumeRepo.delete(ingredientFromList);
 				break;
 			}
 		}
-		return "{}";
+		return "{\"message\": \"success\"}";
 	}
 	
 	@PostMapping("editIngredientVolume")
-	@ResponseBody
-	public String editIngredientVolume(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double newValue) {
+	@ResponseBody 
+	public String editIngredientVolume(@RequestParam long recipeId, @RequestParam long ingredientVolumeId, @RequestParam double newValue) {
 		Recipe recipe = recipeRepo.findById(recipeId);		
 		List<IngredientVolume> currenRecipeIngredients = recipe.getIngredients();
-		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientId);
+		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientVolumeId);
 		for(IngredientVolume ingredietnFromList : currenRecipeIngredients) {
 			if(ingredietnFromList.equals(currentIngredient)) {
 				ingredietnFromList.setVolume(newValue);

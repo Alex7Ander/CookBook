@@ -72,27 +72,24 @@
 							<th>Калорийность (гр/мл)</th>
 							<th></th>
 						</tr>		
-
-						<tr th:each="ingredient : ${ingredients}">
+						<tr th:each="ingredientVolume : ${ingredientsVolumes}">
 							<td>
-								<span th:text="${ingredient.name}"></span>
-								<input type="hidden" th:id="${ingredient.id}">
+								<span th:text="${ingredientVolume.getName()}"></span>
+								<input type="hidden" th:id="${ingredientVolume.id}">
 							</td>
 							<td>
-								<b th:id="${ingredient.id}+Volume" th:text="${ingredient.volume}" th:attr="onclick=|showVolumeTextField('${ingredient.id}')|"></b>
-								<input type="text" hidden="true" th:id="${ingredient.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredient.id}')|">
+								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
+								<input type="text" hidden="true" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredientVolume.id}')|">
 							</td>
 							<td>
-								<input type="hidden" th:id="${ingredient.id}+CalorieFactor" th:value="${ingredient.getIngredient().calorie}">
-								<b th:id="${ingredient.id}+Calorie" th:text="${ingredient.resultCalorie}"></b>
+								<input type="hidden" th:id="${ingredientVolume.id}+CalorieFactor" th:value="${ingredientVolume.getIngredient().calorie}">
+								<b th:id="${ingredientVolume.id}+Calorie" th:text="${ingredientVolume.resultCalorie}"></b>
 							</td>
-							<td><input type="button" th:if="${editable}" th:id="${ingredient.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${recipe.id}', '${ingredient.id}')|" value="Удалить"></td>
+							<td><input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${recipe.id}', '${ingredientVolume.id}')|" value="Удалить"></td>
 						</tr>
-
 						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
 					</table>
-					<b class="label">Итоговая калорийность: </b> <b th:text="${totalRecipeCalorie}"> - </b><br>
-					<input th:if="${editable}" type="button" class="dws-btn" id="saveChangesForIngrListBtn" value="Сохранить изменения" onclick="editIngredientsList()">	
+					<b class="label">Итоговая калорийность: </b> <b th:text="${totalRecipeCalorie}"> - </b><br>	
 				</div>	
 			</div>
 
@@ -172,7 +169,7 @@
 								<div id="ingrList">
 									<select id="ingrName">
 										<option value="none" hidden="">Выберите игредиент</option>
-										<option th:each="ingr : ${ingredients}"> <p th:text=${ingr.name}> - </p> </option>
+										<option th:each="ingredientVolume : ${ingredientsVolumes}"> <p th:text=${ingredientVolume.name}> - </p> </option>
 									</select>
 								</div><br>
 								<a href="javascript:addExistingIngrToRecipe()">Добавить</a>

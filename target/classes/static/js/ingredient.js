@@ -1,12 +1,14 @@
 class ingredient{ 
 
-	constructor(name, type, descr, prot, fat, carbo){
+	constructor(id, name, type, descr, prot, fat, carbo){
+		this.id = id;
 		this.name=name;
 		this.type=type;
 		this.descr=descr;
 		this.prot=prot;
 		this.fat=fat;
 		this.carbo=carbo;
+		this.calorie = this.fat*9 + this.carbo*4 + this.prot*4;
 		this.saved=false;
 	}
 
@@ -24,26 +26,6 @@ class ingredient{
 				this.saved = false;
 			}
 		});
-		/*
-		//var req = new asyncRequest();
-		req.onreadystatechange = function() {
-			if (req.readyState == 4) {
-				if(req.responseText == '0'){
-					saved = new Boolean(false);
-				}
-				else {
-					saved = new Boolean(true);
-				}			
-				if(!req.status == 200) {
-					alert("Error: " + req.status);
-				}
-			}
-		}
-		var body = "name=" + this.name + "&type=" + this.type + "&descr=" + this.descr + "&prot=" + this.prot + "&fat=" + this.fat + "&carbo=" + this.carbo;			
-		req.open("POST", "/ingredient/saveIngredient", false);
-		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		req.send(body);
-		*/
 	}
 	
 	isSaved() {
@@ -53,46 +35,18 @@ class ingredient{
 	getDataFromServer(name, type){
 		this.name = name;
 		this.type = type; 
-		//var req = new asyncRequest();
-		var newObject;
-		var ingredientData = new FormData();
-		ingredientData.append("type", this.type);
-		ingredientData.append("name", this.name);	
-		$.ajax({type: "GET", url: "/ingredient/getProperties", cache: false, contentType: false, processData : false, data: ingredientData,
-			success: function(respond, status, jqXHR) {
-				if (typeof respond.error === 'undefined') {	
-					newObject =  JSON.parse(req.responseText);
-					this.descr = newObject.descr;
-					this.prot = newObject.prot;
-					this.fat = newObject.fat;
-					this.carbo = newObject.carbo;
-				}
-				else {
-					alert("Error: " + status);
-				}
-			}, 
-			error: function(respond, status, jqXHR) {
-				//
+		var body = "?name=" + this.name + "&type=" + this.type;
+		var response = $.ajax({type: "GET", url: "/ingredient/getProperties" + body, async: false, cache: false, contentType: false, dataType: 'json', 
+			error: function(){
+				alert("Ошабка при получении данных с сервера:");
 			}
 		});
-
-/*
-		req.onreadystatechange = function() {
-			if (req.readyState == 4) {
-				if(!req.status == 200) {
-					alert("Error: " + req.status);
-				}
-				newObject =  JSON.parse(req.responseText);
-			}
-		}
-		var body = "?name=" + this.name + "&type=" + this.type;
-		req.open("GET", "/user/addIngrToList"+body, false);
-		req.send();
-*/
-	}
-
-	getCalorificValue(){
-		var calorificValue = this.fat*9 + this.carbo*4 + this.prot*4;
-		return calorificValue;
+		var recipeInfo = JSON.parse(response.responseText);
+		this.id = recipeInfo.id;
+		this.descr = recipeInfo.descr;
+		this.prot = recipeInfo.prot;
+		this.fat = recipeInfo.fat;
+		this.carbo = recipeInfo.carbo;
+		this.calorie = recipeInfo.calorie;
 	}
 }

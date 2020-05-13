@@ -31,7 +31,7 @@ public class Ingredient {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	private int id;
+	private Long id;
 	
 	private String name;
 	private String type;
@@ -45,10 +45,10 @@ public class Ingredient {
 
 	private double calorie;
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getName() {
