@@ -12,7 +12,6 @@ class PopUpWindow{
 
 
 class IngredientsPopUpWindow extends PopUpWindow{
-
     constructor(id, addingToMainTableFunction){
         super(id);
         this.addingFunction = addingToMainTableFunction;
@@ -48,7 +47,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
     }
 
     getNewIngrProt(){
-        return this.getNewIngrProtTextField.value;
+        return this.newIngrProtTextField.value;
     }
 
     getNewIngrFat(){
@@ -73,31 +72,45 @@ class IngredientsPopUpWindow extends PopUpWindow{
         var prot = this.getNewIngrProt();
         var fat = this.getNewIngrFat();
         var carbo = this.getNewIngrCarbo();
-        var ingr = new ingredient(name, type, descr, prot, fat, carbo);
-        ingr.save();
-        if (ingr.isSaved() == true) {
-            try{
-                this.addingFunction(ingr);
+        if(isNaN(prot) || isNaN(fat) || isNaN(carbo)){
+            alert("Одно из введенных Вами значений БЖУ не является числом")
+        }
+        else{
+            var ingr = new ingredient("-", name, type, descr, prot, fat, carbo);
+            var savingMessage = ingr.save();
+            if (ingr.isSaved()) {
+                try{
+                    this.addingFunction(ingr);
+                }
+                catch{
+                    console.log("Отсутствует таблица для сохранения byuhtlbtynf");
+                }
+                this.hideWindow();
+            } else {
+                alert(savingMessage);
             }
-            catch{
-                console.log("Отсутствует таблица для сохранения byuhtlbtynf");
-            }
-            this.hide();
         }
     }
     addExistingIngrToRecipe(){
-        var ingr = this.getIngredient();
-        this.addingFunction(ingr);
-        this.hideWindow();
-    }
-
-    getIngredient(){
         var ingr = new ingredient();
         var selectedType = this.getSelectedIngrType();
         var selectedName = this.getSelectedIngrName();
         ingr.getDataFromServer(selectedName, selectedType);
-        return ingr;
+        var ingredientVolume = new IngredientVolume(ingr);
+        //var ingredientVolume = this.getIngredientVolume();
+        this.addingFunction(ingredientVolume);
+        this.hideWindow();
     }
+/*
+    getIngredientVolume(){  
+        var ingr = new ingredient();
+        var selectedType = this.getSelectedIngrType();
+        var selectedName = this.getSelectedIngrName();
+        ingr.getDataFromServer(selectedName, selectedType);
+        var ingredientVolume = new IngredientVolume(ingr);
+        return ingredientVolume;
+    }
+*/
 }
 
 class PhotoUploadPopUpWindow extends PopUpWindow{
@@ -158,4 +171,10 @@ class EditRecipeMainInfoPopUpWindow extends PopUpWindow{
         });	
     }
 
+}
+
+class CarouselPopUpWindow extends PopUpWindow{
+    constructor(id){
+        super(id);
+    }
 }

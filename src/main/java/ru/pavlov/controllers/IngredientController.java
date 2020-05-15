@@ -1,7 +1,5 @@
 package ru.pavlov.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.repos.IngredientRepository;
-import ru.pavlov.repos.IngredientVolumeRepository;
 
 @Controller
 @RequestMapping("/ingredient/**") // /ingredient/getProperties
@@ -34,15 +31,21 @@ public class IngredientController {
 								 @RequestParam String fat, 
 								 @RequestParam String carbo) {		
 		try {
-			int protein = Integer.parseInt(prot);
-			int fatInt = Integer.parseInt(fat);
-			int carbohydrate = Integer.parseInt(carbo);
-			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
-			this.ingrRepo.save(ingr);
-			Long id = ingr.getId();
-			return id.toString();
+			String response = null;
+			Ingredient ingr = this.ingrRepo.findByName(name);
+			if (ingr!= null) {
+				response = "{\"error\": \"Ингредиент с таким именем уже существует в списке ингредиентов. Его тип: " + ingr.getType() + "\"}";
+				return response;
+			}
+			double protein = Double.parseDouble(prot);
+			double fatInt = Double.parseDouble(fat);
+			double carbohydrate = Double.parseDouble(carbo);
+			Ingredient newIngredient = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			this.ingrRepo.save(newIngredient);
+			response = "{\"id\": \"" + newIngredient.getId().toString() + "\"}";
+			return response;
 		} catch (Exception exp) {
-			return "0";
+			return "{\"error\": \"" + exp.getMessage() + "\"}";
 		}		
 	}
 	
@@ -56,8 +59,8 @@ public class IngredientController {
 			return jsonResponse;
 		}
 		catch(JsonProcessingException jpExp) {
-			System.out.println(jpExp.getMessage());
-			return "{name:'Error'}";
+			jpExp.printStackTrace();
+			return "{\"error\": \"" + jpExp.getMessage() + "\"}";
 		}		
 	}
 	

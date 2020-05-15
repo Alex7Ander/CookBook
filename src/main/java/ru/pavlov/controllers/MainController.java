@@ -47,5 +47,7 @@ public class MainController {
 		userRepo.save(user);		
 		return "redirect:/login";
 	}
+	
+	
 
 }

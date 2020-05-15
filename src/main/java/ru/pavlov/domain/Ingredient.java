@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Table(name = "ingredients")
 public class Ingredient {
 	public Ingredient() {}
-	public Ingredient(String name, String type, String description, int protein, int fat, int carbohydrate) {
+	public Ingredient(String name, String type, String description, double protein, double fat, double carbohydrate) {
 		this.name = name;
 		this.type = type;
 		this.description = description;

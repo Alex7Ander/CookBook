@@ -54,7 +54,7 @@ public class CookBookAuthSuccessHandler implements AuthenticationSuccessHandler 
             }
         }
         if (isUser) {
-            return "/user/personal";
+            return "/user/show";
         } 
         else if (isAdmin) {
             return "/admin/users";

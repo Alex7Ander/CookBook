@@ -1,15 +1,18 @@
 var editRecipeMainInfoWindow;
 var addIngredientWindow;
 var photoUploadWindow;
+var carouselWindow;
 
 $(document).ready(function(){
 	editRecipeMainInfoWindow = new EditRecipeMainInfoPopUpWindow("edit_mainInfo_popup");
 	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable);
 	photoUploadWindow = new PhotoUploadPopUpWindow("add_photo_popup");	
+	carouselWindow = new CarouselPopUpWindow("carousel_recipe_photos");
 	//Hide PopUp windows
 	editRecipeMainInfoWindow.hideWindow();
 	addIngredientWindow.hideWindow();
 	photoUploadWindow.hideWindow();
+	carouselWindow.hideWindow();
 });
 
 /*Working with main info*/
@@ -56,7 +59,6 @@ function addNewIngredienttoRecipe(){
 }
 
 function addIngrToTable(ingredientVolume){ 
-	//Adding line to table
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
 
@@ -66,19 +68,19 @@ function addIngrToTable(ingredientVolume){
 	//Поле с количеством ингредиента и поле для редактирования
 	var volumeTextField = document.createElement('input');
 	volumeTextField.setAttribute("type", "text");
-	volumeTextField.id = ingredientVolume.id + "VolumeTextField";
+	volumeTextField.id = ingredientVolume.ingrId + "VolumeTextField";
 	volumeTextField.oninput = function() {
 		resultCalorificValueField.innerText = ingredientVolume.calorie * volumeTextField.value / 100;
 	}
 	var volumeLabel = document.createElement('b');
 	volumeLabel.hidden= true;
-	volumeLabel.id = ingredientVolume.id + "Volume";
+	volumeLabel.id = ingredientVolume.ingrId + "Volume";
 
 	//Кнопка удаления ингредиента
 	var deleteBtn = document.createElement('input'); 
 	deleteBtn.setAttribute("type", "button");
 	deleteBtn.setAttribute("value", "Удалить");
-	deleteBtn.setAttribute("id", ingredientVolume.id + "DeleteBtn");
+	deleteBtn.setAttribute("id", ingredientVolume.ingrId + "DeleteBtn");
 	deleteBtn.onclick = function(){
 		event.target.parentNode.parentNode.remove();
 	}
@@ -89,7 +91,7 @@ function addIngrToTable(ingredientVolume){
 	saveBtn.setAttribute("value", "Сохранить");
 	var recipeId = document.getElementById("recipeId").value;
 	saveBtn.onclick = function(){
-		saveIngredientInRecipe(recipeId, ingredientVolume.id, volumeTextField.value);
+		saveIngredientInRecipe(recipeId, ingredientVolume.ingrId, volumeTextField.value);
 		event.target.parentNode.remove();		
 	}
 
@@ -214,4 +216,13 @@ function addNewPhoto(){
 }
 function deletePhoto(){
 
+}
+
+function showCarousel(photoId){
+	carouselWindow.showWindow();
+	var startDiv = $("#" + photoId + "Slide").children("div");
+	startDiv.addClass("active");
+}
+function hideCarousel(){
+	carouselWindow.hideWindow();
 }

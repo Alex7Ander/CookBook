@@ -68,24 +68,10 @@ public class UserController {
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
-	private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
-	
-	@GetMapping("cookbook")
-	public String cookbook(Model model) {
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.addAttribute("recipes", recipes);
-		return "cookbook";
-	}
-	
-	@GetMapping("ingredients")
-	public String ingredients( Model model) {		
-		List<Ingredient> ingredients = ingrRepo.findAll();
-		model.addAttribute("ingredients", ingredients);
-		return "ingredients";
-	}
-	
-	@GetMapping("personal")
-	public String personal(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
+	//private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
+		
+	@GetMapping("show")
+	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
 		User currentUser = currentUserDetails.getUser();		
 		model.addAttribute("user", currentUser);		
 		String avatarPath = null;
@@ -99,33 +85,56 @@ public class UserController {
 		
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
-		return "personal";
+		return "user";
 	}
 	
-	@GetMapping("editpersonal")
+	@GetMapping("editpage")
 	public String editPerson(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
 		User currentUser = currentUserDetails.getUser();
 		model.addAttribute("user", currentUser);
-		return "editpersonal";
+		return "edituserpage";
 	}
 	
-	@GetMapping("reviewbook")
-	public String reviewbook(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) {
+	@PostMapping("edit")
+	public String edituser(@RequestParam(required = false, name="name") String name, 
+							@RequestParam(required = false, name="surname") String surname,
+							@RequestParam(required = false, name="city") String city,
+							@RequestParam(required = false, name="temperament") String temperament,
+							@RequestParam(required = false, name="phone") String phone,
+							@RequestParam(required = false, name="avatar") MultipartFile avatar,
+							@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) throws IOException {		
 		User currentUser = currentUserDetails.getUser();
-		List<Review> reviews = reviewRepo.findByUserId(currentUser.getId());
-		model.addAttribute("reviews", reviews);
-		return "reviewbook";
-	}
+		if (name != ValueConstants.DEFAULT_NONE) currentUser.setName(name);
+		if (surname != ValueConstants.DEFAULT_NONE) currentUser.setSurname(surname);
+		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
+		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
+		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
+		this.userRepo.setUserInfoById(currentUser.getId(), 
+				currentUser.getName(), 
+				currentUser.getSurname(), 
+				currentUser.getCity(), 
+				currentUser.getTemperament(), 
+				currentUser.getPhone());		
 		
-	@GetMapping("addrecipe")
-	public String addrecipe(Model model) {
-		model.addAttribute("recipeIngredients", newRecipeIngredients);
-		List<String> ingrTypes = ingrRepo.getIngrTypes();
-		model.addAttribute("ingrTypes", ingrTypes);		
-		List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
-		model.addAttribute("ingredients", ingredients);
-		return "addrecipe";
+		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
+			File uploadDir = new File(uploadPath);
+			if (!uploadDir.exists()) {
+				uploadDir.mkdir();
+			}
+			String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
+			String path = uploadPath + "/" + resultFileName;
+			File newFile = new File(path);
+			avatar.transferTo(newFile);
+			currentUser.setAvatarPath(resultFileName);
+			this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
+		}		
+		model.addAttribute("user", currentUser);
+		return "user"; //personal
 	}
+	
+	/*	
+
+	*/
 	//AJAX 	
 	@PostMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {
@@ -169,157 +178,6 @@ public class UserController {
 		return "addrecipe";
 	}
 	
-	@PostMapping("editUser")
-	public String edituser(@RequestParam(required = false, name="name") String name, 
-							@RequestParam(required = false, name="surname") String surname,
-							@RequestParam(required = false, name="city") String city,
-							@RequestParam(required = false, name="temperament") String temperament,
-							@RequestParam(required = false, name="phone") String phone,
-							@RequestParam(required = false, name="avatar") MultipartFile avatar,
-							@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model) throws IOException {		
-		User currentUser = currentUserDetails.getUser();
-		if (name != ValueConstants.DEFAULT_NONE) currentUser.setName(name);
-		if (surname != ValueConstants.DEFAULT_NONE) currentUser.setSurname(surname);
-		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
-		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
-		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
-		this.userRepo.setUserInfoById(currentUser.getId(), 
-				currentUser.getName(), 
-				currentUser.getSurname(), 
-				currentUser.getCity(), 
-				currentUser.getTemperament(), 
-				currentUser.getPhone());		
-		
-		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
-			File uploadDir = new File(uploadPath);
-			if (!uploadDir.exists()) {
-				uploadDir.mkdir();
-			}
-			String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
-			String path = uploadPath + "/" + resultFileName;
-			File newFile = new File(path);
-			avatar.transferTo(newFile);
-			currentUser.setAvatarPath(resultFileName);
-			this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
-		}		
-		model.addAttribute("user", currentUser);
-		return "personal";
-	}
+
 	
-	@PostMapping("addRecipePhoto")
-	@ResponseBody
-	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
-		Integer hashCode = photo.hashCode();
-		System.out.println("Photo uploaded. Its code is: " + hashCode.toString());
-		byte[] byteArray = photo.getBytes();
-		this.newRecipePhotos.put(hashCode, byteArray);		
-		return hashCode.toString();
-	}
-	
-	@PostMapping("deleteRecipePhoto")
-	@ResponseBody
-	public String deleteRecipePhoto(@RequestParam String code) {
-		Integer reqCode = null;
-		try {
-			reqCode = Integer.parseInt(code);
-			this.newRecipePhotos.remove(reqCode);
-		} 
-		catch(NumberFormatException nfExp) {
-			return "";
-		}		
-		return "0";
-	}
-	
-	@PostMapping("saverecipe")
-	//@ResponseBody
-	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
-								@RequestParam Map<String, String> allParametrs,
-								Model model) throws IOException {		
-		User currentUser = currentUserDetails.getUser();	
-		//Main recipe info
-		String name = allParametrs.get("name");
-		allParametrs.remove("name");
-		String type = allParametrs.get("type");
-		allParametrs.remove("type");
-		String tagline = allParametrs.get("tagline");
-		allParametrs.remove("tagline");
-		String youtubeLink = allParametrs.get("youtubeLink");
-		allParametrs.remove("youtubeLink");
-		String text = allParametrs.get("text");
-		allParametrs.remove("text");
-		
-		List<IngredientVolume> ingredients = new ArrayList<>();
-		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
-		
-		//Ingredients of recipe and their volume		
-		for (String ingredientName : allParametrs.keySet()) {
-			Double volume = null;
-			try {
-				volume = Double.parseDouble(allParametrs.get(ingredientName));
-			} catch(NumberFormatException nfExp) {
-				System.out.println("Ошибка перевода строки в число");
-				System.out.println("");
-				volume = 0.0;
-			} 
-			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);
-			
-			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
-			ingredients.add(ingrVolume);
-		}
-		
-		//Photos saving 
-		List<RecipePhoto> photos = new ArrayList<>();		
-		String recipePhotoFolder = name + "_" + type + "_" + UUID.randomUUID().toString();  //name of the folder with photos
-		String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
-		File uploadDir = new File(recipePhotoFolderFullPath);
-		if (!uploadDir.exists()) {
-			uploadDir.mkdir();
-		}
-		for (Integer photoKey : this.newRecipePhotos.keySet()) {
-			byte[] byteArray = this.newRecipePhotos.get(photoKey);
-			if (byteArray.length != 0) {	
-				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
-				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
-				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName;  //name for saving in database
-				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
-				fos.write(byteArray);
-				fos.close();
-				
-				RecipePhoto uploadedPhoto = new RecipePhoto(dbPhotoName, recipe);
-				photos.add(uploadedPhoto);
-			}
-		}
-		recipe.setPhotos(photos);
-		recipeRepo.save(recipe);
-		recipePhotoRepo.saveAll(photos);
-		ingrVolumeRepo.saveAll(ingredients);
-				
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.addAttribute("recipes", recipes);
-		this.newRecipeIngredients.clear();
-		return "cookbook";
-	}
-	
-	/*	
-	@PostMapping("saveIngredient")
-	@ResponseBody
-	public String saveIngredient(@RequestParam String name, 
-								 @RequestParam String type, 
-								 @RequestParam String descr,
-								 @RequestParam String prot, 
-								 @RequestParam String fat, 
-								 @RequestParam String carbo) {		
-		try {
-			int protein = Integer.parseInt(prot);
-			int fatInt = Integer.parseInt(fat);
-			int carbohydrate = Integer.parseInt(carbo);
-			Ingredient ingr = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
-			this.ingrRepo.save(ingr);
-			Integer id = ingr.getId();
-			return id.toString();
-		} catch (Exception exp) {
-			return "0";
-		}		
-	}
-	*/
 }

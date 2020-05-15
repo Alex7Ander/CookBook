@@ -13,19 +13,36 @@ class ingredient{
 	}
 
 	save() {
+		var ingredientData = new FormData();
+		ingredientData.append("name", this.name);
+		ingredientData.append("type", this.type);
+		ingredientData.append("descr", this.descr);
+		ingredientData.append("prot", this.prot);
+		ingredientData.append("fat", this.fat);
+		ingredientData.append("carbo", this.carbo);
+
+		var doneSuccessfully = false;
+		var message = "";
+		var tempId = "";
 		$.ajax({type: "POST", url: "/ingredient/save", async:false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
 			success: function(respond, status, jqXHR) {
-				if (typeof respond.error === 'undefined') {	
-					this.saved = true;
+				if (typeof respond.error === 'undefined') {		
+					doneSuccessfully = true;
+					tempId = respond.id;				
 				}
 				else {
-					this.saved = false;
+					doneSuccessfully = false;
+					message = respond.error;
 				}
 			}, 
-			error: function(respond, status, jqXHR) {
-				this.saved = false;
-			}
+			error: function(respond, status, jqXHR){
+				message = respond.error;
+				doneSuccessfully = false;
+			}	
 		});
+		this.id = tempId;
+		this.saved = doneSuccessfully;
+		return message;  
 	}
 	
 	isSaved() {
@@ -41,12 +58,12 @@ class ingredient{
 				alert("Ошабка при получении данных с сервера:");
 			}
 		});
-		var recipeInfo = JSON.parse(response.responseText);
-		this.id = recipeInfo.id;
-		this.descr = recipeInfo.descr;
-		this.prot = recipeInfo.prot;
-		this.fat = recipeInfo.fat;
-		this.carbo = recipeInfo.carbo;
-		this.calorie = recipeInfo.calorie;
+		var ingredientInfo = JSON.parse(response.responseText);
+		this.id = ingredientInfo.id;
+		this.descr = ingredientInfo.descr;
+		this.prot = ingredientInfo.prot;
+		this.fat = ingredientInfo.fat;
+		this.carbo = ingredientInfo.carbo;
+		this.calorie = ingredientInfo.calorie;
 	}
 }

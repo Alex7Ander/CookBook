@@ -7,7 +7,7 @@ var photoUploadPopUpWindow;
 
 $(document).ready(function(){
 	//Скрыть PopUp при загрузке страницы  
-	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup"); 
+	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup", addExistingIngrToTable); 
 	photoUploadPopUpWindow = new PhotoUploadPopUpWindow("add_photo_popup"); 
 	ingredientsPopUpWindow.hideWindow();
 	photoUploadPopUpWindow.hideWindow();
@@ -121,51 +121,44 @@ function saveNewIngredient(){
 	ingredientsPopUpWindow.saveNewIngredient();
 }
 
-function addExistingIngrToTable(){
-	try{
-		var ingr = ingredientsPopUpWindow.getIngredient();
-		//Adding line to table
-		var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
-		var row = document.createElement("TR");	
-		//Поле с итоговой калорийностью для ингредиента
-		var resultCalorificValueField = document.createElement('b');
-		//Поле для ввода количества ингредиента
-		var volumeInput = document.createElement('input'); 
-		volumeInput.setAttribute('form', 'saverecipeform');
-		volumeInput.setAttribute('name', ingr.name);
-		volumeInput.oninput = function() {
-			var resultCalValue = ingr.getCalorificValue() * volumeInput.value / 100;
-			resultCalorificValueField.innerText = resultCalValue;
-		}
-		//Кнопка удаления ингредиента
-		var deleteBtn = document.createElement('input'); 
-		deleteBtn.setAttribute("type", "button");
-		deleteBtn.setAttribute("value", "Удалить");
-		deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
-
-		var col1 = document.createElement("TD");
-		col1.appendChild(document.createTextNode(ingr.name));
-		var col2 = document.createElement("TD");
-		col2.appendChild(document.createTextNode(ingr.getCalorificValue()));
-		var col3 = document.createElement("TD");
-		col3.appendChild(volumeInput);
-		var col4 = document.createElement("TD");
-		col4.appendChild(resultCalorificValueField);
-		var col5 = document.createElement("TD");		
-		col5.appendChild(deleteBtn);	
-		
-		row.appendChild(col1);
-		row.appendChild(col2);
-		row.appendChild(col3);
-		row.appendChild(col4);
-		row.appendChild(col5);
-		tbody.appendChild(row);
-    }
-	catch(e){
-		alert("Ошибка при попытке добавить ингредиент");
+function addExistingIngrToTable(ingredient){
+	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
+	var row = document.createElement("TR");	
+	//Поле с итоговой калорийностью для ингредиента
+	var resultCalorificValueField = document.createElement('b');
+	//Поле для ввода количества ингредиента
+	var volumeInput = document.createElement('input'); 
+	volumeInput.setAttribute('form', 'saverecipeform');
+	volumeInput.setAttribute('name', ingredient.name);
+	volumeInput.oninput = function() {
+		var resultCalValue = ingredient.calorie * volumeInput.value / 100;
+		resultCalorificValueField.innerText = resultCalValue;
 	}
+	//Кнопка удаления ингредиента
+	var deleteBtn = document.createElement('input'); 
+	deleteBtn.setAttribute("type", "button");
+	deleteBtn.setAttribute("value", "Удалить");
+	deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
+
+	var col1 = document.createElement("TD");
+	col1.appendChild(document.createTextNode(ingredient.name));
+	var col2 = document.createElement("TD");
+	col2.appendChild(document.createTextNode(ingredient.calorie));
+	var col3 = document.createElement("TD");
+	col3.appendChild(volumeInput);
+	var col4 = document.createElement("TD");
+	col4.appendChild(resultCalorificValueField);
+	var col5 = document.createElement("TD");		
+	col5.appendChild(deleteBtn);	
+	
+	row.appendChild(col1);
+	row.appendChild(col2);
+	row.appendChild(col3);
+	row.appendChild(col4);
+	row.appendChild(col5);
+	tbody.appendChild(row);
     //Closing pop-up window
-	ingredientsPopUpWindow.hideWindow();		
+	//ingredientsPopUpWindow.hideWindow();		
 }
 
 function deleteIngrFromTable(){

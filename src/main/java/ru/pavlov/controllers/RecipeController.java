@@ -1,9 +1,14 @@
 package ru.pavlov.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.IngredientVolume;
@@ -48,6 +54,8 @@ public class RecipeController {
 	
 	@Autowired 
 	private ReviewRepository reviewRepo;
+	
+	private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
 	
 	@GetMapping("show")
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
@@ -169,6 +177,98 @@ public class RecipeController {
 			}
 		}		
 		return "{}";
+	}
+	
+	@PostMapping("addPhoto")
+	@ResponseBody
+	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
+		Integer hashCode = photo.hashCode();
+		System.out.println("Photo uploaded. Its code is: " + hashCode.toString());
+		byte[] byteArray = photo.getBytes();
+		this.newRecipePhotos.put(hashCode, byteArray);		
+		return hashCode.toString();
+	}
+	
+	@PostMapping("deletePhoto")
+	@ResponseBody
+	public String deleteRecipePhoto(@RequestParam String code) {
+		Integer reqCode = null;
+		try {
+			reqCode = Integer.parseInt(code);
+			this.newRecipePhotos.remove(reqCode);
+		} 
+		catch(NumberFormatException nfExp) {
+			return "";
+		}		
+		return "0";
+	}
+	
+	@PostMapping("save")
+	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
+								@RequestParam Map<String, String> allParametrs,
+								Model model) throws IOException {		
+		User currentUser = currentUserDetails.getUser();	
+		//Main recipe info
+		String name = allParametrs.get("name");
+		allParametrs.remove("name");
+		String type = allParametrs.get("type");
+		allParametrs.remove("type");
+		String tagline = allParametrs.get("tagline");
+		allParametrs.remove("tagline");
+		String youtubeLink = allParametrs.get("youtubeLink");
+		allParametrs.remove("youtubeLink");
+		String text = allParametrs.get("text");
+		allParametrs.remove("text");
+		
+		List<IngredientVolume> ingredients = new ArrayList<>();
+		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
+		
+		//Ingredients of recipe and their volume		
+		for (String ingredientName : allParametrs.keySet()) {
+			Double volume = null;
+			try {
+				volume = Double.parseDouble(allParametrs.get(ingredientName));
+			} catch(NumberFormatException nfExp) {
+				System.out.println("Ошибка перевода строки в число");
+				System.out.println("");
+				volume = 0.0;
+			} 
+			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);
+			
+			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
+			ingredients.add(ingrVolume);
+		}
+		
+		//Photos saving 
+		List<RecipePhoto> photos = new ArrayList<>();		
+		String recipePhotoFolder = name + "_" + type + "_" + UUID.randomUUID().toString();  //name of the folder with photos
+		String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
+		File uploadDir = new File(recipePhotoFolderFullPath);
+		if (!uploadDir.exists()) {
+			uploadDir.mkdir();
+		}
+		for (Integer photoKey : this.newRecipePhotos.keySet()) {
+			byte[] byteArray = this.newRecipePhotos.get(photoKey);
+			if (byteArray.length != 0) {	
+				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
+				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName;  //name for saving in database
+				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
+				fos.write(byteArray);
+				fos.close();
+				
+				RecipePhoto uploadedPhoto = new RecipePhoto(dbPhotoName, recipe);
+				photos.add(uploadedPhoto);
+			}
+		}
+		recipe.setPhotos(photos);
+		recipeRepo.save(recipe);
+		recipePhotoRepo.saveAll(photos);
+		ingrVolumeRepo.saveAll(ingredients);
+				
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.addAttribute("recipes", recipes);
+		return "cookbook";
 	}
 		
 }
