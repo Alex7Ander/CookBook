@@ -17,27 +17,29 @@ $(document).ready(function(){
 
 /*Working with main info*/
 function startEditMainInfo(){
-	var name = document.getElementById('name').value;
+	var name = document.getElementById('name').innerText;
 	var type = document.getElementById('type').innerText;
 	var tagline = document.getElementById('tagline').innerText;
+	var youtubeLink = document.getElementById('youtubeLink').href;
 	var text = document.getElementById('text').innerText;
-	editRecipeMainInfoWindow.setRecipeValues(name, type, tagline, text);
+	editRecipeMainInfoWindow.setRecipeValues(name, type, tagline, youtubeLink, text);
 	editRecipeMainInfoWindow.showWindow();
 }
 function editMainInfo(){	
-	var recipeId = document.getElementById('id').value;
+	var recipeId = document.getElementById('recipeId').value;
 	var done = editRecipeMainInfoWindow.editMainInfo(recipeId);
 	if (done===true){
 		document.getElementById('name').innerText = editRecipeMainInfoWindow.getNewName();
 		document.getElementById('type').innerText = editRecipeMainInfoWindow.getNewType();
 		document.getElementById('tagline').innerText = editRecipeMainInfoWindow.getNewTagline();
+		document.getElementById('youtubeLink').href = editRecipeMainInfoWindow.getNewYoutubeLink();
 		document.getElementById('text').innerText = editRecipeMainInfoWindow.getNewText();
 		alert("Изменения успешно сохранены!");
 	}
 	else{
 		alert("Произошла ошибка при попытке внести изменения!");
 	}
-	editRecipeMainInfoWindow.hide();
+	editRecipeMainInfoWindow.hideWindow();
 }
 function hideEditRecipeMainInfoWindow(){
 	this.editRecipeMainInfoWindow.hideWindow();

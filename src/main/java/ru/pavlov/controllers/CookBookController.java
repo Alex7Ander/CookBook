@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
@@ -45,7 +47,10 @@ public class CookBookController {
 	private ReviewRepository reviewRepo;
 	
 	@GetMapping("showCookbook")
-	public String cookbook(Model model) {
+	public String cookbook(@RequestParam(required = false) String name, 
+						   @RequestParam(required = false) String type,
+						   @RequestParam(required = false) String tagline,
+						   @RequestParam(required = false) String auther, Model model) {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
 		return "cookbook";
@@ -53,11 +58,8 @@ public class CookBookController {
 	
 	@GetMapping("addrecipe")
 	public String addrecipe(Model model) {
-		//model.addAttribute("recipeIngredients", newRecipeIngredients);
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);		
-		//List<Ingredient> ingredients = ingrRepo.findByType(curentIngrType);
-		//model.addAttribute("ingredients", ingredients);
 		return "addrecipe";
 	}
 	

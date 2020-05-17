@@ -7,7 +7,7 @@ var photoUploadPopUpWindow;
 
 $(document).ready(function(){
 	//Скрыть PopUp при загрузке страницы  
-	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup", addExistingIngrToTable); 
+	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable); 
 	photoUploadPopUpWindow = new PhotoUploadPopUpWindow("add_photo_popup"); 
 	ingredientsPopUpWindow.hideWindow();
 	photoUploadPopUpWindow.hideWindow();
@@ -16,6 +16,12 @@ $(document).ready(function(){
 /*
 Управление фотографиями
 */
+function showPhotoUploadWindow(){
+	photoUploadPopUpWindow.showWindow();
+}
+function hidePhotoUploadWindow(){
+	photoUploadPopUpWindow.hideWindow();
+}
 function getCurrentlyUploadedPhoto(event){
 	let photoFileLoader = document.getElementById('photoLoader');
 	currentlyUploadedPhoto = photoFileLoader.files[0];
@@ -28,17 +34,18 @@ function addPhotoToPhotoList(event){
 	event.preventDefault();  // остановка дефолтного события для текущего элемента
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
-	$.ajax({type: "POST", url: "/user/addRecipePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/sendPhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
-				showUploadedPhotoOnMainPage(respond);							
+				showUploadedPhotoOnMainPage(respond.code);							
 			}
 			else{
-				alert('Error: ' + respond.data);
+				console.log(respond.error);
+				alert('Ошибка уделнеия фотографии. Повторите попытку.');
 			}
 		}, 
 		error: function(respond, status, jqXHR){
-			alert('Не удалось загрузить фото на сервер: ' + status);
+			alert('Не удалось удалить фото: ' + status);
 		},
 		complete: function(){
 			photoUploadPopUpWindow.hideWindow();
@@ -85,7 +92,7 @@ function deletePhotoCard(){
 	let photoData = new FormData();
 	photoData.append('code', code);
 	
-	$.ajax({type: "POST", url: "/user/deleteRecipePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
 				let parent = document.getElementById('photoList');
@@ -117,11 +124,14 @@ function getIngrListFromServer(){
 	ingredientsPopUpWindow.getIngrListFromServer();
 }
 
-function saveNewIngredient(){
+function addNewIngredientToRecipe(){
 	ingredientsPopUpWindow.saveNewIngredient();
 }
 
-function addExistingIngrToTable(ingredient){
+function addExistingIngrToRecipe(){
+	ingredientsPopUpWindow.addExistingIngrToRecipe();
+}
+function addIngrToTable(ingredientVolume){
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
 	//Поле с итоговой калорийностью для ингредиента
@@ -129,9 +139,9 @@ function addExistingIngrToTable(ingredient){
 	//Поле для ввода количества ингредиента
 	var volumeInput = document.createElement('input'); 
 	volumeInput.setAttribute('form', 'saverecipeform');
-	volumeInput.setAttribute('name', ingredient.name);
+	volumeInput.setAttribute('name', ingredientVolume.name);
 	volumeInput.oninput = function() {
-		var resultCalValue = ingredient.calorie * volumeInput.value / 100;
+		var resultCalValue = ingredientVolume.calorie * volumeInput.value / 100;
 		resultCalorificValueField.innerText = resultCalValue;
 	}
 	//Кнопка удаления ингредиента
@@ -141,9 +151,9 @@ function addExistingIngrToTable(ingredient){
 	deleteBtn.setAttribute("onclick", "deleteIngrFromTable()");
 
 	var col1 = document.createElement("TD");
-	col1.appendChild(document.createTextNode(ingredient.name));
+	col1.appendChild(document.createTextNode(ingredientVolume.name));
 	var col2 = document.createElement("TD");
-	col2.appendChild(document.createTextNode(ingredient.calorie));
+	col2.appendChild(document.createTextNode(ingredientVolume.calorie));
 	var col3 = document.createElement("TD");
 	col3.appendChild(volumeInput);
 	var col4 = document.createElement("TD");
@@ -156,9 +166,7 @@ function addExistingIngrToTable(ingredient){
 	row.appendChild(col3);
 	row.appendChild(col4);
 	row.appendChild(col5);
-	tbody.appendChild(row);
-    //Closing pop-up window
-	//ingredientsPopUpWindow.hideWindow();		
+	tbody.appendChild(row);		
 }
 
 function deleteIngrFromTable(){

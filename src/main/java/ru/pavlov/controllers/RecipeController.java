@@ -101,7 +101,8 @@ public class RecipeController {
 	public String editMainInfo(@RequestParam Map<String, String> allParametrs) {
 		Long id = Long.parseLong(allParametrs.get("id"));
 		allParametrs.remove("id");
-		Recipe recipe = recipeRepo.findById(id);		
+		Recipe recipe = recipeRepo.findById(id);	
+		String response = "{\"wrongFields\":\"[";
 		for(String key : allParametrs.keySet()) {
 			String value = allParametrs.get(key);
 			try {
@@ -112,8 +113,10 @@ public class RecipeController {
 			catch(NoSuchFieldException | IllegalAccessException reflExp) {
 				System.out.println("Ошибка при изменении значения поля: " + key);
 				reflExp.printStackTrace();
+				response += (key + ", ");
 			}
 		}
+		response += "]\"}";
 		recipeRepo.save(recipe);
 		return "{}";
 	}
@@ -178,30 +181,50 @@ public class RecipeController {
 		}		
 		return "{}";
 	}
-	
-	@PostMapping("addPhoto")
+
+	/* PHOTOS */
+	//---------------------------------------------------------------------
+	@PostMapping("sendPhoto")
 	@ResponseBody
 	public String addRecipePhoto(@RequestParam(required = false, name="photo") MultipartFile photo) throws IOException {
 		Integer hashCode = photo.hashCode();
 		System.out.println("Photo uploaded. Its code is: " + hashCode.toString());
 		byte[] byteArray = photo.getBytes();
-		this.newRecipePhotos.put(hashCode, byteArray);		
-		return hashCode.toString();
+		this.newRecipePhotos.put(hashCode, byteArray);
+		String response = "{\"code\":\"" + hashCode.toString() + "\"}";
+		return response;
+	}
+	
+	@PostMapping("dropUnsavedPhoto")
+	@ResponseBody
+	public String dropUnsavedPhoto(@RequestParam String code) {
+		Integer reqCode = null;
+		String response = null;
+		try {
+			reqCode = Integer.parseInt(code);
+			this.newRecipePhotos.remove(reqCode);
+			response = "{\"done\":\" + true + \"}";
+		} 
+		catch(NumberFormatException nfExp) {
+			response = "{\"error\":\" + неправильные формат кода фотографии. + \"}";
+		}		
+		return response;
+	}
+	
+	@PostMapping("savePhoto")
+	@ResponseBody
+	public String savePhoto(@RequestParam long photoCode) {
+		
+		return "";
 	}
 	
 	@PostMapping("deletePhoto")
 	@ResponseBody
-	public String deleteRecipePhoto(@RequestParam String code) {
-		Integer reqCode = null;
-		try {
-			reqCode = Integer.parseInt(code);
-			this.newRecipePhotos.remove(reqCode);
-		} 
-		catch(NumberFormatException nfExp) {
-			return "";
-		}		
-		return "0";
+	public String deletePhoto(@RequestParam long photoCode) {
+		
+		return "";
 	}
+	//---------------------------------------------------------------------
 	
 	@PostMapping("save")
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 

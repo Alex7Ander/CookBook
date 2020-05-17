@@ -83,7 +83,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
                     this.addingFunction(ingr);
                 }
                 catch{
-                    console.log("Отсутствует таблица для сохранения byuhtlbtynf");
+                    console.log("Отсутствует таблица для сохранения");
                 }
                 this.hideWindow();
             } else {
@@ -97,20 +97,9 @@ class IngredientsPopUpWindow extends PopUpWindow{
         var selectedName = this.getSelectedIngrName();
         ingr.getDataFromServer(selectedName, selectedType);
         var ingredientVolume = new IngredientVolume(ingr);
-        //var ingredientVolume = this.getIngredientVolume();
         this.addingFunction(ingredientVolume);
         this.hideWindow();
     }
-/*
-    getIngredientVolume(){  
-        var ingr = new ingredient();
-        var selectedType = this.getSelectedIngrType();
-        var selectedName = this.getSelectedIngrName();
-        ingr.getDataFromServer(selectedName, selectedType);
-        var ingredientVolume = new IngredientVolume(ingr);
-        return ingredientVolume;
-    }
-*/
 }
 
 class PhotoUploadPopUpWindow extends PopUpWindow{
@@ -125,6 +114,7 @@ class EditRecipeMainInfoPopUpWindow extends PopUpWindow{
         this.newNameTextField = document.getElementById("editName");
         this.newTypeTextField = document.getElementById("editType");
         this.newTaglineTextField = document.getElementById("editTagline");
+        this.newYoutubeLinkTextField = document.getElementById("editYoutubeLink");
         this.newTextTextField = document.getElementById("editText");
     }
 
@@ -137,15 +127,19 @@ class EditRecipeMainInfoPopUpWindow extends PopUpWindow{
     getNewTagline(){
         return this.newTaglineTextField.value;
     }
+    getNewYoutubeLink(){
+        return this.newYoutubeLinkTextField.value;
+    }
     getNewText(){
         return this.newTextTextField.value;
     }
 
-    setRecipeValues(name, type, tagline, text){
+    setRecipeValues(name, type, tagline, youtubeLink, text){
         this.newNameTextField.value = name;
         this.newTypeTextField.value = type;
         this.newTaglineTextField.value = tagline;
-        this.newTextTextField = text;
+        this.newYoutubeLinkTextField.value = youtubeLink;
+        this.newTextTextField.value = text;
     }
 
     editMainInfo(recipeId){
@@ -154,21 +148,24 @@ class EditRecipeMainInfoPopUpWindow extends PopUpWindow{
         mainInfoData.append("name", this.getNewName());
         mainInfoData.append("type", this.getNewType());
         mainInfoData.append("tagline", this.getNewTagline());
+        mainInfoData.append("youtubeLink", this.getNewYoutubeLink());
         mainInfoData.append("text", this.getNewText());
 
-        $.ajax({type: "POST", url: "/recipe/editMainInfo", cache: false, dataType: 'json', contentType: false, processData: false, data: mainInfoData,
+        var done = false;
+        $.ajax({type: "POST", url: "/recipe/editMainInfo", async:false, cache: false, dataType: 'json', contentType: false, processData: false, data: mainInfoData,
             success: function(respond, status, jqXHR) {
                 if (typeof respond.error === 'undefined') {		
-                    return true;					
+                    done = true;					
                 }
                 else {
-                    return false;
+                    done = false;
                 }
             }, 
             error: function(respond, status, jqXHR) {
-                return false;
+                done = false;
             }
-        });	
+        });
+        return done;	
     }
 
 }

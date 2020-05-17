@@ -4,19 +4,43 @@
     <title>Getting Started: Serving Web Content</title>
     <link rel="stylesheet" href="/styles/style.css" type="text/css">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">		
+	<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
 </head>
 <body>
-    <div class="container">
-		<form method="get" action="user/cookbook">
-			<b>Для входа нажмите</b><br>
-			<button class = "dws-btn" type="submit">Войти</button><br>
-		</form>
-		<br>
-		<form method="get" action="registration">
-			<button class = "dws-btn" type="submit">Регистрация</button>
-		</form>
-		
-	</div> 
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-7">
+				<div>
+					<b class="label">Добро пожаловать в CookBook</b><br>
+					<p>Разработчики сайта рады приветствовать Вас у себя на странице.
+					Мы полагаем, раз Вы нашли нас, то скорее всего вы здесь по приглашению.
+					В этом случае вы можете приступать к регистрации, используя свой код приглашения.
+					Или же войти на сайт, если Вы уже зарегистрированны.</p><br><br>
+					<p>Если же вы нашли наш сайт случайно, то Вам следует кое-что знать о нем:</p><br>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="container">
+					<form method="get" action="/cookbook/showCookbook">
+						<b>Для входа нажмите</b><br>
+						<button class = "dws-btn" type="submit">Войти</button><br>
+					</form>
+					<br>
+					<form method="get" action="registration">
+						<button class = "dws-btn" type="submit">Регистрация</button>
+					</form>					
+				</div> 
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+	</div>	
 	
+	<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+
 </body>
 </html>
