@@ -13,6 +13,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.JoinColumn;
 
 @Entity
@@ -22,6 +26,7 @@ public class User {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)    
     private Long id;
+	@JsonProperty("login")
 	@Column(name = "login", unique = true)
 	private String userLoginName;
     private String password; 
@@ -35,6 +40,7 @@ public class User {
 	private String avatarPath;
 	private int enabled;
 		
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns=@JoinColumn(name = "roleId"))
 	private List<UserRole> roles;

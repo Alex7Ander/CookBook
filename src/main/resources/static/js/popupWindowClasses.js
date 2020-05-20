@@ -175,3 +175,10 @@ class CarouselPopUpWindow extends PopUpWindow{
         super(id);
     }
 }
+
+
+class AddNewUserPopUpWindow extends PopUpWindow{
+    constructor(id){
+        super(id);
+    }
+}

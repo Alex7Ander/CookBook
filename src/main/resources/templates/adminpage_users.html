@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">	
+	<head>
+		<meta charset="utf-8">
+		<title>Рецепт</title>
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="../static/styles/style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/table.css}"  href="../static/styles/table.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
+        <link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+	</head>
+
+	<body>
+        <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-2">
+                    <h2>Функции: </h2>
+                    <input type="button" value="На свою страницу пользователя" class="btn btn-secondary" onclick="javascript:document.location.href='/user/personal'"><br>
+                    <input type="button" value="Пользователи" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/users'"><br>
+                    <input type="button" value="Рецепты" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/recipes'"><br>
+                    <input type="button" value="Ингредиенты" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/ingredients'"><br>
+                    <input type="button" value="Сообщения" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/reviews'"><br>
+                </div>
+                <div class="col-md-4">
+                    <h2>Пользователи: </h2>
+                    <input type="button" id="newUserCreate" value="Новый пользователь">
+                    <table id="ingrTable">
+                        <tr>
+                            <th class="idcol">id</th> 
+                            <th>Имя</th>
+                            <th>Фамилия</th>
+                        </tr>
+                        <tr th:each="user : ${users}" th:attr="onclick=|loadUser('${user.id}')|">
+                            <td class="idcol"><span th:text="${user.id}"></td>
+                            <td><span th:text="${user.name}"></td>
+                            <td><span th:text="${user.surname}"></td> 
+                        </tr>	
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2>Информация: </h2>
+                    <b>online: </b> <b></b> <br>
+                    <input type="hidden" id="id">
+                    <b>Имя: </b> <b id="name"> - </b> <br>
+                    <b>Фамилия: </b> <b id="surname"> - </b> <br>
+                    <b>Логин: </b> <b id="login"> - </b> <br>
+                    <b>Пароль: </b> <b id="password"> - </b> <br>
+                    <b>Город: </b> <b id="city"> - </b> <br>
+                    <b>Темперамент: </b> <b id="temperament"> - </b> <br>
+                    <b>email: </b> <b id="email"> - </b> <br>
+                    <b>Телефон: </b> <b id="phone"> - </b> <br>
+                    <input type="button" value="Редактировать">
+                    <input type="button" value="В бан">
+                    <input type="button" value="Удалить">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pop up window for new user -->
+        <div class="popup" id="newUserWindow">			
+			<div class="container-fluid">			
+				<div class="row">
+					<div class="col-md-1"></div>	
+					<div class="col-md-10">	
+                        <form method="post" action="/admin/addNewUser">			
+                            <b>Логин: </b> <input type="text" id="newUserLogin"> <br>
+                            <b>Пароль: </b> <input type="text" id="newUserPassword"> <br>
+                            <b>E-mail: </b> <input type="text" id="newUserEmail"> <br>
+                            <b>Роль: </b> 
+                            <select id="newUserRole">
+                                <option> USER </option>
+                                <option> ADMIN </option>
+                            </select>
+                            <br>
+                            <input type="submitt">
+                        </form>
+					</div>
+					<div class="col-md-1"></div>													
+				</div>
+			</div>
+        </div>
+        
+
+        <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        
+        <script th:src="@{/js/adminpage.js}" src="../static/js/adminpage.js"></script>
+    </body>
+
+</html>

@@ -13,8 +13,7 @@ public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	
+		
 	private String text;
 	
 	private Long userId;

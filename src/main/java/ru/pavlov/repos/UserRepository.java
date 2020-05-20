@@ -1,5 +1,7 @@
 package ru.pavlov.repos;
 
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,6 +11,7 @@ import ru.pavlov.domain.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+	public User findById(long id);
 	public User findByName(String username);
 	public User findByUserLoginName(String login);
 	public User findByEmail(String email);
