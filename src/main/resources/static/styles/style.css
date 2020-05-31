@@ -1,5 +1,5 @@
 body {
-	background: url(../img/main2.jpg) no-repeat center center fixed;
+	background: url(../img/main.jpg) no-repeat center center fixed;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
@@ -44,7 +44,7 @@ textarea{
 .cookBookContainer{
 	width: 450px;
 	height: auto;
-	background-color: rgb(128, 128, 0, 0.7);
+	background-color: rgba(243, 115, 11, 0.7);
 	margin: 120px auto 0 auto;
 	text-align: center;
 	border-radius: 0 0 30px 30px;
@@ -61,7 +61,7 @@ textarea{
 .recipecontainer{
 	width: 500px;
 	height: 250px;
-	background-color: #E8E6D1(128, 128, 0, 0.7);
+	background-color: rgba(128, 128, 0, 0.7);
 	margin: 10px auto 0 auto;
 	text-align: center;
 	border-radius: 0 0 30px 0px;
@@ -75,21 +75,21 @@ textarea{
 	font-size: 24px;
 	font-style: italic;
 	color: black;
-	background-color: #E8E6D1; /*#008080;*/
+	background-color: rgb(250, 246, 2); 
 	border: none;
-	border-bottom: 4px solid  #B9B29F;/* #20B2AA;*/
+	border-bottom: 4px solid  #B9B29F;
 	cursor: pointer;
 }
 
 .dws-btn:hover{
 	transition: all 0.7s;
-	background: rgb(102, 100, 30);
-	color: #E8E6D1; /* #2c536C;*/
+	background:  rgba(235, 95, 14, 0.9);
+	color: #E8E6D1;
 }
 
 .label{
 	font-family: Calibri;
 	font-size: 16px;
 	font-style: italic;
-	color: #fff;
+	color: rgb(107, 45, 4);
 }

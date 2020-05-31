@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +38,10 @@ import ru.pavlov.security.CookBookUserDetails;
 @Controller
 @RequestMapping("/recipe/**")  
 public class RecipeController {
+	
+	@Value("${upload.path}")
+	private String uploadPath;
+	
 	@Autowired
 	private UserRepository userRepo;
 	
@@ -265,7 +270,8 @@ public class RecipeController {
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();		
 		String recipePhotoFolder = name + "_" + type + "_" + UUID.randomUUID().toString();  //name of the folder with photos
-		String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
+		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
+		//String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
 		File uploadDir = new File(recipePhotoFolderFullPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
@@ -275,7 +281,7 @@ public class RecipeController {
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
 				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
-				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName;  //name for saving in database
+				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName; 
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
 				fos.close();

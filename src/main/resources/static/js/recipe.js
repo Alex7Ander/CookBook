@@ -3,6 +3,8 @@ var addIngredientWindow;
 var photoUploadWindow;
 var carouselWindow;
 
+var currentCaruselActiveSlide;
+
 $(document).ready(function(){
 	editRecipeMainInfoWindow = new EditRecipeMainInfoPopUpWindow("edit_mainInfo_popup");
 	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable);
@@ -220,11 +222,13 @@ function deletePhoto(){
 
 }
 
-function showCarousel(photoId){
+function showCarouselWindow(photoId){
 	carouselWindow.showWindow();
-	var startDiv = $("#" + photoId + "Slide").children("div");
-	startDiv.addClass("active");
+	currentCaruselActiveSlide = $("#" + photoId + "Slide");
+	currentCaruselActiveSlide.addClass("active");
 }
-function hideCarousel(){
+function hideCarouselWindow(){
 	carouselWindow.hideWindow();
+	currentCaruselActiveSlide.removeClass("active");	
+	currentCaruselActiveSlide = null;
 }

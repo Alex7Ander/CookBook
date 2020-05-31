@@ -1,5 +1,5 @@
 .navbar-default {
-	background-color: rgb(128, 128, 0, 0.7);
+	background-color: rgba(235, 95, 14, 0.993);
 	border-color: black;
 }
 .navbar-default .navbar-brand {
@@ -24,7 +24,7 @@
 }
 
 .card{
-	background-color: rgba(134, 134, 11, 0.3);
+	background-color: rgba(235, 95, 14, 0.55);
 }
 
 .btn-secondary{

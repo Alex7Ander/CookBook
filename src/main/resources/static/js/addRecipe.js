@@ -63,7 +63,7 @@ function showUploadedPhotoOnMainPage(code){
 	var image = document.createElement('img');
 	var photoPath = document.getElementById('uploadedPhoto').src;
 	image.src = photoPath;
-	image.className = "imageContainer";
+	image.className = "d-block w-100";
 	newPhotoCard.append(image);
 	// Hidden input with hashcode
 	var codeInput = document.createElement('input');
