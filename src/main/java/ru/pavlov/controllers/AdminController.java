@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,7 @@ import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
+import ru.pavlov.mail.MailSender;
 
 @Controller
 @RequestMapping("/admin/**")
@@ -40,6 +42,9 @@ public class AdminController {
 	
 	@Autowired
 	private ReviewRepository reviewRepo;
+	
+	@Autowired
+	private MailSender mailSender;
 	
 	@GetMapping("users")	
 	public String adminPageUsers(Model model) {
@@ -119,5 +124,17 @@ public class AdminController {
 		Iterable<Review> reviews = reviewRepo.findAll();
 		model.addAttribute("reviews", reviews);
 		return "adminpage_reviews";
+	}
+	
+	@GetMapping("sendmailwindow")
+	public String sendmailwindow() {
+		return "sendmailwindow";
+	}
+	
+	@PostMapping("sendemail")
+	@ResponseBody
+	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
+		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
+		return "{}";
 	}
 }

@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	public User findByName(String username);
 	public User findByUserLoginName(String login);
 	public User findByEmail(String email);
+	public User findByActivationCode(String activationCode);
 	
 	@Transactional
 	@Modifying
@@ -25,4 +26,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Modifying	
 	@Query("update User u set u.avatarPath = ?2 where u.id = ?1")
 	void setUserAvatarById(Long id, String avatarPath);
+	
 }

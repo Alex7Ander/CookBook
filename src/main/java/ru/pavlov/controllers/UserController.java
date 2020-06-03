@@ -1,14 +1,10 @@
 package ru.pavlov.controllers;
 
 import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +24,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.pavlov.domain.Ingredient;
-import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
-import ru.pavlov.domain.RecipePhoto;
-import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
-import ru.pavlov.repos.IngredientVolumeRepository;
-import ru.pavlov.repos.RecipePhotoRepository;
 import ru.pavlov.repos.RecipeRepository;
-import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
@@ -57,14 +47,6 @@ public class UserController {
 	@Autowired
 	private IngredientRepository ingrRepo;
 	
-	@Autowired
-	private IngredientVolumeRepository ingrVolumeRepo;
-	
-	@Autowired
-	private RecipePhotoRepository recipePhotoRepo;	
-	
-	@Autowired 
-	private ReviewRepository reviewRepo;
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
@@ -132,9 +114,6 @@ public class UserController {
 		return "user"; //personal
 	}
 	
-	/*	
-
-	*/
 	//AJAX 	
 	@PostMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {

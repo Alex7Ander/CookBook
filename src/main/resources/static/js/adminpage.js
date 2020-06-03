@@ -1,3 +1,10 @@
+var newUserPopupWindow;
+
+$(document).ready(function(){
+    newUserPopupWindow = new AddNewUserPopUpWindow("new_user_window");
+    newUserPopupWindow.hideWindow();
+});
+
 function loadUser(id){
     $.ajax({type: "GET", url: "/admin/loadUser?id=" + id, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
         success: function(respond, status, jqXHR){
@@ -80,4 +87,18 @@ function startEdit(id){
     $("#" + id + "TextField").attr('hidden', false);
     $("#" + id + "TextField").prop("value", $("#" + id).text());
     $("#" + id).attr('hidden', true);
+}
+
+function sendEmail(){
+    var emailData = new FormData();
+    emailData.append("emailTo", $("#emailTo").val());
+    emailData.append("message", $("#message").val());
+    $.ajax({type: "POST", url: "/admin/sendemail", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: emailData,
+        success: function(respond, status, jqXHR){
+            alert("Сообщение отправлено");
+        },
+        error: function(respond, status, jqXHR){
+            alert(status);
+        }
+    });
 }
