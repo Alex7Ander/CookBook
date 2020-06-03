@@ -90,5 +90,28 @@ public class MainController {
 		}		
 	}
 	
+	@GetMapping("resurectionPage")
+	public String resurectionPage() {
+		return "resurection";
+	}
+	
+	@GetMapping("resurection")
+	public String resurection(@RequestParam String email, Model model) {
+		User user = userRepo.findByEmail(email);
+		if (user == null) {
+			return "regUser";
+		}
+		String pass = user.getPassword();
+		String message = "Пароль от вашего аккаунта в CookBook: " + pass;
+		try {
+			mailSender.send(email, "Запрос на восстановление пароля", message);
+			model.addAttribute("errorMsg", "Письмо с паролем выслано на ваш адрес");
+		}
+		catch(Exception exp) {
+			model.addAttribute("errorMsg", "Ошибка при отправке письма с паролем");
+		}
+		return "redirect:/login";
+	}
+	
 	
 }

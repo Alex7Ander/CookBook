@@ -99,7 +99,9 @@
 						<img class="d-block w-100" th:src="@{/img/} + ${photo.photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
 					</div>
 				</div>
-				<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
+				<div th:if="${editable}">
+					<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
+				</div>
 			</div>			
 		</div>
 

@@ -91,27 +91,29 @@ public class UserController {
 		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
 		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
+		/*
 		this.userRepo.setUserInfoById(currentUser.getId(), 
 				currentUser.getName(), 
 				currentUser.getSurname(), 
 				currentUser.getCity(), 
 				currentUser.getTemperament(), 
 				currentUser.getPhone());		
-		
+		*/
 		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
 			File uploadDir = new File(uploadPath);
 			if (!uploadDir.exists()) {
 				uploadDir.mkdir();
 			}
 			String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
-			String path = uploadPath + "/" + resultFileName;
+			String path = uploadPath + "/avatars/" + resultFileName;
 			File newFile = new File(path);
 			avatar.transferTo(newFile);
 			currentUser.setAvatarPath(resultFileName);
-			this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
+			//this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
 		}		
+		userRepo.save(currentUser);
 		model.addAttribute("user", currentUser);
-		return "user"; //personal
+		return "user";
 	}
 	
 	//AJAX 	

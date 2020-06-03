@@ -2,24 +2,85 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="/styles/style.css" type="text/css">
+	<!--link rel="stylesheet" href="/styles/style.css" type="text/css"-->
 	<title>Книга рецептов - Восстановление пароля</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">		
 	<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+	<style type="text/css">
+		body {
+			background: url(../../img/reg.jpg) no-repeat center center fixed;
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+		a{
+			color: #fff; /*Белый цвет*/
+		}
+		a:hover{
+			text-decoration: none;
+		}						
+		input[type="text"], input[type="password"], input[type="email"]{
+			width: 300px;
+			height: 30px;
+			font-size: 14px;
+			margin-bottom: 25px;
+			border-radius: 5px;
+		}
+		.container{
+			width: 450px;
+			height: auto;
+			background-color: rgb(128, 128, 0, 0.7);
+			margin: 120px auto 0 auto;
+			padding: 10px 10px 30px 10px;
+			text-align: center;
+			border-radius: 0 0 30px 30px;
+		}
+		.container img{
+			width: 150px;
+			height: 150px;
+			margin: -100px 0 30px 0;
+			border: 5px solid #6B8E23;
+			border-radius: 50%;
+		}		
+		.dws-btn {
+			padding: 10px 30px;
+			margin: 5px 0 20px 0;
+			font-family: Calibri;
+			font-size: 24px;
+			font-style: italic;
+			color: #fff;
+			background-color: #008080;
+			border: none;
+			border-bottom: 4px solid #20B2AA;
+			cursor: pointer;
+		}
+		.dws-btn:hover{
+			transition: all 0.7s;
+			background: #fff;
+			color: #2c536C;
+		}
+	</style>
 </head>
 <body>
 	<div class = "container-fluid">
 		<div class="row">
 			<div class="col-md-3"></div>
-			<div class="col-md-6"></div>
-				<img src="/img/autorisation_ico.png">
-				<form>
-					<b class = "label">Введи e-mail, указанный при регистрации: </b><br>
-					<input type = "text" class = "dws-input" name = "username" placeholder = "e-mail">
-					<input class = "dws-btn" type = "submit" name = "submit" value = "Восстановить"><br>	
-				</form>
-				<a href="login.html">Вход</a>
+			<div class="col-md-6">
+				<div class="container">
+					<img src="/img/autorisation_ico.png">
+					<form method="get" action="/resurection">
+						<b class = "label">Введи e-mail, указанный при регистрации: </b><br>
+						<input type = "text" class = "dws-input" name = "email" placeholder = "e-mail">
+						<input class = "dws-btn" type = "submit" name = "submit" value = "Восстановить"><br>	
+					</form>
+					<div>
+						<a href="/login">Вход</a>
+						<b>/</b>
+						<a href="/registration">Зарегистрироваться</a>
+					</div>
+				</div>
 			</div>
 			<div class="col-md-3"></div>
 		</div>

@@ -31,10 +31,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 		http.authorizeRequests()
 			//.anyRequest().authenticated()		
-			.antMatchers("/regPage").permitAll()
-			.antMatchers("/user/**", "/recipe/**", "/ingredient/**", "/cookbook/**", "/activate/*").hasAnyRole("ADMIN", "USER")
+			.antMatchers("/img/**", "/uploadimg/**", "/regPage/", "/activate/*", "/resurectionPage/", "/resurection/*").permitAll()
+			.antMatchers("/user/**", "/recipe/**", "/ingredient/**", "/cookbook/**").hasAnyRole("ADMIN", "USER")
 			.antMatchers("/admin/**").hasRole("ADMIN")
-			.antMatchers("/img/**", "/uploadimg/**").permitAll()
 			.and().formLogin().loginPage("/login").permitAll().loginProcessingUrl("/login").successHandler(cookbookSuccessHandler())
 			.and().logout().permitAll();
 	}
