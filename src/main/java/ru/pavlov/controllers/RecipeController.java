@@ -1,6 +1,7 @@
 package ru.pavlov.controllers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -66,7 +67,7 @@ public class RecipeController {
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
 		model.addAttribute("recipe", recipe);
-		
+
 		double totalRecipeCalorie = 0;
 		for (IngredientVolume ingr : recipe.getIngredients()) {
 			try {
@@ -200,6 +201,34 @@ public class RecipeController {
 		return response;
 	}
 	
+	@PostMapping("saveUnsavedePhoto")
+	@ResponseBody
+	public String saveUnsavedePhoto(@RequestParam long recipeId, @RequestParam String code) throws IOException {
+		String response = null;
+		Recipe recipe = recipeRepo.findById(recipeId);
+		
+		byte[] byteArray = this.newRecipePhotos.get(Integer.parseInt(code));
+		String recipePhotoFolder = recipe.getPhotoFolder(); //name of the folder with photos
+		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
+		RecipePhoto uploadedPhoto = null;
+		if (byteArray.length != 0) {	
+			String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+			String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name) 
+			FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
+			fos.write(byteArray);
+			fos.close();
+			
+			uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
+			recipe.getPhotos().add(uploadedPhoto);
+			recipePhotoRepo.save(uploadedPhoto);			
+			response = "{\"id\":\"" + uploadedPhoto.getId() + "\"}";;
+		}
+		else {
+			response = "{\"error\":\"фото не загружено\"}";
+		}		
+		return response;
+	}
+	
 	@PostMapping("dropUnsavedPhoto")
 	@ResponseBody
 	public String dropUnsavedPhoto(@RequestParam String code) {
@@ -225,9 +254,27 @@ public class RecipeController {
 	
 	@PostMapping("deletePhoto")
 	@ResponseBody
-	public String deletePhoto(@RequestParam long photoCode) {
-		
-		return "";
+	public String deletePhoto(@RequestParam long recipeId, @RequestParam long photoId) {
+		String response = null;
+		Recipe recipe = this.recipeRepo.findById(recipeId);
+		boolean fileDeleted = false;
+		for (RecipePhoto rPhoto : recipe.getPhotos()) {
+			if (rPhoto.getId() == photoId) {
+				String photoPath = uploadPath + "/" + recipe.getPhotoFolder() + "/" + rPhoto.getPhotoPath();								
+				recipePhotoRepo.delete(rPhoto);
+				recipe.getPhotos().remove(rPhoto);
+				File photoFile = new File(photoPath);
+				fileDeleted = photoFile.delete();				
+				break;
+			}
+		}
+		if(fileDeleted) {
+			response = "{\"done\":\" + true + \"}";
+		}
+		else {
+			response = "{\"error\":\" Фото не найдено на диске + \"}";
+		}
+		return response;
 	}
 	//---------------------------------------------------------------------
 	
@@ -269,9 +316,8 @@ public class RecipeController {
 		
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();		
-		String recipePhotoFolder = name + "_" + type + "_" + UUID.randomUUID().toString();  //name of the folder with photos
+		String recipePhotoFolder = UUID.randomUUID().toString();  //name of the folder with photos
 		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
-		//String recipePhotoFolderFullPath = new File(".").getAbsolutePath() + "/src/main/resources/static/img/" + recipePhotoFolder; //full path to the folder with photos
 		File uploadDir = new File(recipePhotoFolderFullPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
@@ -281,15 +327,14 @@ public class RecipeController {
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
 				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
-				String dbPhotoName = recipePhotoFolder + "/" + uniqPhotoName; 
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
-				fos.close();
-				
-				RecipePhoto uploadedPhoto = new RecipePhoto(dbPhotoName, recipe);
+				fos.close();				
+				RecipePhoto uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
 				photos.add(uploadedPhoto);
 			}
 		}
+		recipe.setPhotoFolder(recipePhotoFolder);
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		recipePhotoRepo.saveAll(photos);

@@ -93,12 +93,15 @@
 			</div>
 
 			<!-- Photo cards -->
-			<div class="row">
-				<div class="card" style="width: 25%;" th:each="photo : ${recipePhotos}">
+			<div class="row" id="photoList">
+				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_ + ${photo.id}">
 					<div class="card-body">
-						<img class="d-block w-100" th:src="@{/img/} + ${photo.photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<img class="d-block w-100" th:src="@{/img/} + ${recipe.photoFolder} + @{/} + ${photo.photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<input type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>
+			</div>
+			<div class="row">
 				<div th:if="${editable}">
 					<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
 				</div>
@@ -114,7 +117,7 @@
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
 								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="${photo.id} + Slide">
-									<img class="d-block w-100" th:src="@{/img/} + ${photo.photoPath}" th:alt="${photo.photoPath}">
+									<img class="d-block w-100" th:src="@{/img/} + ${recipe.photoFolder} + @{/} + ${photo.photoPath}" th:alt="${photo.photoPath}">
 								</div>						
 							</div>
 							<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
@@ -223,9 +226,9 @@
 					<div class="row">
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data">
-								<input type="file" class= "dws-btn" id="photoLoader" value="Загрузить фото" onchange="getCurrentLyUploadedPhoto(event)">
+								<input type="file" class= "btn btn-primary" id="photoLoader" value="Загрузить фото" onchange="getCurrentlyUploadedPhoto()">
 								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
-								<a href="javascript:PopUpHide('add_photo_popup')"> Отмена </a>
+								<a href="javascript:hidePhotoUploadWindow()"> Отмена </a>
 							</form>
 						</div>
 						<div class="col-md-9">
@@ -243,7 +246,7 @@
 		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
 		<script th:src="@{/js/recipe.js}"       		src="../static/js/recipe.js" ></script>
 		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredient.js"></script>	
-		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredientVolume.js"></script>			
+		<script th:src="@{/js/ingredientVolume.js}"   	src="../static/js/ingredientVolume.js"></script>			
 			
 	</body>
 	

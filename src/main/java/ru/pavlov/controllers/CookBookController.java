@@ -1,5 +1,6 @@
 package ru.pavlov.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
@@ -27,6 +29,9 @@ import ru.pavlov.security.CookBookUserDetails;
 @Controller
 @RequestMapping("/cookbook/**") 
 public class CookBookController {
+	
+	@Value("${upload.path}")
+	private String uploadPath;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -53,6 +58,22 @@ public class CookBookController {
 						   @RequestParam(required = false) String auther, Model model) {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
+		/*
+		List<String> photoPaths = new ArrayList<>();
+		for(Recipe recipe : recipes) {
+			String path = uploadPath + "/" + recipe.getPhotoFolder();
+			RecipePhoto rPhoto = null;
+			try {
+				rPhoto = recipe.getPhotos().get(0);
+				path += ("/" + rPhoto.getPhotoPath());
+			}
+			catch(Exception exp) {
+				System.out.println("В рецепте " + recipe.getName() + " нет фото");
+			}	
+			photoPaths.add(path);
+		}
+		model.addAttribute("photoPaths", photoPaths);
+		*/
 		return "cookbook";
 	}
 	

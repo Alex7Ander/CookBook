@@ -25,6 +25,11 @@
 
 .card{
 	background-color: rgba(235, 95, 14, 0.55);
+	width: 25%;
+}
+
+.btn-primary{
+	width: 100%;
 }
 
 .btn-secondary{

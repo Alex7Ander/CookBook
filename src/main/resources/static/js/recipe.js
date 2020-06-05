@@ -1,3 +1,5 @@
+var newPhotoCount = 0;
+
 var editRecipeMainInfoWindow;
 var addIngredientWindow;
 var photoUploadWindow;
@@ -215,11 +217,149 @@ function showPhotoUploadWindow(){
 function hidePhotoUploadWindow(){
 	photoUploadWindow.hideWindow();
 }
-function addNewPhoto(){
-	//
-}
-function deletePhoto(){
 
+function getCurrentlyUploadedPhoto(){
+	var photoFileLoader = document.getElementById('photoLoader');
+	currentlyUploadedPhoto = photoFileLoader.files[0];
+	var output = document.getElementById('uploadedPhoto');
+	output.src = URL.createObjectURL(currentlyUploadedPhoto); 
+}
+
+function addPhotoToPhotoList(event){
+	event.stopPropagation(); // остановка всех текущих JS событий
+	event.preventDefault();  // остановка дефолтного события для текущего элемента
+	let photoData = new FormData();
+	photoData.append('photo', currentlyUploadedPhoto);
+	$.ajax({type: "POST", url: "/recipe/sendPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				newPhotoCount++;
+				showUploadedPhotoOnMainPage(respond.code);							
+			}
+			else{
+				console.log(respond.error);
+				alert('Загрузки фотографии. Повторите попытку.');
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось загрузить фото: ' + status);
+		},
+		complete: function(){
+			photoUploadWindow.hideWindow();
+		}
+	});
+} 
+
+function showUploadedPhotoOnMainPage(code){
+	var element = document.getElementById('photoList');
+
+	var newPhotoCard = document.createElement('div');
+	newPhotoCard.id = "photoCard_" + code;
+	newPhotoCard.className = "card";
+	element.append(newPhotoCard);	
+
+	var newPhotoCardBody = document.createElement('div');
+	newPhotoCardBody.className = "card-body";
+	newPhotoCard.append(newPhotoCardBody);
+
+	// Image
+	var image = document.createElement('img');
+	var photoPath = document.getElementById('uploadedPhoto').src;
+	image.src = photoPath;
+	image.className = "d-block w-100";
+	newPhotoCardBody.append(image);
+
+	// Hidden input with hashcode
+	var codeInput = document.createElement('input');
+	codeInput.type = "hidden";
+	codeInput.id = "hidden_" + newPhotoCount;
+	codeInput.className = "hiddenInput";
+	codeInput.value = code;
+	newPhotoCard.append(codeInput);
+
+	//Save link
+	var saveBtn = document.createElement('input');
+	saveBtn.type = "button";
+	saveBtn.value = "Сохранить";
+	saveBtn.id = "saveBtn" + code;
+	saveBtn.className = "btn btn-primary";
+	saveBtn.onclick = function(){
+		saveNewPhoto(code);
+	}
+	newPhotoCardBody.append(saveBtn);
+
+	// Delete link
+	var deleteBtn = document.createElement('input');
+	deleteBtn.type = "button";
+	deleteBtn.value = "Отмена";
+	deleteBtn.id = "deleteBtn" + code;
+	deleteBtn.className = "btn btn-primary";
+	deleteBtn.onclick = function(){
+		var photoData = new FormData();
+		photoData.append("code", code);
+		$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+			success: function(respond, status, jqXHR){
+				if( typeof respond.error === 'undefined' ){
+					newPhotoCard.remove();					
+				}
+				else {
+					console.log(respond.error);
+				}
+			}, 
+			error: function(respond, status, jqXHR){
+				alert('Не удалось удалить фото: ' + status);
+			}
+		});
+	}
+	newPhotoCardBody.append(deleteBtn);
+}
+
+function saveNewPhoto(code){
+	var photoData = new FormData();
+	photoData.append("recipeId", $("#recipeId").val());
+	photoData.append("code", code);
+	$.ajax({type: "POST", url: "/recipe/saveUnsavedePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				alert("Фото успешно сохранено");
+				var newPhotoId = respond.id;
+				$("#saveBtn"+code).remove();
+				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);
+				$("#deleteBtn" + code).val("Удалить");
+				$("#deleteBtn" + code).on('click', function() {					
+					deletePhoto(newPhotoId);
+				});							
+			}
+			else {
+				console.log(respond.error);
+				alert('Ошибка сохранения фотографии:' + respond.error + '.\nПовторите попытку.');
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось сохранить фото: ' + status);
+		}
+	});
+}
+
+function deletePhoto(photoId){
+	var photoData = new FormData();
+	photoData.append("recipeId", $("#recipeId").val());
+	photoData.append("photoId", photoId);
+	$.ajax({type: "POST", url: "/recipe/deletePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				alert("Фото успешно удалено");
+				$("#photoCard_" + photoId).remove();							
+			}
+			else{
+				console.log(respond.error);
+				alert('Ошибка удаления фотографии:' + respond.error + '.\nПовторите попытку.');
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось удалить фото: ' + status);
+		}
+	});
 }
 
 function showCarouselWindow(photoId){

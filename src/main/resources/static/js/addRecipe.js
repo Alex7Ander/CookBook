@@ -58,28 +58,52 @@ function showUploadedPhotoOnMainPage(code){
 	var newPhotoCard = document.createElement('div');
 	newPhotoCard.id = photoCount;
 	newPhotoCard.className = "card";
-	element.append(newPhotoCard);	
+	element.append(newPhotoCard);
+
+	var newPhotoCardBody = document.createElement('div');
+	newPhotoCardBody.className = "card-body";
+	newPhotoCard.append(newPhotoCardBody);
+
 	// Image
 	var image = document.createElement('img');
 	var photoPath = document.getElementById('uploadedPhoto').src;
 	image.src = photoPath;
 	image.className = "d-block w-100";
-	newPhotoCard.append(image);
+	newPhotoCardBody.append(image);
 	// Hidden input with hashcode
 	var codeInput = document.createElement('input');
 	codeInput.type = "hidden";
 	codeInput.id="hidden_" + photoCount;
 	codeInput.className = "hiddenInput";
 	codeInput.value = code;
-	newPhotoCard.append(codeInput);
+	newPhotoCardBody.append(codeInput);
 	// Delete link
 	var deleteBtn = document.createElement('input');
 	deleteBtn.type="button";
 	deleteBtn.value = "Удалить";
 	deleteBtn.className = "btn btn-primary";
-	deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
+	//deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
 	deleteBtn.id = photoCount;
-	newPhotoCard.append(deleteBtn);
+	deleteBtn.onclick = function(){
+		newPhotoCard.remove();
+		var photoData = new FormData();
+		photoData.append('code', code);		
+		$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", async:false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+			success: function(respond, status, jqXHR) {
+				if (typeof respond.error === 'undefined') {	
+					currentPhotoCard.remove();
+					alert('Фотография успешно удалена');						
+				}
+				else {
+					alert('Error: ' + respond.data);
+				}
+			}, 
+			error: function(respond, status, jqXHR) {
+				alert('Ошибка при удалении фотографии: ' + status);
+			}
+		});
+	};
+	newPhotoCardBody.append(deleteBtn);
 	photoCount++;
 }
 
@@ -92,7 +116,7 @@ function deletePhotoCard(){
 	let photoData = new FormData();
 	photoData.append('code', code);
 	
-	$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/deletePhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
 				let parent = document.getElementById('photoList');

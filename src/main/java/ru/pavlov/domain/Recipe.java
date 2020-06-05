@@ -25,6 +25,7 @@ public class Recipe {
 	private String tagline;
 	private String text;
 	private String youtubeLink;
+	private String photoFolder;
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
@@ -109,6 +110,14 @@ public class Recipe {
 
 	public void setPhotos(List<RecipePhoto> photos) {
 		this.photos = photos;
+	}
+
+	public String getPhotoFolder() {
+		return photoFolder;
+	}
+
+	public void setPhotoFolder(String photoFolder) {
+		this.photoFolder = photoFolder;
 	}
 		
 }
