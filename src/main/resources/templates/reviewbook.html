@@ -40,8 +40,33 @@
 			</div>
 		</nav>	
 			
-		<div class = "container">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+					<form method="post" action="/user/saveReview">
+						<b>Напишите Ваше сообщение администрации с пожеланиями или отзывами.<b> <br>
+						<textarea id= "reviewText" name= "reviewText" rows=10> - </textarea> <br>
+					</form>
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+		</div>
 
+		<div class="container-fluid" th:each="review : ${reviews}">
+			<div class="row">
+				<div class="col-md-9">
+					<b> Вопрос: <b> <br>
+					<p th:text="${review.text}"> </p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-9">
+					<b>Ответ:</b> <br>
+					<p th:text="${review.answer}"> </p>
+				</div>
+			</div>
 		</div>
 		
 		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

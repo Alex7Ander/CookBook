@@ -25,9 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.RecipeRepository;
+import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
@@ -47,6 +49,8 @@ public class UserController {
 	@Autowired
 	private IngredientRepository ingrRepo;
 	
+	@Autowired
+	private ReviewRepository reviewRepo;
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
@@ -159,6 +163,15 @@ public class UserController {
 		return "addrecipe";
 	}
 	
-
+	@PostMapping("saveReview")
+	public String saveReview(@AuthenticationPrincipal CookBookUserDetails currentUserDetails,
+							 @RequestParam String reviewText) {
+		User user = currentUserDetails.getUser();
+		Review review = new Review();
+		review.setText(reviewText);
+		review.setUserId(user.getId());
+		reviewRepo.save(review);
+		return "user";
+	}
 	
 }

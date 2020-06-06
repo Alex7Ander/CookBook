@@ -9,4 +9,5 @@ import ru.pavlov.domain.Review;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 	public List<Review> findByUserId(Long userId);
+
 }
