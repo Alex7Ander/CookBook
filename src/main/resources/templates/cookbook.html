@@ -48,28 +48,37 @@
 		
 		<div class = "container-md">
 			<!-- Recipe serching -->
-			<div class="row">
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Тип </b> </br>
-					<select>
-						<option> - </option>
-					</select>
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Имя </b> </br>
-					<input type = "text" name = "name">
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Слоган </b> </br>
-					<input type = "text" name = "tagline">
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Автор </b> </br>
-					<input type = "text" name = "tagline">
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<input type="submit" class="dws-btn" value="Поиск">
-				</div>
+			<form method="get" action="showCookbook">
+				<div class="row">
+					<div class="col-md-3 cookBookContainer">
+						<b class = "label"> Тип </b> </br>
+						<select name="type">
+							<option></option>
+							<option>Горячие блюда</option>
+							<option>Гарниры</option>
+							<option>Закуски</option>
+							<option>Салаты</option>
+							<option>Десерты</option>
+							<option>Напитки</option>
+							<option>Fast food</option>
+						</select>
+					</div>
+					<div class="col-md-3 cookBookContainer">
+						<b class = "label"> Имя </b> </br>
+						<input type = "text" name = "name">
+					</div>
+					<div class="col-md-3 cookBookContainer">
+						<b class = "label"> Слоган </b> </br>
+						<input type = "text" name = "tagline">
+					</div>
+					<div class="col-md-3 cookBookContainer">
+						<b class = "label"> Автор </b> </br>
+						<input type = "text" name = "auther">
+					</div>
+					<div class="col-md-3 cookBookContainer">
+						<input type="submit" class="dws-btn" value="Поиск">
+					</div>
+				</form>
 			</div>
 			
 			<!-- Recipe cards -->

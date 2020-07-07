@@ -21,7 +21,6 @@ import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.domain.UserRole;
-import ru.pavlov.googleDrive.GoogleDriveFileManager;
 import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
@@ -46,9 +45,6 @@ public class AdminController {
 	
 	@Autowired
 	private MailSender mailSender;
-	
-	@Autowired 
-	private GoogleDriveFileManager googleFileManager;
 	
 	@GetMapping("users")	
 	public String adminPageUsers(Model model) {
@@ -140,18 +136,5 @@ public class AdminController {
 	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
 		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
 		return "{}";
-	}
-	
-	@PostMapping("createGoogleDriveFolder")
-	@ResponseBody
-	public String createGoogleDriveFolder(@RequestParam String folderName) {
-		boolean isCreated = googleFileManager.createFolder(folderName);
-		if (isCreated) {
-			return "{}";
-		}
-		else {
-			return "{'error':'notCreated'}";
-		}
-		
 	}
 }

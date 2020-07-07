@@ -26,6 +26,7 @@ public class Recipe {
 	private String text;
 	private String youtubeLink;
 	private String photoFolder;
+	private String auther;
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
@@ -118,6 +119,14 @@ public class Recipe {
 
 	public void setPhotoFolder(String photoFolder) {
 		this.photoFolder = photoFolder;
+	}
+
+	public String getAuther() {
+		return auther;
+	}
+
+	public void setAuther(String auther) {
+		this.auther = auther;
 	}
 		
 }

@@ -22,6 +22,7 @@ import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.services.RecipeService;
 
 @Controller
 @RequestMapping("/cookbook/**") 
@@ -48,29 +49,24 @@ public class CookBookController {
 	@Autowired 
 	private ReviewRepository reviewRepo;
 	
+	@Autowired
+	private RecipeService recipeService;
+	
 	@GetMapping("showCookbook")
 	public String cookbook(@RequestParam(required = false) String name, 
 						   @RequestParam(required = false) String type,
 						   @RequestParam(required = false) String tagline,
 						   @RequestParam(required = false) String auther, Model model) {
-		Iterable<Recipe> recipes = recipeRepo.findAll();
+		
+		Recipe recipeExampleObject = new Recipe();
+		if(name != null && name.length() != 0) recipeExampleObject.setName(name);
+		if(type != null && type.length() != 0) recipeExampleObject.setType(type);
+		if(tagline != null && tagline.length() != 0) recipeExampleObject.setTagline(tagline);
+		if(auther != null && auther.length() != 0) recipeExampleObject.setAuther(auther);
+		
+		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); //recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
-		/*
-		List<String> photoPaths = new ArrayList<>();
-		for(Recipe recipe : recipes) {
-			String path = uploadPath + "/" + recipe.getPhotoFolder();
-			RecipePhoto rPhoto = null;
-			try {
-				rPhoto = recipe.getPhotos().get(0);
-				path += ("/" + rPhoto.getPhotoPath());
-			}
-			catch(Exception exp) {
-				System.out.println("В рецепте " + recipe.getName() + " нет фото");
-			}	
-			photoPaths.add(path);
-		}
-		model.addAttribute("photoPaths", photoPaths);
-		*/
+
 		return "cookbook";
 	}
 	
