@@ -1,3 +1,4 @@
 /target/
 /src/main/resources/static/img
 /tokens
+/src/main/resources/application.properties

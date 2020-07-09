@@ -105,8 +105,8 @@ function sendEmail(){
 
 function createFolder(){
     var folderData = new FormData();
-    folderData.append("folderName", $("#newFolderName").val());
-    $.ajax({type: "POST", url: "/admin/createGoogleDriveFolder", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: folderData,
+    //folderData.append("folderName", $("#newFolderName").val());
+    $.ajax({type: "POST", url: "/admin/getAWSBuckets", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: folderData,
         success: function(respond, status, jqXHR){
             alert("Сообщение отправлено");
         },

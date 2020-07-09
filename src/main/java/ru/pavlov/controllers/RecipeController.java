@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import ru.pavlov.aws.AWSConnector;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
@@ -42,6 +43,9 @@ public class RecipeController {
 	
 	@Value("${upload.path}")
 	private String uploadPath;
+	
+	@Autowired
+	private AWSConnector awsConnector;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -317,6 +321,9 @@ public class RecipeController {
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();		
 		String recipePhotoFolder = UUID.randomUUID().toString();  //name of the folder with photos
+		this.awsConnector.createBucket(recipePhotoFolder);
+		
+		
 		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
 		File uploadDir = new File(recipePhotoFolderFullPath);
 		if (!uploadDir.exists()) {

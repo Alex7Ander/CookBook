@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.amazonaws.services.s3.model.Bucket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ru.pavlov.aws.AWSConnector;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.Review;
@@ -45,6 +47,9 @@ public class AdminController {
 	
 	@Autowired
 	private MailSender mailSender;
+	
+	@Autowired
+	private AWSConnector awsConnector;
 	
 	@GetMapping("users")	
 	public String adminPageUsers(Model model) {
@@ -136,5 +141,14 @@ public class AdminController {
 	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
 		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
 		return "{}";
+	}
+	
+	@PostMapping("getAWSBuckets")
+	@ResponseBody
+	public String getAWSBuckets() {
+		for (Bucket bucket : awsConnector.getAllBuckets()) {
+			System.out.println(bucket.getName());
+		}
+		return "";
 	}
 }
