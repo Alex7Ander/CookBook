@@ -319,13 +319,11 @@ public class RecipeController {
 		}
 		
 		//Photos saving 
-		List<RecipePhoto> photos = new ArrayList<>();		
-		String recipePhotoFolder = UUID.randomUUID().toString();  //name of the folder with photos
-		this.awsConnector.createBucket(recipePhotoFolder);
-		
-		
-		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
-		File uploadDir = new File(recipePhotoFolderFullPath);
+		List<RecipePhoto> photos = new ArrayList<>();
+		List<String> photoPaths = new ArrayList<>();
+		//Create temporary folder
+		String uploadTempDirPath = new File(".").getAbsolutePath() + "/temp";
+		File uploadDir = new File(uploadTempDirPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
@@ -333,7 +331,8 @@ public class RecipeController {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
-				String resultFullPhotoName = recipePhotoFolderFullPath + "/" + uniqPhotoName; //full path to the currently saving photo (including its uniq name)
+				String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
+				photoPaths.add(resultFullPhotoName);
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
 				fos.close();				
@@ -341,7 +340,15 @@ public class RecipeController {
 				photos.add(uploadedPhoto);
 			}
 		}
-		recipe.setPhotoFolder(recipePhotoFolder);
+		//Creating bucket for photos;				
+		String recipePhotoBucket = UUID.randomUUID().toString();  //name of the folder with photos
+		awsConnector.createBucket(recipePhotoBucket);
+		for(int i = 0; i < photoPaths.size(); i++) {
+			String path = photoPaths.get(i);
+			File photoFile = new File(path);
+			awsConnector.uploadFile(recipePhotoBucket, photos.get(i).getPhotoPath(), photoFile);
+		}
+		recipe.setPhotoFolder(recipePhotoBucket);
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		recipePhotoRepo.saveAll(photos);
