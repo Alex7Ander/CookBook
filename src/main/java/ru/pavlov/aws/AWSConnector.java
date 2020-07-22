@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.AmazonServiceException;
@@ -65,12 +66,7 @@ public class AWSConnector {
 	public void downloadFile(String bucketName,  String fileKey, String downloadingPath) throws IOException {
 		S3Object s3object = s3client.getObject(bucketName, fileKey);
 		S3ObjectInputStream inputStream = s3object.getObjectContent();
-		byte[] buffer = new byte[inputStream.available()];
-		inputStream.read(buffer);
-		
-		File targetFile = new File(downloadingPath);
-	    OutputStream outStream = new FileOutputStream(targetFile);
-	    outStream.write(buffer);
+		FileUtils.copyInputStreamToFile(inputStream, new File(downloadingPath));
 	}
 
 }

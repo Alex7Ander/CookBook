@@ -93,11 +93,12 @@
 			</div>
 
 			<!-- Photo cards -->
-			<div class="row" id="photoList">
-				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_ + ${photo.id}">
+			
+			<div class="row" id="photoList">				
+				<div class="card" th:each="photoPath : ${photoPaths}" th:id="photoCard_ + ${photoPath}">
 					<div class="card-body">
-						<img class="d-block w-100" th:src="@{/img/} + ${recipe.photoFolder} + @{/} + ${photo.photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
-						<input type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
+						<img class="d-block w-100" th:src="${photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photoPath}')|">
+						<input type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photoPath}')|">
 					</div>
 				</div>
 			</div>

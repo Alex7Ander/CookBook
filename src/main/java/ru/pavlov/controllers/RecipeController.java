@@ -100,9 +100,23 @@ public class RecipeController {
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
 		
-		for (RecipePhoto rp : recipePhotos) {
-			System.out.println(rp.getPhotoPath());
-		}		
+		String tempPhotoFolderPath = "\\src\\main\\resources\\static\\img\\";
+		//File tempPhotoFolder = new File(new File(".").getAbsolutePath() + tempPhotoFolderPath);
+		//tempPhotoFolder.mkdir();
+				
+		List<String> photoPaths = new ArrayList<>();
+		for (RecipePhoto rp : recipePhotos) {			
+			try {
+				String newPhotoPath = tempPhotoFolderPath + "\\" + rp.getPhotoPath();
+				this.awsConnector.downloadFile(recipe.getPhotoFolder(), rp.getPhotoPath(), new File(".").getAbsolutePath() + newPhotoPath);
+				photoPaths.add("/img/" + rp.getPhotoPath());
+			} catch (IOException e) {
+				System.err.println("Error while downloading file " + rp.getPhotoPath() + " from bucket " + recipe.getPhotoFolder());
+				e.printStackTrace();
+			}			
+		}	
+		model.addAttribute("photoPaths", photoPaths);
+		
 		return "recipe";
 	}
 	
