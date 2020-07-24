@@ -28,6 +28,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		http.requiresChannel().requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null).requiresSecure();
+		
 		http.csrf().disable();
 		http.authorizeRequests()
 			//.anyRequest().authenticated()		
@@ -36,6 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.antMatchers("/admin/**").hasRole("ADMIN")
 			.and().formLogin().loginPage("/login").permitAll().loginProcessingUrl("/login").successHandler(cookbookSuccessHandler())
 			.and().logout().permitAll();
+
 	}
 	
 	@Override
