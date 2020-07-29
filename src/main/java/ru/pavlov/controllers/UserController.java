@@ -123,8 +123,15 @@ public class UserController {
 	//AJAX 	
 	@PostMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {
-		List<Ingredient> ingredients = ingrRepo.findByType(type); 
+		
+		System.out.println("1");
+		List<Ingredient> ingredients = ingrRepo.findByType(type);
+		
+		System.out.println("2");
 		model.addAttribute("ingredients", ingredients);
+		
+
+		System.out.println("3");
 		return "ingrSelectElement";
 	}
 		

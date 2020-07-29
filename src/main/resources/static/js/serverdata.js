@@ -1,6 +1,19 @@
-function getIngrListFromServer(){
-    var selectedType = $("#ingrType").val();
-    var element = $("#ingrList");
-    $("#ingrList").load("/user/getIngrList", {type: selectedType});
-    $("#select option:first").prop("selected", true);
+//Функция отправлят запрос для получения списка ингредиентов типа ingrType
+function getIngrListFromServer(ingrType, currentIngredientsList){
+	var typeData = new FormData();
+	var requestedIngredientsList = new Array();
+    typeData.append("ingrType", ingrType);
+    $.ajax({type: "GET", url: "/ingredient/getIngredients?ingrType=" + ingrType, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+        success: function(respond, status, jqXHR){
+            if (typeof respond.error === 'undefined') {
+				requestedIngredientsList = respond;
+            }
+        },
+        error: function(respond, status, jqXHR){
+            alert(status);
+        }
+    });
+	$.each(requestedIngredientsList, function(index,value){
+		currentIngredientsList.push(requestedIngredientsList[index]);
+	});
 }

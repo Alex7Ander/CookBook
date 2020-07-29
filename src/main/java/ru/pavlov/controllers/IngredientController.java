@@ -1,5 +1,7 @@
 package ru.pavlov.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +18,7 @@ import ru.pavlov.domain.Ingredient;
 import ru.pavlov.repos.IngredientRepository;
 
 @Controller
-@RequestMapping("/ingredient/**") // /ingredient/getProperties
+@RequestMapping("/ingredient/**") // /ingredient/getIngredients
 public class IngredientController {
 
 	@Autowired
@@ -62,6 +64,31 @@ public class IngredientController {
 			jpExp.printStackTrace();
 			return "{\"error\": \"" + jpExp.getMessage() + "\"}";
 		}		
+	}
+	
+	@GetMapping("getIngredients")
+	@ResponseBody
+	public String getIngredients(@RequestParam String ingrType, Model model) {
+		List<Ingredient> ingredients = ingrRepo.findByType(ingrType);
+		model.addAttribute("ingredients", ingredients);
+		ObjectMapper jsonCreator = new ObjectMapper();
+		
+		StringBuilder answer = new StringBuilder();
+		answer.append("[");
+		for(int i = 0; i< ingredients.size(); i++) {
+			try {
+				Ingredient ingredient = ingredients.get(i);
+				String jsonResponse = jsonCreator.writeValueAsString(ingredient);
+				answer.append(jsonResponse);
+				if (i < ingredients.size()-1) answer.append(", ");
+ 			}
+			catch(JsonProcessingException jpExp) {
+				
+			}
+		}
+		answer.append("]");
+		System.out.println("\n" + answer.toString() + "\n");
+		return answer.toString();
 	}
 	
 }
