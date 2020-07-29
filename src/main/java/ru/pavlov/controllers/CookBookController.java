@@ -81,6 +81,8 @@ public class CookBookController {
 	public String ingredients(Model model) {		
 		List<Ingredient> ingredients = ingrRepo.findAll();
 		model.addAttribute("ingredients", ingredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);
 		return "ingredients";
 	}
 	

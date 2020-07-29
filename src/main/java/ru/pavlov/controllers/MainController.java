@@ -50,6 +50,7 @@ public class MainController {
 			model.addAttribute("errorMsg", "Пароли не совпадают");
 			return "registration";
 		}
+		/*
 		User userByLogin = userRepo.findByUserLoginName(login);
 		if (userByLogin != null) {
 			model.addAttribute("errorMsg", "Введенный логин занят");
@@ -59,12 +60,12 @@ public class MainController {
 		if (userByEmail != null) {
 			model.addAttribute("errorMsg", "Введенный email занят");
 			return "registration";
-		}		
+		}
+		*/		
 		List<UserRole> roles = userRoleRepo.findByRole("USER");
 		String userActivationCode = UUID.randomUUID().toString();
 		User user = new User(login, password, email, roles);
-		user.setActivationCode(userActivationCode);
-		userRepo.save(user);
+		user.setActivationCode(userActivationCode);		
 		String message = "Добро пожаловать! Вы в одном шаге от регистрации в книге рецептов CookBook.\n"
 				+ "Пройдите по ссылке, что бы активировать свой аккаунт:\n\n"
 				+ "localhost:8080/activate?code="+userActivationCode;
@@ -72,10 +73,14 @@ public class MainController {
 			mailSender.send(email, "Активация регистрации на сайте CookBook", message);
 		}
 		catch(Exception exp) {
+			System.err.println("-------------------------ERROR---------------------------");
+			exp.printStackTrace();
+			System.err.println("---------------------------------------------------------");
 			model.addAttribute("errorMsg", "Ошибка отправки письма с активацией аккаунта.");
 			userRepo.delete(user);
 			return "registration";
-		}		
+		}	
+		userRepo.save(user);
 		return "redirect:/login";
 	}
 	
