@@ -1,11 +1,10 @@
 package ru.pavlov.controllers;
 
 import java.io.File;
-
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,17 +57,21 @@ public class UserController {
 		
 	@GetMapping("show")
 	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
-		User currentUser = currentUserDetails.getUser();		
-		model.addAttribute("user", currentUser);		
-		String avatarPath = null;
-		if (currentUser.getAvatarPath() != null) {
-			avatarPath = "/uploadimg/" + currentUser.getAvatarPath();
-		} 
-		else {
-			avatarPath = "/uploadimg/No_avatar.png";
-		}		 
-		model.addAttribute("avatarPath", avatarPath);
+		User currentUser = currentUserDetails.getUser();
+		model.addAttribute("user", currentUser);
 		
+		String imageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
+        try(FileOutputStream fos=new FileOutputStream(imageFilePath))
+        {
+        	byte[] image = currentUser.getImage();              
+            fos.write(image, 0, image.length);
+        }
+        catch(IOException ex){              
+            System.out.println(ex.getMessage());
+        }	
+        String avatarFileName = currentUser.getName() + "_avatar.jpg";
+        model.addAttribute("avatarPath", avatarFileName);
+        				
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
 		return "user";
@@ -95,25 +98,9 @@ public class UserController {
 		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
 		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
-		/*
-		this.userRepo.setUserInfoById(currentUser.getId(), 
-				currentUser.getName(), 
-				currentUser.getSurname(), 
-				currentUser.getCity(), 
-				currentUser.getTemperament(), 
-				currentUser.getPhone());		
-		*/
-		if (avatar != null && !avatar.getOriginalFilename().isEmpty()) {
-			File uploadDir = new File(uploadPath);
-			if (!uploadDir.exists()) {
-				uploadDir.mkdir();
-			}
-			String resultFileName = UUID.randomUUID().toString() + "." + avatar.getOriginalFilename();
-			String path = uploadPath + "/avatars/" + resultFileName;
-			File newFile = new File(path);
-			avatar.transferTo(newFile);
-			currentUser.setAvatarPath(resultFileName);
-			//this.userRepo.setUserAvatarById(currentUser.getId(), resultFileName);
+		if(avatar != null) {
+			byte[] avatarImage = avatar.getBytes();
+			currentUser.setImage(avatarImage);
 		}		
 		userRepo.save(currentUser);
 		model.addAttribute("user", currentUser);
