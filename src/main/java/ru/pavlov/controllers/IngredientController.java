@@ -87,7 +87,6 @@ public class IngredientController {
 			}
 		}
 		answer.append("]");
-		System.out.println("\n" + answer.toString() + "\n");
 		return answer.toString();
 	}
 	
