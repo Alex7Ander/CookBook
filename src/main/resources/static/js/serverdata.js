@@ -8,9 +8,6 @@ function getIngrListFromServer(ingrType, currentIngredientsList){
             if (typeof respond.error === 'undefined') {
 				requestedIngredientsList = respond;
             }
-        },
-        error: function(respond, status, jqXHR){
-            alert(status);
         }
     });
 	$.each(requestedIngredientsList, function(index,value){

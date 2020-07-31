@@ -60,17 +60,19 @@ public class UserController {
 		User currentUser = currentUserDetails.getUser();
 		model.addAttribute("user", currentUser);
 		
-		String imageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
-        try(FileOutputStream fos=new FileOutputStream(imageFilePath))
+		String avatarImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
+        try(FileOutputStream fos=new FileOutputStream(avatarImageFilePath))
         {
-        	byte[] image = currentUser.getImage();              
-            fos.write(image, 0, image.length);
+        	byte[] avatarImageByteArray = currentUser.getImage();
+        	if(avatarImageByteArray != null) {
+        		fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
+                String avatarFileName = currentUser.getName() + "_avatar.jpg";
+                model.addAttribute("avatarPath", avatarFileName);
+        	}          
         }
-        catch(IOException ex){              
-            System.out.println(ex.getMessage());
+        catch(IOException ioExp){              
+            System.out.println(ioExp.getMessage());
         }	
-        String avatarFileName = currentUser.getName() + "_avatar.jpg";
-        model.addAttribute("avatarPath", avatarFileName);
         				
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
@@ -98,12 +100,24 @@ public class UserController {
 		if (city != ValueConstants.DEFAULT_NONE) currentUser.setCity(city);
 		if (temperament != ValueConstants.DEFAULT_NONE) currentUser.setTemperament(temperament);
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
-		if(avatar != null) {
-			byte[] avatarImage = avatar.getBytes();
-			currentUser.setImage(avatarImage);
-		}		
+		if(avatar != null && avatar.getBytes().length != 0) {
+			byte[] avatarImageByteArray = avatar.getBytes();
+			currentUser.setImage(avatarImageByteArray);			
+			String imageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
+	        try(FileOutputStream fos=new FileOutputStream(imageFilePath))
+	        {              
+	            fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
+	        }
+	        catch(IOException ioExp){              
+	            System.out.println(ioExp.getMessage());
+	        }	
+		}
+        String avatarFileName = currentUser.getName() + "_avatar.jpg";
+        model.addAttribute("avatarPath", avatarFileName);
 		userRepo.save(currentUser);
 		model.addAttribute("user", currentUser);
+		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
+		model.addAttribute("recipes", recipes);
 		return "user";
 	}
 	

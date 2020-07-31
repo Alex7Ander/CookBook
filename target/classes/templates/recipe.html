@@ -48,16 +48,16 @@
 			</div>
 		</div>
 	
-		<div class="container-fluid">
+		<div class="container-md">
 			<div class="row">
 				<div class="col-md-3">					
 					<h4>Основная информация</h4><br>
+					<div th:if="${editable}"><a href="javascript:startEditMainInfo()">Редактировать</a></div>
 					<input type="hidden" id="recipeId" th:value="${recipe.id}">
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
-					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>
-					<div th:if="${editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="startEditMainInfo();"></div>
+					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>					
 				</div>
 				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
@@ -102,10 +102,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div th:if="${editable}">
-					<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
-				</div>
+			<div th:if="${editable}" class="row">
+				<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
 			</div>			
 		</div>
 

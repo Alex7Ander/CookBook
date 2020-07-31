@@ -64,9 +64,12 @@ public class CookBookController {
 		if(tagline != null && tagline.length() != 0) recipeExampleObject.setTagline(tagline);
 		if(auther != null && auther.length() != 0) recipeExampleObject.setAuther(auther);
 		
-		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); //recipeRepo.findAll();
+		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); 
 		model.addAttribute("recipes", recipes);
 
+		Iterable<User> users = userRepo.findAll();
+		model.addAttribute("users", users);
+		
 		return "cookbook";
 	}
 	

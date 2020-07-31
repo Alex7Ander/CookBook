@@ -1,8 +1,10 @@
 package ru.pavlov.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.repos.IngredientRepository;
+import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
 @RequestMapping("/ingredient/**") // /ingredient/getIngredients
@@ -26,7 +29,8 @@ public class IngredientController {
 	
 	@PostMapping("save")
 	@ResponseBody
-	public String saveIngredient(@RequestParam String name, 
+	public String saveIngredient(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
+								 @RequestParam String name, 
 								 @RequestParam String type, 
 								 @RequestParam String descr,
 								 @RequestParam String prot, 
@@ -43,6 +47,8 @@ public class IngredientController {
 			double fatInt = Double.parseDouble(fat);
 			double carbohydrate = Double.parseDouble(carbo);
 			Ingredient newIngredient = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			newIngredient.setUser(currentUserDetails.getUser());
+			newIngredient.setCommon(false);
 			this.ingrRepo.save(newIngredient);
 			response = "{\"id\": \"" + newIngredient.getId().toString() + "\"}";
 			return response;
@@ -68,22 +74,31 @@ public class IngredientController {
 	
 	@GetMapping("getIngredients")
 	@ResponseBody
-	public String getIngredients(@RequestParam String ingrType, Model model) {
-		List<Ingredient> ingredients = ingrRepo.findByType(ingrType);
-		model.addAttribute("ingredients", ingredients);
+	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType, Model model) {
+		List<Ingredient> allIngredientsofThisType = ingrRepo.findByType(ingrType);
+		List<Ingredient> requestedIngredientsofThisType = new ArrayList<>();
+		for (int i = 0; i < allIngredientsofThisType.size(); i++ ) {
+			Ingredient ingredient = allIngredientsofThisType.get(i);
+			if(ingredient.isCommon() || ingredient.getUser().equals(currentUserDetails.getUser())) {
+				requestedIngredientsofThisType.add(ingredient);
+			}
+		}		
+		model.addAttribute("ingredients", requestedIngredientsofThisType);
 		ObjectMapper jsonCreator = new ObjectMapper();
 		
 		StringBuilder answer = new StringBuilder();
 		answer.append("[");
-		for(int i = 0; i< ingredients.size(); i++) {
-			try {
-				Ingredient ingredient = ingredients.get(i);
+		for(int i = 0; i< requestedIngredientsofThisType.size(); i++) {
+			Ingredient ingredient = requestedIngredientsofThisType.get(i);
+			try {				
 				String jsonResponse = jsonCreator.writeValueAsString(ingredient);
 				answer.append(jsonResponse);
-				if (i < ingredients.size()-1) answer.append(", ");
+				if (i < requestedIngredientsofThisType.size()-1) answer.append(", ");
+				
  			}
 			catch(JsonProcessingException jpExp) {
-				
+				System.err.println("Error [ingredient -> json] for ingredient with id= " + ingredient.getId());
+				jpExp.printStackTrace();
 			}
 		}
 		answer.append("]");

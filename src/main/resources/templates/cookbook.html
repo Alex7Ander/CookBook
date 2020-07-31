@@ -73,7 +73,11 @@
 					</div>
 					<div class="col-md-3 cookBookContainer">
 						<b class = "label"> Автор </b> </br>
-						<input type = "text" name = "auther">
+						<select name = "auther">
+							<option> </option>
+							<option th:each="user : ${users}" th:text="${user.name} + @{_} + ${user.surname}"></option>
+						</select>
+						<!--input type = "text" name = "auther"-->
 					</div>
 					<div class="col-md-3 cookBookContainer">
 						<input type="submit" class="dws-btn" value="Поиск">

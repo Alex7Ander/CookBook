@@ -40,9 +40,9 @@
 		</nav>
 
 		
-        <div class="container-fluid">
+        <div class="container-md">
 			<div class="row">
-                <div class="col-md-2">
+                <div class="col-md-3 cookBookContainer">
 					<b>Выбрать ингридиент</b><br>
 					<b>Категория ингридиента:</b><br>
 					<select id="ingrType" name="type" onchange="setIngredientsNames()">
@@ -54,7 +54,7 @@
 						<option value="none" hidden="">Выберите игредиент</option>
 					</select>
 				</div>
-                <div class="col-md-10">
+                <div class="col-md-9 cookBookContainer">
 					<h4 id="selectedIngrName"></h4>					
                     <table id="ingrTable">
                         <tr> 
@@ -77,7 +77,6 @@
 		<script th:src="@{/js/ingredient.js}"           src="../static/js/ingredient.js">         </script>
 		<script th:src="@{/js/ingredientVolume.js}"     src="../static/js/ingredientVolume.js">   </script>
 		<script th:src="@{/js/serverdata.js}" 			src="../static/js/serverdata.js"></script>	
-		<script th:src="@{/js/ingredientsPageScripts.js}" 	src="../static/js/ingredientsPageScripts.js"></script>
-		
+		<script th:src="@{/js/ingredientsPageScripts.js}" 	src="../static/js/ingredientsPageScripts.js"></script>		
 	</body>
 </html>

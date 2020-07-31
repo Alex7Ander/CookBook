@@ -15,8 +15,8 @@ class IngredientsPopUpWindow extends PopUpWindow{
     constructor(id, addingToMainTableFunction){
         super(id);
         this.addingFunction = addingToMainTableFunction;
-        this.ingrTypeSelect = document.getElementById("ingrType");
-        this.ingrListSelect = document.getElementById("ingrName");
+        this.ingrTypeSelect = $('#ingrType');
+        this.ingrListSelect = $('#ingrName');
 
         this.newIngrNameTextField = document.getElementById("newIngrName");
         this.newIngrTypeTextField = document.getElementById("newIngrType");
@@ -59,10 +59,21 @@ class IngredientsPopUpWindow extends PopUpWindow{
     }
 
     getIngrListFromServer(){
-        var selectedType = this.getSelectedIngrType();
-        var element = this.ingrListSelect;
-        $(element).load("/user/getIngrList", {type: selectedType});
-        $("#select option:first").prop("selected", true);
+        var selectedType = $('#ingrType').val();
+        var requestedIngredientsList = new Array();
+        $.ajax({type: "GET", url: "/ingredient/getIngredients?ingrType=" + selectedType, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+            success: function(respond, status, jqXHR){
+                if (typeof respond.error === 'undefined') {
+                    requestedIngredientsList = respond;
+                }
+            }
+        });
+        
+        $('#ingrName').empty();	
+        $('#ingrName').append('<option> </option>');
+        $.each(requestedIngredientsList, function(index, value){
+            $('#ingrName').append('<option>'+requestedIngredientsList[index].name+'</option>');
+        });
     }
 
     saveNewIngredient(){
@@ -93,8 +104,8 @@ class IngredientsPopUpWindow extends PopUpWindow{
     }
     addExistingIngrToRecipe(){
         var ingr = new ingredient();
-        var selectedType = this.getSelectedIngrType();
-        var selectedName = this.getSelectedIngrName();
+        var selectedType = $('#ingrType').val();
+        var selectedName = $('#ingrName').val();
         ingr.getDataFromServer(selectedName, selectedType);
         var ingredientVolume = new IngredientVolume(ingr);
         this.addingFunction(ingredientVolume);
