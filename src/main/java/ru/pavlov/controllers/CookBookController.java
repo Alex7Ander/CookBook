@@ -23,6 +23,7 @@ import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 import ru.pavlov.services.RecipeService;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
 
 @Controller
 @RequestMapping("/cookbook/**") 
@@ -30,6 +31,9 @@ public class CookBookController {
 	
 	@Value("${upload.path}")
 	private String uploadPath;
+	
+	@Value("${upload.path}")
+	private String token;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -51,6 +55,9 @@ public class CookBookController {
 	
 	@Autowired
 	private RecipeService recipeService;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@GetMapping("showCookbook")
 	public String cookbook(@RequestParam(required = false) String name, 

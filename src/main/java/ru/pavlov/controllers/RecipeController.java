@@ -36,6 +36,8 @@ import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
 @RequestMapping("/recipe/**")  
@@ -46,6 +48,9 @@ public class RecipeController {
 	
 	@Autowired
 	private AWSConnector awsConnector;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -299,7 +304,7 @@ public class RecipeController {
 	@PostMapping("save")
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
 								@RequestParam Map<String, String> allParametrs,
-								Model model) throws IOException {		
+								Model model) throws IOException, YandexDiskException {		
 		User currentUser = currentUserDetails.getUser();	
 		//Main recipe info
 		String name = allParametrs.get("name");
@@ -341,6 +346,11 @@ public class RecipeController {
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
+		
+		//Creating yandex folder for photos;				
+		String recipePhotosYandexDiskFolder = UUID.randomUUID().toString()+"_"+recipe.getName();  //name of the folder with photos
+		yandexDiskConnector.createFolder("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder);
+		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
 			if (byteArray.length != 0) {	
@@ -352,17 +362,10 @@ public class RecipeController {
 				fos.close();				
 				RecipePhoto uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
 				photos.add(uploadedPhoto);
+				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder, uniqPhotoName, resultFullPhotoName);
 			}
 		}
-		//Creating bucket for photos;				
-		String recipePhotoBucket = UUID.randomUUID().toString();  //name of the folder with photos
-		awsConnector.createBucket(recipePhotoBucket);
-		for(int i = 0; i < photoPaths.size(); i++) {
-			String path = photoPaths.get(i);
-			File photoFile = new File(path);
-			awsConnector.uploadFile(recipePhotoBucket, photos.get(i).getPhotoPath(), photoFile);
-		}
-		recipe.setPhotoFolder(recipePhotoBucket);
+		this.newRecipePhotos.clear();
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		recipePhotoRepo.saveAll(photos);
