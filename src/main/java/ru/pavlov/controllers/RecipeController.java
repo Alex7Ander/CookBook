@@ -105,23 +105,28 @@ public class RecipeController {
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
 		
-		String tempPhotoFolderPath = "\\src\\main\\resources\\static\\img\\";
-		//File tempPhotoFolder = new File(new File(".").getAbsolutePath() + tempPhotoFolderPath);
-		//tempPhotoFolder.mkdir();
+		//Создаем папку для фото
+		String tempPhotoFolderPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder(); //"C:\\Users\\user\\eclipse-workspace\\CookBook\\target\\classes\\static\\img\\" + recipe.getPhotoFolder();		
+		File tempPhotoFolder = new File(tempPhotoFolderPath);
+		tempPhotoFolder.mkdir();
 				
 		List<String> photoPaths = new ArrayList<>();
 		for (RecipePhoto rp : recipePhotos) {			
-			try {
-				String newPhotoPath = tempPhotoFolderPath + "\\" + rp.getPhotoPath();
-				this.awsConnector.downloadFile(recipe.getPhotoFolder(), rp.getPhotoPath(), new File(".").getAbsolutePath() + newPhotoPath);
-				photoPaths.add("/img/" + rp.getPhotoPath());
+			try {	
+				String internalPathToTargetFile = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath();
+				String downloadedPhotoFileFullPath = tempPhotoFolderPath + "/" + rp.getPhotoPath();
+				try {
+					yandexDiskConnector.downloadFile(internalPathToTargetFile, downloadedPhotoFileFullPath);
+					photoPaths.add("/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
+				} catch (YandexDiskException e) {
+					e.printStackTrace();
+				}				
 			} catch (IOException e) {
 				System.err.println("Error while downloading file " + rp.getPhotoPath() + " from bucket " + recipe.getPhotoFolder());
 				e.printStackTrace();
 			}			
 		}	
-		model.addAttribute("photoPaths", photoPaths);
-		
+		model.addAttribute("photoPaths", photoPaths);		
 		return "recipe";
 	}
 	
@@ -231,8 +236,7 @@ public class RecipeController {
 		Recipe recipe = recipeRepo.findById(recipeId);
 		
 		byte[] byteArray = this.newRecipePhotos.get(Integer.parseInt(code));
-		String recipePhotoFolder = recipe.getPhotoFolder(); //name of the folder with photos
-		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
+		String recipePhotoFolderFullPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder();
 		RecipePhoto uploadedPhoto = null;
 		if (byteArray.length != 0) {	
 			String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
@@ -240,11 +244,17 @@ public class RecipeController {
 			FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 			fos.write(byteArray);
 			fos.close();
-			
-			uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
-			recipe.getPhotos().add(uploadedPhoto);
-			recipePhotoRepo.save(uploadedPhoto);			
-			response = "{\"id\":\"" + uploadedPhoto.getId() + "\"}";;
+			String internalPathToTargetFolder = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
+			try {
+				yandexDiskConnector.uploadFile(internalPathToTargetFolder, uniqPhotoName, resultFullPhotoName);
+				uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
+				recipe.getPhotos().add(uploadedPhoto);
+				recipePhotoRepo.save(uploadedPhoto);			
+				response = "{\"id\":\"" + uploadedPhoto.getId() + "\"}";
+			} catch (IOException | YandexDiskException e) {
+				response = "{\"error\":\"ошибка при загрузке файла на Yandex Disk\"}";
+				e.printStackTrace();
+			}
 		}
 		else {
 			response = "{\"error\":\"фото не загружено\"}";
@@ -268,33 +278,27 @@ public class RecipeController {
 		return response;
 	}
 	
-	@PostMapping("savePhoto")
-	@ResponseBody
-	public String savePhoto(@RequestParam long photoCode) {
-		
-		return "";
-	}
-	
 	@PostMapping("deletePhoto")
 	@ResponseBody
 	public String deletePhoto(@RequestParam long recipeId, @RequestParam long photoId) {
 		String response = null;
 		Recipe recipe = this.recipeRepo.findById(recipeId);
-		boolean fileDeleted = false;
-		for (RecipePhoto rPhoto : recipe.getPhotos()) {
-			if (rPhoto.getId() == photoId) {
-				String photoPath = uploadPath + "/" + recipe.getPhotoFolder() + "/" + rPhoto.getPhotoPath();								
-				recipePhotoRepo.delete(rPhoto);
-				recipe.getPhotos().remove(rPhoto);
-				File photoFile = new File(photoPath);
-				fileDeleted = photoFile.delete();				
+		for (RecipePhoto rp : recipe.getPhotos()) {
+			if (rp.getId() == photoId) {												
+				recipePhotoRepo.delete(rp);
+				recipe.getPhotos().remove(rp);
+				try {
+					yandexDiskConnector.delete("/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
+					String photoPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath();
+					File photoFile = new File(photoPath);
+					photoFile.delete();
+					response = "{\"done\":\" + true + \"}";
+				} catch (IOException | YandexDiskException e) {
+					response = "{\"error\":\" Ошибка при удалении ото из Yandex Disk + \"}";
+					e.printStackTrace();
+				}
 				break;
 			}
-		}
-		if(fileDeleted) {
-			response = "{\"done\":\" + true + \"}";
-		}
-		else {
 			response = "{\"error\":\" Фото не найдено на диске + \"}";
 		}
 		return response;
@@ -374,6 +378,21 @@ public class RecipeController {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
 		return "cookbook";
+	}
+	
+	@PostMapping("delete")
+	public String deleterecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId,
+								Model model) throws IOException, YandexDiskException {
+		Recipe recipe = this.recipeRepo.findById(recipeId);
+		User currentUser = currentUserDetails.getUser();
+		if (recipe.getRecipeAuther().equals(currentUser)) {
+			String yandexDiskPhotosFilePath = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
+			this.recipeRepo.delete(recipe);			
+			this.yandexDiskConnector.delete(yandexDiskPhotosFilePath);
+		}
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.addAttribute("recipes", recipes);
+		return "cookbook";		
 	}
 		
 }

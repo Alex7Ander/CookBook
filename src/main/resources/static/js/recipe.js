@@ -344,7 +344,7 @@ function saveNewPhoto(code){
 function deletePhoto(photoId){
 	var photoData = new FormData();
 	photoData.append("recipeId", $("#recipeId").val());
-	photoData.append("photoId", photoId);
+	photoData.append("photoId", 1);
 	$.ajax({type: "POST", url: "/recipe/deletePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){

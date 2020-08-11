@@ -117,7 +117,6 @@ public class YandexDiskConnector {
 	}
 	
 	public void uploadFile(String internalPathToTargetFolder, String internalFileName, String filePath) throws ClientProtocolException, IOException, YandexDiskException {
-		//������ URL ��� ��������
 		internalPathToTargetFolder = internalPathToTargetFolder.replaceAll("/", "%2F");
 		String getReqUrl = "https://cloud-api.yandex.net:443/v1/disk/resources/upload?path=" + internalPathToTargetFolder + "%2F" + internalFileName;			
         HttpGet get = new HttpGet(getReqUrl);
@@ -138,7 +137,6 @@ public class YandexDiskConnector {
 		ObjectMapper mapper = new ObjectMapper();
 		YandexDiskResponse ydResp = mapper.readValue(result, YandexDiskResponse.class);
 		
-		//�������� ����� �� ���������� URL
 		String url = ydResp.getHref();
 		File file = new File(filePath);	
 		CloseableHttpClient client = HttpClients.createDefault();
