@@ -16,7 +16,8 @@ public class RecipePhoto {
 	private Long id;
 	
 	private String photoPath;
-	
+	private String downloadedPhotoPath;
+
 	@ManyToOne
 	@JoinColumn(name="recipeId")
 	private Recipe recipe;
@@ -50,5 +51,13 @@ public class RecipePhoto {
 
 	public void setRecipe(Recipe recipe) {
 		this.recipe = recipe;
+	}
+
+	public String getDownloadedPhotoPath() {
+		return downloadedPhotoPath;
+	}
+
+	public void setDownloadedPhotoPath(String downloadedPhotoPath) {
+		this.downloadedPhotoPath = downloadedPhotoPath;
 	}	
 }

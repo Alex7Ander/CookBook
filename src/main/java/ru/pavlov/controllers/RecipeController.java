@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -110,14 +111,15 @@ public class RecipeController {
 		File tempPhotoFolder = new File(tempPhotoFolderPath);
 		tempPhotoFolder.mkdir();
 				
-		List<String> photoPaths = new ArrayList<>();
+		//Map<Long, String> photoPaths = new LinkedHashMap<>();
 		for (RecipePhoto rp : recipePhotos) {			
 			try {	
 				String internalPathToTargetFile = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath();
 				String downloadedPhotoFileFullPath = tempPhotoFolderPath + "/" + rp.getPhotoPath();
 				try {
 					yandexDiskConnector.downloadFile(internalPathToTargetFile, downloadedPhotoFileFullPath);
-					photoPaths.add("/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
+					rp.setDownloadedPhotoPath("/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
+					//photoPaths.put(rp.getId(), "/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
 				} catch (YandexDiskException e) {
 					e.printStackTrace();
 				}				
@@ -126,7 +128,7 @@ public class RecipeController {
 				e.printStackTrace();
 			}			
 		}	
-		model.addAttribute("photoPaths", photoPaths);		
+		//model.addAttribute("photoPaths", photoPaths);		
 		return "recipe";
 	}
 	
