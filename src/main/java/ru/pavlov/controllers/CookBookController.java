@@ -67,23 +67,25 @@ public class CookBookController {
 	@GetMapping("showCookbook")
 	public String cookbook(@RequestParam(required = false) String name, 
 						   @RequestParam(required = false) String type,
-						   @RequestParam(required = false) String tagline, Model model) {		
+						   @RequestParam(required = false) String tagline, Model model) {	
+		System.out.println("showCookbook");
 		Recipe recipeExampleObject = new Recipe();
 		if(name != null && name.length() != 0) recipeExampleObject.setName(name);
 		if(type != null && type.length() != 0) recipeExampleObject.setType(type);
 		if(tagline != null && tagline.length() != 0) recipeExampleObject.setTagline(tagline);
 		
-		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); 		
+		System.out.print("Getting all recipe from db");		
+		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); 
+		System.out.println(" - done");	
 		for(Recipe recipe : recipes) {
-			String previewImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + recipe.getName() + "_preview.jpg";
+			String previewImageFilePath = uploadPath + recipe.getName() + "_preview.jpg";
+			System.out.println("previewImageFilePath - " + previewImageFilePath);
 	        try(FileOutputStream fos = new FileOutputStream(previewImageFilePath)) {
 	        	byte[] previewImageByteArray = recipe.getPreviewImage();
-	        	if(previewImageByteArray != null) {
-	        		fos.write(previewImageByteArray, 0, previewImageByteArray.length);
-	        	}
-	        	else{
+	        	if(previewImageByteArray == null) {
+	        		System.out.println("No image detected for this recipe. Special image will be shown");
 	        		String noImagePath = new File(".").getAbsolutePath();
-	        		FileInputStream fis = new FileInputStream("/static/img/noimg.png");
+	        		FileInputStream fis = new FileInputStream(uploadPath + "noimg.png");
 	        		int b = -1;
 	        		List<Byte> bytes = new ArrayList<>();
 	        		while((b = fis.read()) != -1) {
@@ -94,8 +96,9 @@ public class CookBookController {
 	        			previewImageByteArray[i] = bytes.get(i);
 	        		}	        		
 	        		fis.close();
-	        	} 
+	        	}
 	        	fos.write(previewImageByteArray, 0, previewImageByteArray.length);
+	        	System.out.println("Image created");
 	        }
 	        catch(IOException ioExp) {              
 	            System.out.println(ioExp.getMessage());
