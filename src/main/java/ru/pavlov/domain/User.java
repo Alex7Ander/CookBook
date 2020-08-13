@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -35,10 +36,10 @@ public class User {
 	private String temperament;
 	private String email;
 	private String phone;
-	private String avatarPath;
-	private int enabled;
-	
 	private String activationCode;
+	@Column(name = "image", columnDefinition="longblob", length=2*1024*1024*1024)
+    @Lob()
+	private byte[] image;	
 		
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -48,7 +49,7 @@ public class User {
 	public User(){}
 	
 	public User(String userLoginName, String password, String name, String surname, String city, String temperament,
-			String email, String phone, int enabled) {
+			String email, String phone) {
 		this.userLoginName = userLoginName;
 		this.password = password;
 		this.name = name;
@@ -57,7 +58,6 @@ public class User {
 		this.temperament = temperament;
 		this.email = email;
 		this.phone = phone;
-		this.enabled = enabled;
 	}
 	
 	public User(String userLoginName, String password, String email, List<UserRole> roles) {
@@ -138,27 +138,13 @@ public class User {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-
-	public int getEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(int enabled) {
-		this.enabled = enabled;
-	}
+	
 	public List<UserRole> getRoles() {
 		return roles;
 	}
+	
 	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
-	}
-
-	public String getAvatarPath() {
-		return avatarPath;
-	}
-
-	public void setAvatarPath(String avatarPath) {
-		this.avatarPath = avatarPath;
 	}
 	
 	@Override
@@ -178,6 +164,14 @@ public class User {
 
 	public void setActivationCode(String activationCode) {
 		this.activationCode = activationCode;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 
 }

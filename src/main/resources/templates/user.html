@@ -49,7 +49,7 @@
 		<div class = "container-md">
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
-					<img th:src="@{/img/avatars/} + ${avatarPath}" src="../static/img/autorisation_ico.png">
+					<img th:src="@{/img/} + ${avatarPath}" src="../static/img/autorisation_ico.png">
 				</div>
 					
 				<div class="col-md-9 cookBookContainer">
@@ -67,8 +67,15 @@
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
 					<b class = "label"> Тип </b> </br>
-					<select>
-						<option> - </option>
+					<select name="type">
+						<option></option>
+						<option>Горячие блюда</option>
+						<option>Гарниры</option>
+						<option>Закуски</option>
+						<option>Салаты</option>
+						<option>Десерты</option>
+						<option>Напитки</option>
+						<option>Fast food</option>
 					</select>
 				</div>
 				<div class="col-md-3 cookBookContainer">
@@ -89,10 +96,10 @@
 					<div class="card-body">
 						<form method="get" action="/recipe/show">
 							<input type="hidden" name="recipeId" th:value="${recipe.id}">
+							<img class="d-block w-100" th:src="@{/img/} + ${recipe.name} + @{_preview.jpg}" alt="-">
 							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
-							<p><span th:text="${recipe.type}"> Категория </span></p><br>
-							<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>
-							<!-- img class="d-block w-100" th:src="@{/img/} + ${recipe.photos.get(0).photoPath}" alt="no photo" -->
+							<p>Категория: <span th:text="${recipe.type}"> - </span></p><br>
+							<p>Слоган: <span th:text="${recipe.tagline}"> - </span></p><br>
 							<button class = "dws-btn" type="submit">Подробнее</button><br>
 						</form> 
 					</div>

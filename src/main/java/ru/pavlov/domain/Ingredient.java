@@ -1,15 +1,11 @@
 package ru.pavlov.domain;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,6 +29,11 @@ public class Ingredient {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private Long id;
 	
+	@ManyToOne
+	@JoinColumn(name="userId")
+	@JsonIgnore
+	private User user;
+	
 	private String name;
 	private String type;
 	@JsonProperty("descr")
@@ -45,6 +46,10 @@ public class Ingredient {
 
 	private double calorie;
 
+	private boolean common;
+	
+
+	
 	public Long getId() {
 		return id;
 	}
@@ -93,4 +98,17 @@ public class Ingredient {
 	public void setCalorie(double calorie) {
 		this.calorie = calorie;
 	}
+	public boolean isCommon() {
+		return common;
+	}
+	public void setCommon(boolean common) {
+		this.common = common;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 }

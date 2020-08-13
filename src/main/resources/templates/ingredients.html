@@ -38,18 +38,45 @@
 				</ul>
 			</div>
 		</nav>
-		<a class="label" href="personal">На свою страницу</a>
-		<div class = "recipecontainer" th:each="ingredient : ${ingredients}">
-			<form method="get" th:action="recipe">
-				<input type="hidden" name="recipeId" th:value="${ingredient.id}">
-				<b class="label"><span th:text="${ingredient.name}"> Название </span></b><br>
-				<p><span th:text="${ingredient.type}"> Категория </span></p><br>			
-				<button class = "dws-btn" type="submit">Подробнее</button><br>
-			</form>  
-		</div>
+
 		
-		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <div class="container-md">
+			<div class="row">
+                <div class="col-md-3 cookBookContainer">
+					<b>Выбрать ингридиент</b><br>
+					<b>Категория ингридиента:</b><br>
+					<select id="ingrType" name="type" onchange="setIngredientsNames()">
+						<option value="none" hidden="">Выберите тип</option>
+						<option th:each="type : ${ingrTypes}"> <b th:text=${type}> - </b> </option>
+					</select>
+					<b>Ингридиенты:</b><br>
+					<select id="ingrName" onchange="setIngredientValues()">
+						<option value="none" hidden="">Выберите игредиент</option>
+					</select>
+				</div>
+                <div class="col-md-9 cookBookContainer">
+					<h4 id="selectedIngrName"></h4>					
+                    <table id="ingrTable">
+                        <tr> 
+                            <th>Белки</th>
+							<th>Жиры</th>
+							<th>Углеводы</th>
+							<th>Калорийность</th>
+                        </tr>	
+                    </table>
+					<p id="description"> - </p>
+                </div>
+            </div>
+        </div>
+		
+		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+		
+		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"> </script>		
+		<script th:src="@{/js/ingredient.js}"           src="../static/js/ingredient.js">         </script>
+		<script th:src="@{/js/ingredientVolume.js}"     src="../static/js/ingredientVolume.js">   </script>
+		<script th:src="@{/js/serverdata.js}" 			src="../static/js/serverdata.js"></script>	
+		<script th:src="@{/js/ingredientsPageScripts.js}" 	src="../static/js/ingredientsPageScripts.js"></script>		
 	</body>
 </html>

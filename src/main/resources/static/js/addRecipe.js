@@ -155,6 +155,7 @@ function addNewIngredientToRecipe(){
 function addExistingIngrToRecipe(){
 	ingredientsPopUpWindow.addExistingIngrToRecipe();
 }
+
 function addIngrToTable(ingredientVolume){
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	

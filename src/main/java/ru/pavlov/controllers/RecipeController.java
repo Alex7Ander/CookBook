@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +37,8 @@ import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
 @RequestMapping("/recipe/**")  
@@ -46,6 +49,9 @@ public class RecipeController {
 	
 	@Autowired
 	private AWSConnector awsConnector;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -95,28 +101,30 @@ public class RecipeController {
 		}			
 		
 		List<IngredientVolume> ingredientsVolumes = recipe.getIngredients();
-		model.addAttribute("ingredientsVolumes", ingredientsVolumes);
-		
+		model.addAttribute("ingredientsVolumes", ingredientsVolumes);		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
 		
-		String tempPhotoFolderPath = "\\src\\main\\resources\\static\\img\\";
-		//File tempPhotoFolder = new File(new File(".").getAbsolutePath() + tempPhotoFolderPath);
-		//tempPhotoFolder.mkdir();
+		//Создаем папку для фото
+		String tempPhotoFolderPath = uploadPath + recipe.getPhotoFolder(); //"C:\\Users\\user\\eclipse-workspace\\CookBook\\target\\classes\\static\\img\\" + recipe.getPhotoFolder();		
+		File tempPhotoFolder = new File(tempPhotoFolderPath);
+		tempPhotoFolder.mkdir();
 				
-		List<String> photoPaths = new ArrayList<>();
-		for (RecipePhoto rp : recipePhotos) {			
-			try {
-				String newPhotoPath = tempPhotoFolderPath + "\\" + rp.getPhotoPath();
-				this.awsConnector.downloadFile(recipe.getPhotoFolder(), rp.getPhotoPath(), new File(".").getAbsolutePath() + newPhotoPath);
-				photoPaths.add("/img/" + rp.getPhotoPath());
+		for (RecipePhoto photo : recipePhotos) {			
+			try {	
+				String internalPathToTargetFile = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + photo.getPhotoPath();
+				String downloadedPhotoFileFullPath = tempPhotoFolderPath + "/" + photo.getPhotoPath();
+				try {
+					yandexDiskConnector.downloadFile(internalPathToTargetFile, downloadedPhotoFileFullPath);
+					photo.setDownloadedPhotoPath("/img/" + recipe.getPhotoFolder() + "/" + photo.getPhotoPath());
+				} catch (YandexDiskException e) {
+					e.printStackTrace();
+				}				
 			} catch (IOException e) {
-				System.err.println("Error while downloading file " + rp.getPhotoPath() + " from bucket " + recipe.getPhotoFolder());
+				System.err.println("Error while downloading file " + photo.getPhotoPath() + " from bucket " + recipe.getPhotoFolder());
 				e.printStackTrace();
 			}			
-		}	
-		model.addAttribute("photoPaths", photoPaths);
-		
+		}		
 		return "recipe";
 	}
 	
@@ -226,8 +234,7 @@ public class RecipeController {
 		Recipe recipe = recipeRepo.findById(recipeId);
 		
 		byte[] byteArray = this.newRecipePhotos.get(Integer.parseInt(code));
-		String recipePhotoFolder = recipe.getPhotoFolder(); //name of the folder with photos
-		String recipePhotoFolderFullPath = uploadPath + "/" + recipePhotoFolder;
+		String recipePhotoFolderFullPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder();
 		RecipePhoto uploadedPhoto = null;
 		if (byteArray.length != 0) {	
 			String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
@@ -235,11 +242,17 @@ public class RecipeController {
 			FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 			fos.write(byteArray);
 			fos.close();
-			
-			uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
-			recipe.getPhotos().add(uploadedPhoto);
-			recipePhotoRepo.save(uploadedPhoto);			
-			response = "{\"id\":\"" + uploadedPhoto.getId() + "\"}";;
+			String internalPathToTargetFolder = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
+			try {
+				yandexDiskConnector.uploadFile(internalPathToTargetFolder, uniqPhotoName, resultFullPhotoName);
+				uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
+				recipe.getPhotos().add(uploadedPhoto);
+				recipePhotoRepo.save(uploadedPhoto);			
+				response = "{\"id\":\"" + uploadedPhoto.getId() + "\"}";
+			} catch (IOException | YandexDiskException e) {
+				response = "{\"error\":\"ошибка при загрузке файла на Yandex Disk\"}";
+				e.printStackTrace();
+			}
 		}
 		else {
 			response = "{\"error\":\"фото не загружено\"}";
@@ -263,43 +276,36 @@ public class RecipeController {
 		return response;
 	}
 	
-	@PostMapping("savePhoto")
-	@ResponseBody
-	public String savePhoto(@RequestParam long photoCode) {
-		
-		return "";
-	}
-	
 	@PostMapping("deletePhoto")
 	@ResponseBody
 	public String deletePhoto(@RequestParam long recipeId, @RequestParam long photoId) {
 		String response = null;
 		Recipe recipe = this.recipeRepo.findById(recipeId);
-		boolean fileDeleted = false;
-		for (RecipePhoto rPhoto : recipe.getPhotos()) {
-			if (rPhoto.getId() == photoId) {
-				String photoPath = uploadPath + "/" + recipe.getPhotoFolder() + "/" + rPhoto.getPhotoPath();								
-				recipePhotoRepo.delete(rPhoto);
-				recipe.getPhotos().remove(rPhoto);
-				File photoFile = new File(photoPath);
-				fileDeleted = photoFile.delete();				
+		for (RecipePhoto rp : recipe.getPhotos()) {
+			if (rp.getId() == photoId) {												
+				recipePhotoRepo.delete(rp);
+				recipe.getPhotos().remove(rp);
+				try {
+					yandexDiskConnector.delete("/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
+					String photoPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath();
+					File photoFile = new File(photoPath);
+					photoFile.delete();
+					response = "{\"done\":\" + true + \"}";
+				} catch (IOException | YandexDiskException e) {
+					response = "{\"error\":\" Ошибка при удалении ото из Yandex Disk + \"}";
+					e.printStackTrace();
+				}
 				break;
 			}
-		}
-		if(fileDeleted) {
-			response = "{\"done\":\" + true + \"}";
-		}
-		else {
 			response = "{\"error\":\" Фото не найдено на диске + \"}";
 		}
 		return response;
 	}
-	//---------------------------------------------------------------------
-	
+	//---------------------------------------------------------------------	
 	@PostMapping("save")
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
 								@RequestParam Map<String, String> allParametrs,
-								Model model) throws IOException {		
+								Model model) throws IOException, YandexDiskException {		
 		User currentUser = currentUserDetails.getUser();	
 		//Main recipe info
 		String name = allParametrs.get("name");
@@ -341,8 +347,16 @@ public class RecipeController {
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
+		
+		//Creating yandex folder for photos;				
+		String recipePhotosYandexDiskFolder = UUID.randomUUID().toString();  //name of the folder with photos
+		yandexDiskConnector.createFolder("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder);
+		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
+			if(recipe.getPreviewImage() == null) {
+				recipe.setPreviewImage(byteArray);
+			}
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
 				String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
@@ -352,17 +366,12 @@ public class RecipeController {
 				fos.close();				
 				RecipePhoto uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
 				photos.add(uploadedPhoto);
+				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder, uniqPhotoName, resultFullPhotoName);
 			}
 		}
-		//Creating bucket for photos;				
-		String recipePhotoBucket = UUID.randomUUID().toString();  //name of the folder with photos
-		awsConnector.createBucket(recipePhotoBucket);
-		for(int i = 0; i < photoPaths.size(); i++) {
-			String path = photoPaths.get(i);
-			File photoFile = new File(path);
-			awsConnector.uploadFile(recipePhotoBucket, photos.get(i).getPhotoPath(), photoFile);
-		}
-		recipe.setPhotoFolder(recipePhotoBucket);
+		//Clear container for photos - newRecipePhotos
+		this.newRecipePhotos.clear();
+	
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		recipePhotoRepo.saveAll(photos);
@@ -371,6 +380,21 @@ public class RecipeController {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
 		return "cookbook";
+	}
+	
+	@PostMapping("delete")
+	public String deleterecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId,
+								Model model) throws IOException, YandexDiskException {
+		Recipe recipe = this.recipeRepo.findById(recipeId);
+		User currentUser = currentUserDetails.getUser();
+		if (recipe.getRecipeAuther().equals(currentUser)) {
+			String yandexDiskPhotosFilePath = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
+			this.recipeRepo.delete(recipe);			
+			this.yandexDiskConnector.delete(yandexDiskPhotosFilePath);
+		}
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.addAttribute("recipes", recipes);
+		return "cookbook";		
 	}
 		
 }

@@ -1,13 +1,14 @@
 package ru.pavlov.domain;
 import java.util.List;
-import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -26,7 +27,10 @@ public class Recipe {
 	private String text;
 	private String youtubeLink;
 	private String photoFolder;
-	private String auther;
+	
+	@Column(name = "preview_image", columnDefinition="longblob", length=2*1024*1024*1024)
+    @Lob()
+	private byte[] previewImage;	
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
@@ -37,7 +41,7 @@ public class Recipe {
 	
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
-	
+		
 	public Recipe() {}
 
 	public Recipe(User recipeAuther, String name, String type, String tagline, String youtubeLink, String text, List<IngredientVolume> ingredientsVolume) {
@@ -121,12 +125,11 @@ public class Recipe {
 		this.photoFolder = photoFolder;
 	}
 
-	public String getAuther() {
-		return auther;
+	public byte[] getPreviewImage() {
+		return previewImage;
 	}
 
-	public void setAuther(String auther) {
-		this.auther = auther;
-	}
-		
+	public void setPreviewImage(byte[] previewImage) {
+		this.previewImage = previewImage;
+	}		
 }

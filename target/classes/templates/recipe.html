@@ -48,16 +48,16 @@
 			</div>
 		</div>
 	
-		<div class="container-fluid">
+		<div class="container-md">
 			<div class="row">
 				<div class="col-md-3">					
 					<h4>Основная информация</h4><br>
+					<div th:if="${editable}"><a href="javascript:startEditMainInfo()">Редактировать</a></div>
 					<input type="hidden" id="recipeId" th:value="${recipe.id}">
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
-					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>
-					<div th:if="${editable}"><input type="button" class="dws-btn" value="Редактировать" onclick="startEditMainInfo();"></div>
+					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>					
 				</div>
 				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
@@ -92,20 +92,17 @@
 				</div>	
 			</div>
 
-			<!-- Photo cards -->
-			
+			<!-- Photo cards -->			
 			<div class="row" id="photoList">				
-				<div class="card" th:each="photoPath : ${photoPaths}" th:id="photoCard_ + ${photoPath}">
+				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_ + ${photo.id}">
 					<div class="card-body">
-						<img class="d-block w-100" th:src="${photoPath}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photoPath}')|">
-						<input type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photoPath}')|">
+						<img class="d-block w-100" th:src="${photo.getDownloadedPhotoPath()}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<input th:if="${editable}" type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div th:if="${editable}">
-					<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
-				</div>
+			<div th:if="${editable}" class="row">
+				<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
 			</div>			
 		</div>
 

@@ -1,5 +1,10 @@
 package ru.pavlov.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,7 @@ import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 import ru.pavlov.services.RecipeService;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
 
 @Controller
 @RequestMapping("/cookbook/**") 
@@ -30,6 +36,9 @@ public class CookBookController {
 	
 	@Value("${upload.path}")
 	private String uploadPath;
+	
+	@Value("${upload.path}")
+	private String token;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -52,21 +61,49 @@ public class CookBookController {
 	@Autowired
 	private RecipeService recipeService;
 	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
+	
 	@GetMapping("showCookbook")
 	public String cookbook(@RequestParam(required = false) String name, 
 						   @RequestParam(required = false) String type,
-						   @RequestParam(required = false) String tagline,
-						   @RequestParam(required = false) String auther, Model model) {
-		
+						   @RequestParam(required = false) String tagline, Model model) {		
 		Recipe recipeExampleObject = new Recipe();
 		if(name != null && name.length() != 0) recipeExampleObject.setName(name);
 		if(type != null && type.length() != 0) recipeExampleObject.setType(type);
 		if(tagline != null && tagline.length() != 0) recipeExampleObject.setTagline(tagline);
-		if(auther != null && auther.length() != 0) recipeExampleObject.setAuther(auther);
 		
-		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); //recipeRepo.findAll();
-		model.addAttribute("recipes", recipes);
-
+		Iterable<Recipe> recipes = recipeService.findRecipiesLike(recipeExampleObject); 		
+		for(Recipe recipe : recipes) {
+			String previewImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + recipe.getName() + "_preview.jpg";
+	        try(FileOutputStream fos = new FileOutputStream(previewImageFilePath)) {
+	        	byte[] previewImageByteArray = recipe.getPreviewImage();
+	        	if(previewImageByteArray != null) {
+	        		fos.write(previewImageByteArray, 0, previewImageByteArray.length);
+	        	}
+	        	else{
+	        		String noImagePath = new File(".").getAbsolutePath();
+	        		FileInputStream fis = new FileInputStream("/static/img/noimg.png");
+	        		int b = -1;
+	        		List<Byte> bytes = new ArrayList<>();
+	        		while((b = fis.read()) != -1) {
+	        			bytes.add((byte) b);
+	        		}
+	        		previewImageByteArray = new byte[bytes.size()];
+	        		for(int i = 0; i < bytes.size(); i++) {
+	        			previewImageByteArray[i] = bytes.get(i);
+	        		}	        		
+	        		fis.close();
+	        	} 
+	        	fos.write(previewImageByteArray, 0, previewImageByteArray.length);
+	        }
+	        catch(IOException ioExp) {              
+	            System.out.println(ioExp.getMessage());
+	        }
+		}	
+        model.addAttribute("recipes", recipes);        
+		Iterable<User> users = userRepo.findAll();
+		model.addAttribute("users", users);		
 		return "cookbook";
 	}
 	
@@ -79,8 +116,10 @@ public class CookBookController {
 	
 	@GetMapping("showIngredients")
 	public String ingredients(Model model) {		
-		List<Ingredient> ingredients = ingrRepo.findAll();
-		model.addAttribute("ingredients", ingredients);
+		//List<Ingredient> ingredients = ingrRepo.findAll();
+		//model.addAttribute("ingredients", ingredients);
+		List<String> ingrTypes = ingrRepo.getIngrTypes();
+		model.addAttribute("ingrTypes", ingrTypes);
 		return "ingredients";
 	}
 	
