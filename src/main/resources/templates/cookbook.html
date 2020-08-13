@@ -72,26 +72,17 @@
 						<input type = "text" name = "tagline">
 					</div>
 					<div class="col-md-3 cookBookContainer">
-						<b class = "label"> Автор </b> </br>
-						<select name = "auther">
-							<option> </option>
-							<option th:each="user : ${users}" th:text="${user.name} + @{_} + ${user.surname}"></option>
-						</select>
-						<!--input type = "text" name = "auther"-->
-					</div>
-					<div class="col-md-3 cookBookContainer">
 						<input type="submit" class="dws-btn" value="Поиск">
 					</div>
-				</form>
-			</div>
-			
+				</div>
+			</form>			
 			<!-- Recipe cards -->
 			<div class="row">		
 				<div class="card" style="width: 25%;" th:each="recipe : ${recipes}" >
 					<div class="card-body">
 						<form method="get" action="/recipe/show">
 							<input type="hidden" name="recipeId" th:value="${recipe.id}">
-							<img class="d-block w-100" th:src="path" alt="-">
+							<img class="d-block w-100" th:src="@{/img/} + ${recipe.name} + @{_preview.jpg}" alt="-">
 							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
 							<p>Категория: <span th:text="${recipe.type}"> Категория </span></p><br>
 							<p>Слоган: <span th:text="${recipe.tagline}"> Слоган </span></p><br>
