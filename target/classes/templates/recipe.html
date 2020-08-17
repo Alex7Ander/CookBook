@@ -115,7 +115,7 @@
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
 								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="${photo.id} + Slide">
-									<img class="d-block w-100" th:src="@{/img/} + ${recipe.photoFolder} + @{/} + ${photo.photoPath}" th:alt="${photo.photoPath}">
+									<img class="d-block w-100" th:src="${photo.getDownloadedPhotoPath()}" th:alt="${photo.photoPath}">
 								</div>						
 							</div>
 							<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">

@@ -167,7 +167,7 @@ public class YandexDiskConnector {
     	}
 	}
 	
-	public void downloadFile(String internalPathToTargetFile, String downloadingPath) throws ClientProtocolException, IOException, YandexDiskException  {
+	public String getDownloadLink(String internalPathToTargetFile) throws ClientProtocolException, IOException, NoConnectionToYandexDiskException, YandexDiskInternalException {
 		internalPathToTargetFile = internalPathToTargetFile.replaceAll("/", "%2F");
 		String dwnlUrl = "https://cloud-api.yandex.net:443/v1/disk/resources/download?path=" + internalPathToTargetFile;
 		HttpGet getLinkRequest = new HttpGet(dwnlUrl);
@@ -189,6 +189,11 @@ public class YandexDiskConnector {
         ObjectMapper mapper = new ObjectMapper();
         YandexDiskResponse ydResp = mapper.readValue(result, YandexDiskResponse.class);
 		String url = ydResp.getHref();
+		return url;
+	}
+	
+	public void downloadFile(String internalPathToTargetFile, String downloadingPath) throws ClientProtocolException, IOException, YandexDiskException  {
+		String url = getDownloadLink(internalPathToTargetFile);
         HttpGet getFile = new HttpGet(url);
         // add request headers
         getFile.addHeader("Authorization", "OAuth " + token); 

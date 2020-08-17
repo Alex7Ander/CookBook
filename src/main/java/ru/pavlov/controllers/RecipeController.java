@@ -104,19 +104,13 @@ public class RecipeController {
 		model.addAttribute("ingredientsVolumes", ingredientsVolumes);		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
-		
-		//Создаем папку для фото
-		String tempPhotoFolderPath = uploadPath + recipe.getPhotoFolder(); //"C:\\Users\\user\\eclipse-workspace\\CookBook\\target\\classes\\static\\img\\" + recipe.getPhotoFolder();		
-		File tempPhotoFolder = new File(tempPhotoFolderPath);
-		tempPhotoFolder.mkdir();
 				
 		for (RecipePhoto photo : recipePhotos) {			
 			try {	
 				String internalPathToTargetFile = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + photo.getPhotoPath();
-				String downloadedPhotoFileFullPath = tempPhotoFolderPath + "/" + photo.getPhotoPath();
 				try {
-					yandexDiskConnector.downloadFile(internalPathToTargetFile, downloadedPhotoFileFullPath);
-					photo.setDownloadedPhotoPath("/img/" + recipe.getPhotoFolder() + "/" + photo.getPhotoPath());
+					String imgUrl = yandexDiskConnector.getDownloadLink(internalPathToTargetFile);
+					photo.setDownloadedPhotoPath(imgUrl);					
 				} catch (YandexDiskException e) {
 					e.printStackTrace();
 				}				
