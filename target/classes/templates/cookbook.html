@@ -81,8 +81,13 @@
 				<div class="card" style="width: 25%;" th:each="recipe : ${recipes}" >
 					<div class="card-body">
 						<form method="get" action="/recipe/show">
-							<input type="hidden" name="recipeId" th:value="${recipe.id}">
-							<img class="d-block w-100" th:src="@{/img/} + ${recipe.name} + @{_preview.jpg}" alt="-">
+							<input type="hidden" name="recipeId" th:id="recipeId_+${recipe.id}" th:value="${recipe.id}">
+
+							<div class="spinner-border" role="status" th:id="spinner_+${recipe.id}">
+								<span class="sr-only">Loading...</span>
+							</div>
+							<img class="d-block w-100" th:id="img_+${recipe.id}">
+
 							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
 							<p>Категория: <span th:text="${recipe.type}"> Категория </span></p><br>
 							<p>Слоган: <span th:text="${recipe.tagline}"> Слоган </span></p><br>
@@ -93,8 +98,10 @@
 			</div>
 		</div>
 
-		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
+
+		<script th:src="@{/js/loadpreviews.js}"			src="../static/js/loadpreviews.js"></script>
 	</body>
 </html>

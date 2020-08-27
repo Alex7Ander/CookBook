@@ -94,9 +94,13 @@
 
 			<!-- Photo cards -->			
 			<div class="row" id="photoList">				
-				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_ + ${photo.id}">
+				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_+${photo.id}">
 					<div class="card-body">
-						<img class="d-block w-100" th:src="${photo.getDownloadedPhotoPath()}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<input type="hidden" th:id="photoPath_+${photo.id}" th:value="${photo.id}">
+						<div class="spinner-border" role="status" th:id="spinner_+${photo.id}">
+							<span class="sr-only">Loading...</span>
+						</div>
+						<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
 						<input th:if="${editable}" type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>
@@ -114,8 +118,11 @@
 					<div class="col-md-10">				
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
-								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="${photo.id} + Slide">
-									<img class="d-block w-100" th:src="@{/img/} + ${recipe.photoFolder} + @{/} + ${photo.photoPath}" th:alt="${photo.photoPath}">
+								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="slide_+${photo.id}">
+									<img class="d-block w-100" th:id="carousel_img_+${photo.id}" th:alt="${photo.photoPath}">
+									<div class="spinner-border" role="status" th:id="carousel_spinner_+${photo.id}">
+										<span class="sr-only">Loading...</span>
+									</div>
 								</div>						
 							</div>
 							<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
@@ -241,11 +248,11 @@
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
+		<script th:src="@{/js/loadphotos.js}"			src="../static/js/loadphotos.js"></script>
 		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
 		<script th:src="@{/js/recipe.js}"       		src="../static/js/recipe.js" ></script>
 		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredient.js"></script>	
 		<script th:src="@{/js/ingredientVolume.js}"   	src="../static/js/ingredientVolume.js"></script>			
 			
 	</body>
-	
 </html>

@@ -13,9 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
@@ -27,6 +29,7 @@ import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 import ru.pavlov.services.RecipeService;
 import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
 @RequestMapping("/cookbook/**") 
@@ -113,6 +116,14 @@ public class CookBookController {
 		List<Review> reviews = reviewRepo.findByUserId(currentUser.getId());
 		model.addAttribute("reviews", reviews);
 		return "reviewbook";
+	}
+	
+	@GetMapping("loadPreview")
+	@ResponseBody
+	public byte[] loadPreviews(@RequestParam long recipeId) {
+		Recipe recipe = this.recipeRepo.findById(recipeId);
+		byte[] previewImageByteArray = recipe.getPreviewImage();
+		return previewImageByteArray;
 	}
 	
 }

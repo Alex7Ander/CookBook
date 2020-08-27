@@ -104,27 +104,7 @@ public class RecipeController {
 		model.addAttribute("ingredientsVolumes", ingredientsVolumes);		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);
-		
-		//Создаем папку для фото
-		String tempPhotoFolderPath = "/home/alex/eclipse-workspace/CookBook/target/classes/static/img/" + recipe.getPhotoFolder(); //"C:\\Users\\user\\eclipse-workspace\\CookBook\\target\\classes\\static\\img\\" + recipe.getPhotoFolder();		
-		File tempPhotoFolder = new File(tempPhotoFolderPath);
-		tempPhotoFolder.mkdir();
-				
-		for (RecipePhoto rp : recipePhotos) {			
-			try {	
-				String internalPathToTargetFile = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath();
-				String downloadedPhotoFileFullPath = tempPhotoFolderPath + "/" + rp.getPhotoPath();
-				try {
-					yandexDiskConnector.downloadFile(internalPathToTargetFile, downloadedPhotoFileFullPath);
-					rp.setDownloadedPhotoPath("/img/" + recipe.getPhotoFolder() + "/" + rp.getPhotoPath());
-				} catch (YandexDiskException e) {
-					e.printStackTrace();
-				}				
-			} catch (IOException e) {
-				System.err.println("Error while downloading file " + rp.getPhotoPath() + " from bucket " + recipe.getPhotoFolder());
-				e.printStackTrace();
-			}			
-		}		
+			
 		return "recipe";
 	}
 	
@@ -333,8 +313,7 @@ public class RecipeController {
 				System.out.println("");
 				volume = 0.0;
 			} 
-			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);
-			
+			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);		
 			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
 			ingredients.add(ingrVolume);
 		}
@@ -351,6 +330,7 @@ public class RecipeController {
 		
 		//Creating yandex folder for photos;				
 		String recipePhotosYandexDiskFolder = UUID.randomUUID().toString();  //name of the folder with photos
+		recipePhotosYandexDiskFolder.replace(" ", "_");
 		yandexDiskConnector.createFolder("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder);
 		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
@@ -365,19 +345,17 @@ public class RecipeController {
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
 				fos.write(byteArray);
 				fos.close();				
-				RecipePhoto uploadedPhoto = new RecipePhoto(uniqPhotoName, recipe);
+				RecipePhoto uploadedPhoto = new RecipePhoto("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder + "/" + uniqPhotoName, recipe);
 				photos.add(uploadedPhoto);
 				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder, uniqPhotoName, resultFullPhotoName);
 			}
 		}
 		//Clear container for photos - newRecipePhotos
-		this.newRecipePhotos.clear();
-	
+		this.newRecipePhotos.clear();	
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
 		recipePhotoRepo.saveAll(photos);
-		ingrVolumeRepo.saveAll(ingredients);
-				
+		ingrVolumeRepo.saveAll(ingredients);				
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
 		return "cookbook";
@@ -396,6 +374,20 @@ public class RecipeController {
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
 		return "cookbook";		
+	}
+	
+	@GetMapping("loadPhoto")
+	@ResponseBody
+	public byte[] loadPhoto(@RequestParam long photoId) {
+		RecipePhoto sendingPhoto = this.recipePhotoRepo.findById(photoId);
+		String internalPathToTargetFile = sendingPhoto.getPhotoPath();
+		byte[] bytes = null;
+		try {
+			bytes = yandexDiskConnector.getTargetFileByteArrayByPath(internalPathToTargetFile);
+		} catch (IOException | YandexDiskException e) {
+			e.printStackTrace();
+		}
+		return bytes;
 	}
 		
 }

@@ -364,7 +364,7 @@ function deletePhoto(photoId){
 
 function showCarouselWindow(photoId){
 	carouselWindow.showWindow();
-	currentCaruselActiveSlide = $("#" + photoId + "Slide");
+	currentCaruselActiveSlide = $("#slide_" + photoId);
 	currentCaruselActiveSlide.addClass("active");
 }
 function hideCarouselWindow(){

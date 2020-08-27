@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -167,10 +166,10 @@ public class YandexDiskConnector {
     	}
 	}
 	
-	public void downloadFile(String internalPathToTargetFile, String downloadingPath) throws ClientProtocolException, IOException, YandexDiskException  {
+	public String getDownloadLink(String internalPathToTargetFile) throws ClientProtocolException, IOException, NoConnectionToYandexDiskException, YandexDiskInternalException {
 		internalPathToTargetFile = internalPathToTargetFile.replaceAll("/", "%2F");
 		String dwnlUrl = "https://cloud-api.yandex.net:443/v1/disk/resources/download?path=" + internalPathToTargetFile;
-		HttpGet getLinkRequest = new HttpGet(dwnlUrl);
+		HttpGet getLinkRequest = new HttpGet(dwnlUrl);		
 		getLinkRequest.addHeader("Authorization", "OAuth " + token); 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse getDownloadLinkResponse = httpClient.execute(getLinkRequest);
@@ -189,7 +188,11 @@ public class YandexDiskConnector {
         ObjectMapper mapper = new ObjectMapper();
         YandexDiskResponse ydResp = mapper.readValue(result, YandexDiskResponse.class);
 		String url = ydResp.getHref();
-        HttpGet getFile = new HttpGet(url);
+		return url;
+	}
+	
+	private HttpEntity loadHttpEntityByUrl(String downloadingUrl) throws ClientProtocolException, IOException, YandexDiskException {
+        HttpGet getFile = new HttpGet(downloadingUrl);
         // add request headers
         getFile.addHeader("Authorization", "OAuth " + token); 
         CloseableHttpClient gettingFileHttpClient = HttpClients.createDefault();
@@ -199,10 +202,13 @@ public class YandexDiskConnector {
     	}
     	if(responseGettingFile.getStatusLine().getStatusCode() >= 400) {
     		throw new YandexDiskInternalException(Integer.toString(responseGettingFile.getStatusLine().getStatusCode()));
-    	}
-        HttpEntity gettingFileEntity = responseGettingFile.getEntity();
-        if (gettingFileEntity != null) {
-            long len = gettingFileEntity.getContentLength();           
+    	}         
+		return responseGettingFile.getEntity(); 
+	}
+	
+	public void downloadFile(String downloadingUrl, String downloadingPath) throws ClientProtocolException, IOException, YandexDiskException  {        
+		HttpEntity gettingFileEntity = loadHttpEntityByUrl(downloadingUrl);       
+        if (gettingFileEntity != null) {           
             BufferedInputStream bis = new BufferedInputStream(gettingFileEntity.getContent());
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(downloadingPath)));
             int inByte;
@@ -214,5 +220,27 @@ public class YandexDiskConnector {
         else {
         	throw new NoSuchSourceException();
         }
+	}
+	
+	public byte[] getTargetFileByteArray(String downloadingUrl) throws ClientProtocolException, IOException, YandexDiskException {
+		List<Byte> bytesList = new ArrayList<>();
+		HttpEntity gettingFileEntity = loadHttpEntityByUrl(downloadingUrl);		
+		BufferedInputStream bis = new BufferedInputStream(gettingFileEntity.getContent());		
+		int inByte;
+		while((inByte = bis.read()) != -1) {
+			bytesList.add((byte) inByte);
+		}		
+		byte[] bytes = new byte[bytesList.size()];
+		for(int i = 0; i < bytesList.size(); i++) {
+			byte value = bytesList.get(i);
+			bytes[i] = value;
+		} 
+		return bytes;
+	}
+	
+	public byte[] getTargetFileByteArrayByPath(String internalPathToTargetFile) throws ClientProtocolException, IOException, YandexDiskException {
+		String url = getDownloadLink(internalPathToTargetFile);
+		byte[] bytes = getTargetFileByteArray(url);		
+		return bytes; 
 	}
 }
