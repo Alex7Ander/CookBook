@@ -49,11 +49,12 @@
 		<div class = "container-md">
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
-					<img th:src="@{/img/} + ${avatarPath}" src="../static/img/autorisation_ico.png">
+					<img id="avatar">
 				</div>
 					
 				<div class="col-md-9 cookBookContainer">
 					<a href="/user/editpage">Редактировать</a> <br>
+					<input type="hidden" id="user_id" th:value="${user.getId()}">
 					<b class = "label"> Имя: <span th:text="${user.getName()}"> - </span> </b> <br>
 					<b class = "label"> Фамилия: <span th:text="${user.getSurname()}"> - </span> </b> <br>
 					<b class = "label"> Я живу в: <span th:text="${user.getCity()}"> - </span> </b> <br>
@@ -115,7 +116,8 @@
 		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>	
-
+		
+		<script th:src="@{/js/loadavatar.js}"	src="../static/js/loadavatar.js"></script>
 		<script th:src="@{/js/loadpreviews.js}"	src="../static/js/loadpreviews.js"></script>
 	</body>
 </html>

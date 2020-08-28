@@ -31,6 +31,7 @@ import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
 
 @Controller
 @RequestMapping("/user/**")  
@@ -51,6 +52,9 @@ public class UserController {
 	@Autowired
 	private ReviewRepository reviewRepo;
 	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
+	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
 	//private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
@@ -58,25 +62,18 @@ public class UserController {
 	@GetMapping("show")
 	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
 		User currentUser = currentUserDetails.getUser();
-		model.addAttribute("user", currentUser);
-		
-		String avatarImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
-        try(FileOutputStream fos=new FileOutputStream(avatarImageFilePath))
-        {
-        	byte[] avatarImageByteArray = currentUser.getImage();
-        	if(avatarImageByteArray != null) {
-        		fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
-                String avatarFileName = currentUser.getName() + "_avatar.jpg";
-                model.addAttribute("avatarPath", avatarFileName);
-        	}          
-        }
-        catch(IOException ioExp){              
-            System.out.println(ioExp.getMessage());
-        }	
-        				
+		model.addAttribute("user", currentUser);		     				
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
 		return "user";
+	}
+	
+	@GetMapping("loadAvatar")
+	@ResponseBody
+	public byte[] loadAvatar(@RequestParam long userId) {
+		User user = this.userRepo.findById(userId);
+		byte[] avatarByteArray = user.getImage();
+		return avatarByteArray;
 	}
 	
 	@GetMapping("editpage")
@@ -102,15 +99,7 @@ public class UserController {
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
 		if(avatar != null && avatar.getBytes().length != 0) {
 			byte[] avatarImageByteArray = avatar.getBytes();
-			currentUser.setImage(avatarImageByteArray);			
-			String imageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
-	        try(FileOutputStream fos=new FileOutputStream(imageFilePath))
-	        {              
-	            fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
-	        }
-	        catch(IOException ioExp){              
-	            System.out.println(ioExp.getMessage());
-	        }	
+			currentUser.setImage(avatarImageByteArray);				
 		}
         String avatarFileName = currentUser.getName() + "_avatar.jpg";
         model.addAttribute("avatarPath", avatarFileName);

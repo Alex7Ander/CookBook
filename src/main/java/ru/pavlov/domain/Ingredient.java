@@ -1,10 +1,12 @@
 package ru.pavlov.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -45,11 +47,11 @@ public class Ingredient {
 	private double carbohydrate;
 
 	private double calorie;
-
 	private boolean common;
-	
-
-	
+	@Column(name = "image", columnDefinition="longblob", length=2*1024*1024*1024)
+    @Lob()
+	private byte[] image;
+		
 	public Long getId() {
 		return id;
 	}
@@ -109,6 +111,12 @@ public class Ingredient {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public byte[] getImage() {
+		return image;
+	}
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 
 }

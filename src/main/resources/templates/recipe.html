@@ -57,7 +57,7 @@
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
-					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>					
+					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> youtube link </a><br>					
 				</div>
 				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
@@ -105,10 +105,19 @@
 					</div>
 				</div>
 			</div>
-			<div th:if="${editable}" class="row">
+			<div class="row" th:if="${editable}" >
 				<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
+			</div>
+
+			<div class="row" th:if="${editable}">
+				<div class="col-md-9"></div>
+				<div class="col-md-3">
+					<button type="button" class="btn btn-link" onclick="deleteRecipe()">Удалить рецепт</button>
+				</div>
 			</div>			
 		</div>
+
+
 
 		<!-- Pop up window with photo carousel -->
 		<div class="popup" id="carousel_recipe_photos">			

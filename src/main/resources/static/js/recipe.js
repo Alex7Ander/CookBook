@@ -372,3 +372,23 @@ function hideCarouselWindow(){
 	currentCaruselActiveSlide.removeClass("active");	
 	currentCaruselActiveSlide = null;
 }
+
+function deleteRecipe(){
+	var recipeData = new FormData();
+	recipeData.append("recipeId", $("#recipeId").val());
+	$.ajax({type: "POST", url: "/recipe/delete", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: recipeData,
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				alert("Рецепт успешно удален");
+				$(location).attr('href', '/cookbook/showCookbook');						
+			}
+			else{
+				console.log(respond.error);
+				alert('Ошибка удаления рецепта:\n' + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось удалить рецепт:\n' + status);
+		}
+	});
+}

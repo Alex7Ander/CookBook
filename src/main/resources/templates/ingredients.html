@@ -39,7 +39,6 @@
 			</div>
 		</nav>
 
-		
         <div class="container-md">
 			<div class="row">
                 <div class="col-md-3 cookBookContainer">
@@ -55,7 +54,13 @@
 					</select>
 				</div>
                 <div class="col-md-9 cookBookContainer">
-					<h4 id="selectedIngrName"></h4>					
+					<h4 id="selectedIngrName"></h4>	
+					<input type="hidden" id="ingrId">
+					<img id="image">
+					<div id="imageUploader">
+						<input type="file" name="ingrImage" id="imageLoader"> <br>
+						<input type="button" value="Сохранить фото" onclick="sendIngrImage()">
+					</div>				
                     <table id="ingrTable">
                         <tr> 
                             <th>Белки</th>

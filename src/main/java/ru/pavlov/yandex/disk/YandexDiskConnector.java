@@ -115,7 +115,8 @@ public class YandexDiskConnector {
     	}
 	}
 	
-	public void uploadFile(String internalPathToTargetFolder, String internalFileName, String filePath) throws ClientProtocolException, IOException, YandexDiskException {
+	
+	private String getUploadingLink(String internalPathToTargetFolder, String internalFileName) throws ClientProtocolException, IOException, YandexDiskException {
 		internalPathToTargetFolder = internalPathToTargetFolder.replaceAll("/", "%2F");
 		String getReqUrl = "https://cloud-api.yandex.net:443/v1/disk/resources/upload?path=" + internalPathToTargetFolder + "%2F" + internalFileName;			
         HttpGet get = new HttpGet(getReqUrl);
@@ -134,13 +135,32 @@ public class YandexDiskConnector {
 			result = EntityUtils.toString(entity);
         }
 		ObjectMapper mapper = new ObjectMapper();
-		YandexDiskResponse ydResp = mapper.readValue(result, YandexDiskResponse.class);
-		
+		YandexDiskResponse ydResp = mapper.readValue(result, YandexDiskResponse.class);		
 		String url = ydResp.getHref();
+		return url;
+	}
+	
+	public void uploadFile(String internalPathToTargetFolder, String internalFileName, String filePath) throws ClientProtocolException, IOException, YandexDiskException {		
+		String url = getUploadingLink(internalPathToTargetFolder, internalFileName);		
 		File file = new File(filePath);	
 		CloseableHttpClient client = HttpClients.createDefault();
 	    HttpPost uploadingPostRequest = new HttpPost(url);
 	    HttpEntity multipartEntity = MultipartEntityBuilder.create().addPart("file", new FileBody(file)).build();
+	    uploadingPostRequest.setEntity(multipartEntity);
+	    CloseableHttpResponse uploadingResponse = client.execute(uploadingPostRequest);
+    	if(uploadingResponse == null) {
+    		throw new NoConnectionToYandexDiskException();
+    	}
+    	if(uploadingResponse.getStatusLine().getStatusCode() >= 400) {
+    		throw new YandexDiskInternalException(Integer.toString(uploadingResponse.getStatusLine().getStatusCode()));
+    	}
+	}
+	
+	public void uploadFile(String internalPathToTargetFolder, String internalFileName, byte[] byteArray) throws ClientProtocolException, IOException, YandexDiskException {
+		String url = getUploadingLink(internalPathToTargetFolder, internalFileName);			
+		CloseableHttpClient client = HttpClients.createDefault();
+	    HttpPost uploadingPostRequest = new HttpPost(url);
+	    HttpEntity multipartEntity = MultipartEntityBuilder.create().addBinaryBody("file", byteArray).build();
 	    uploadingPostRequest.setEntity(multipartEntity);
 	    CloseableHttpResponse uploadingResponse = client.execute(uploadingPostRequest);
     	if(uploadingResponse == null) {

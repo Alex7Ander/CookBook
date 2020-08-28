@@ -1,5 +1,6 @@
 package ru.pavlov.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +23,7 @@ import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.security.CookBookUserDetails;
 
 @Controller
-@RequestMapping("/ingredient/**") // /ingredient/getIngredients
+@RequestMapping("/ingredient/**")
 public class IngredientController {
 
 	@Autowired
@@ -103,6 +105,36 @@ public class IngredientController {
 		}
 		answer.append("]");
 		return answer.toString();
+	}
+	
+	@GetMapping("loadImg")
+	@ResponseBody
+	public byte[] loadImg(@RequestParam long ingrId) {
+		Ingredient ingredient = this.ingrRepo.findById(ingrId);
+		byte[] imgByteArray = ingredient.getImage();				
+		return imgByteArray;
+	}
+	
+	@PostMapping("saveImage")
+	public String saveImage(@RequestParam long imageId, @RequestParam(required = true, name="ingrImage") MultipartFile image) {
+		String response = null;
+		byte[] byteArray = null;
+		try {
+			byteArray = image.getBytes();
+		}
+		catch(IOException ioExp) {
+			response = "{\"error\":\"нет файла с изображением, возможно он был поврежден при передаче.\"}";
+			return response;
+		}
+		Ingredient ingredient = this.ingrRepo.findById(imageId);
+		if(ingredient == null) {
+			response = "{\"error\":\"ингредиент не найден\"}";
+			return response;
+		}
+		ingredient.setImage(byteArray);
+		this.ingrRepo.save(ingredient);
+		response = "{\"done\":\" + true + \"}";
+		return response;
 	}
 	
 }
