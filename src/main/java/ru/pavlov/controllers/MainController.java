@@ -43,32 +43,41 @@ public class MainController {
 						@RequestParam String email, 
 						@RequestParam String code,
 						Model model) {
+		
+		System.out.println("Начата регистрация нового пользователя");
 		if(!code.equals("CookBookGuest2043")) {
 			return "notinvited";
 		}
+		
+		System.out.println("Пользователь был приглашен и ввел правильный код");
 		if(!password.equals(password2)) {
 			model.addAttribute("errorMsg", "Пароли не совпадают");
 			return "registration";
 		}
-		/*
+		
+		System.out.println("Пользователь правильно ввел пароли");
 		User userByLogin = userRepo.findByUserLoginName(login);
 		if (userByLogin != null) {
 			model.addAttribute("errorMsg", "Введенный логин занят");
+			System.err.println("Введенный пользователем логин занят");
 			return "registration";
 		}
+		
 		User userByEmail = userRepo.findByEmail(email);
 		if (userByEmail != null) {
 			model.addAttribute("errorMsg", "Введенный email занят");
+			System.err.println("Введенный пользователем адресс электронной почты занят");
 			return "registration";
-		}
-		*/		
+		}	
+		
+		System.out.println("Пользователь ввел ранее не используемые логин и пароль");
 		List<UserRole> roles = userRoleRepo.findByRole("USER");
 		String userActivationCode = UUID.randomUUID().toString();
 		User user = new User(login, password, email, roles);
 		user.setActivationCode(userActivationCode);		
 		String message = "Добро пожаловать! Вы в одном шаге от регистрации в книге рецептов CookBook.\n"
 				+ "Пройдите по ссылке, что бы активировать свой аккаунт:\n\n"
-				+ "localhost:8080/activate?code="+userActivationCode;
+				+ "localhost:5000/activate?code="+userActivationCode;
 		try {
 			mailSender.send(email, "Активация регистрации на сайте CookBook", message);
 		}
@@ -80,7 +89,10 @@ public class MainController {
 			userRepo.delete(user);
 			return "registration";
 		}	
+		
+		System.out.println("Письмо отправлено успешно");
 		userRepo.save(user);
+		System.out.println("Пользователь сохранен в БД");
 		return "redirect:/login";
 	}
 	

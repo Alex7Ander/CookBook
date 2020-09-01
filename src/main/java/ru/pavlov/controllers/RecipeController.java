@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import ru.pavlov.aws.AWSConnector;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
@@ -42,9 +41,6 @@ public class RecipeController {
 	
 	@Value("${upload.path}")
 	private String uploadPath;
-	
-	@Autowired
-	private AWSConnector awsConnector;
 	
 	@Autowired
 	private YandexDiskConnector yandexDiskConnector;

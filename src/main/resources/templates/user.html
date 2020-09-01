@@ -7,6 +7,13 @@
 		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="/../static/styles/style.css" type="text/css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">			
 		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+
+		<style>
+			.notActiveText {
+				text-align: center;
+				font-style: italic; 				
+			}
+		</style>
 	</head>
 	
 	<body>
@@ -61,7 +68,10 @@
 					<b class = "label"> Темперамент: <span th:text="${user.getTemperament()}"> - </span> </b> <br>
 					<b class = "label"> Телефон: <span th:text="${user.getPhone()}"> - </span> </b> <br>
 					<b class = "label"> E-mail: <span th:text="${user.getEmail()}"> - </span> </b> <br>
-					<input type = "button" class="dws-btn" value="Написать рецепт" onclick='location.href="/cookbook/addrecipe"'>
+					<input th:if="${activated}" type = "button" class="dws-btn" value="Написать рецепт" onclick='location.href="/cookbook/addrecipe"'><br>
+					<div class="notActiveText" th:unless="${activated}">
+						<p>Зайдите в почтовый ящик, что Вы указывали при регистрации и активируйте свой аккаунт, что бы начать вести свою книгу рецептов </p>
+					</div>
 				</div>
 			</div>
 			

@@ -1,7 +1,5 @@
 package ru.pavlov.controllers;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,6 @@ import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
-import ru.pavlov.yandex.disk.YandexDiskConnector;
 
 @Controller
 @RequestMapping("/user/**")  
@@ -52,9 +49,6 @@ public class UserController {
 	@Autowired
 	private ReviewRepository reviewRepo;
 	
-	@Autowired
-	private YandexDiskConnector yandexDiskConnector;
-	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
 	//private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
@@ -62,7 +56,15 @@ public class UserController {
 	@GetMapping("show")
 	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
 		User currentUser = currentUserDetails.getUser();
-		model.addAttribute("user", currentUser);		     				
+		model.addAttribute("user", currentUser);	
+		if(currentUser.getActivationCode() == null) {
+			System.out.println("Activation code is null. User is activated");
+			model.addAttribute("activated", true);
+		} 
+		else {
+			System.out.println("Activation code is " + currentUser.getActivationCode() + ". User is NOT activated");
+			model.addAttribute("activated", false);
+		}
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
 		return "user";

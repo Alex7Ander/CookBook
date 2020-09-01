@@ -23,19 +23,24 @@ function setIngredientValues(){
 	var calorie = prot*4 + carbo*4 + fat*9;
 	var description = currentIngredientsList[currentIngrIndex].descr;
 
+	$('#ingrId').val(currentIngredientsList[currentIngrIndex].id);
 	$('#ingrTable').find('tr').eq(1).remove();
 	$('#ingrTable').append('<tr><td>'+prot+'</td><td>'+fat+'</td><td>'+carbo+'</td><td>'+calorie+' ккал</td></tr>');
 	$('#description').empty();	
 	$('#description').append(description);
 	$('#selectedIngrName').empty();	
 	$('#selectedIngrName').append(currentIngredientsList[currentIngrIndex].name);
-	$('#ingrId').val(currentIngredientsList[currentIngrIndex].id);
 
-	loadImg();
+	$('#imageUploader').show();	
+	var localImg = currentIngredientsList[currentIngrIndex].image;
+	var url = window.URL || window.webkitURL;
+	var localImgUrl = url.createObjectURL(localImg);
+	$("#image").attr('src', localImgUrl);
+/*
 	if(currentIngredientsList[currentIngrIndex].common != true){
 		$('#imageUploader').show();
 	}
-	
+*/	
 }
 
 function loadImg(){
@@ -62,16 +67,17 @@ function loadImg(){
 
 function sendIngrImage(){
 	var ingredientData = new FormData();
-	var currentIngrId = $('#ingrId').val(); 	
-	ingredientData.append('ingrId', currentIngrId);
-	var currentlyUploadedPhoto = $('#imageLoader').val();
+	var currentIngrId = $('#ingrId').val(); 		
+	var currentlyUploadedPhoto = $('#imageLoader').prop('files')[0];
 	ingredientData.append('ingrImage', currentlyUploadedPhoto);
+	ingredientData.append('ingrId', currentIngrId);
 
 	$.ajax({type: "POST", url: "/ingredient/saveImage", async:false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {		
 				var img = document.getElementById('image');
-				img.src = url.createObjectURL(data);
+				var url = window.URL || window.webkitURL;
+				img.src = url.createObjectURL(currentlyUploadedPhoto);
 			}
 			else {
 				alert("Ошибка при загрузке изображения: " + respond.error);

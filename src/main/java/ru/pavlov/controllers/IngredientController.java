@@ -116,17 +116,18 @@ public class IngredientController {
 	}
 	
 	@PostMapping("saveImage")
-	public String saveImage(@RequestParam long imageId, @RequestParam(required = true, name="ingrImage") MultipartFile image) {
+	@ResponseBody
+	public String saveImage( @RequestParam MultipartFile ingrImage, @RequestParam long ingrId) {
 		String response = null;
 		byte[] byteArray = null;
 		try {
-			byteArray = image.getBytes();
+			byteArray = ingrImage.getBytes();
 		}
 		catch(IOException ioExp) {
 			response = "{\"error\":\"нет файла с изображением, возможно он был поврежден при передаче.\"}";
 			return response;
 		}
-		Ingredient ingredient = this.ingrRepo.findById(imageId);
+		Ingredient ingredient = this.ingrRepo.findById(ingrId);
 		if(ingredient == null) {
 			response = "{\"error\":\"ингредиент не найден\"}";
 			return response;
