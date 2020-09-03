@@ -1,5 +1,6 @@
 $(document).ready(function(){
-        loadavatar();  
+    $("#avatar").hide();
+    loadavatar();  
 });
 
 function loadavatar(){
@@ -17,6 +18,8 @@ function loadavatar(){
             var img = document.getElementById('avatar');
             var url = window.URL || window.webkitURL;
             img.src = url.createObjectURL(data);
+            $("#avatar").show();
+            $("#spinner_avatar").hide();
         },
         error: function(respond, status, jqXHR) {
             alert(respond.statusText);

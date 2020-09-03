@@ -51,7 +51,6 @@ public class UserController {
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
-	//private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
 		
 	@GetMapping("show")
 	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
@@ -142,12 +141,11 @@ public class UserController {
 		model.addAttribute("ingredients", ingredients);
 		ObjectMapper jsonCreator = new ObjectMapper();
 		try {
-			String jsonResponse = jsonCreator.writeValueAsString(ingr);
-			return jsonResponse;
+			return jsonCreator.writeValueAsString(ingr);
 		}
 		catch(JsonProcessingException jpExp) {
 			System.out.println(jpExp.getMessage());
-			return "{name:'Error'}";
+			return "{\"name\": \"Error\"}";
 		}		
 	}
 		
@@ -163,14 +161,15 @@ public class UserController {
 	}
 	
 	@PostMapping("saveReview")
-	public String saveReview(@AuthenticationPrincipal CookBookUserDetails currentUserDetails,
-							 @RequestParam String reviewText) {
+	@ResponseBody
+	public String saveReview(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String reviewText) {
 		User user = currentUserDetails.getUser();
 		Review review = new Review();
 		review.setText(reviewText);
 		review.setUserId(user.getId());
 		reviewRepo.save(review);
-		return "user";
+		
+		return "{\"done\": \"true\"}";
 	}
 	
 }

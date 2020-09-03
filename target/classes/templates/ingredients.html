@@ -55,22 +55,27 @@
 				</div>
                 <div class="col-md-9 cookBookContainer">
 					<h4 id="selectedIngrName"></h4>	
-					<input type="hidden" id="ingrId">
-					<img id="image">
+					<input type="hidden" id="ingrId">					
+					<div style="width: 30%;">
+						<img id="image">
+						<div class="spinner-border" role="status" id="spinner_image">
+							<span class="sr-only">Loading...</span>
+						</div>
+					</div>
 					<div id="imageUploader">
 						<input type="file" name="ingrImage" id="imageLoader"> <br>
 						<input type="button" value="Сохранить фото" onclick="sendIngrImage()">
-					</div>				
-                    <table id="ingrTable">
-                        <tr> 
-                            <th>Белки</th>
+					</div>
+					<table id="ingrTable">
+						<tr> 
+							<th>Белки</th>
 							<th>Жиры</th>
 							<th>Углеводы</th>
 							<th>Калорийность</th>
-                        </tr>	
-                    </table>
+						</tr>	
+					</table>
 					<p id="description"> - </p>
-                </div>
+				</div>
             </div>
         </div>
 		

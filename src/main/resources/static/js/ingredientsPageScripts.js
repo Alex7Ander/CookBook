@@ -2,6 +2,8 @@ var currentIngredientsList = new Array();
 
 $(document).ready(function(){
 	$('#imageUploader').hide();
+	$("#image").hide();
+	$("#spinner_image").hide();
 });
 
 function setIngredientsNames(){
@@ -31,20 +33,18 @@ function setIngredientValues(){
 	$('#selectedIngrName').empty();	
 	$('#selectedIngrName').append(currentIngredientsList[currentIngrIndex].name);
 
-	$('#imageUploader').show();	
-	var localImg = currentIngredientsList[currentIngrIndex].image;
-	var url = window.URL || window.webkitURL;
-	var localImgUrl = url.createObjectURL(localImg);
-	$("#image").attr('src', localImgUrl);
-/*
+	//$('#imageUploader').show();	
+	loadImg();
 	if(currentIngredientsList[currentIngrIndex].common != true){
 		$('#imageUploader').show();
 	}
-*/	
+	
 }
 
 function loadImg(){
 	var currentIngrId = $('#ingrId').val();
+	$("#spinner_image").show();
+	$("#image").hide();
     jQuery.ajax({	
         type: "GET",
         url: "/ingredient/loadImg?ingrId=" + currentIngrId,
@@ -57,7 +57,9 @@ function loadImg(){
         success: function(data){
             var img = document.getElementById('image');
             var url = window.URL || window.webkitURL;
-            img.src = url.createObjectURL(data);
+			img.src = url.createObjectURL(data);
+			$("#image").show();
+			$("#spinner_image").hide();
         },
         error: function(respond, status, jqXHR) {
             alert(respond.statusText);

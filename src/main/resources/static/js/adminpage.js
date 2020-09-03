@@ -103,12 +103,28 @@ function sendEmail(){
     });
 }
 
-function createFolder(){
-    var folderData = new FormData();
-    //folderData.append("folderName", $("#newFolderName").val());
-    $.ajax({type: "POST", url: "/admin/getAWSBuckets", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: folderData,
+function sendAnswer(reviewId){
+    var answerData = new FormData();
+    answerData.append('reviewId', reviewId);
+    var answer = $('#answer_' + reviewId).val();
+    answerData.append('answer', answer);
+    $.ajax({type: "POST", url: "/admin/sendAnswer", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: answerData,
         success: function(respond, status, jqXHR){
-            alert("Сообщение отправлено");
+            alert("Ответ сохранен");
+        },
+        error: function(respond, status, jqXHR){
+            alert(status);
+        }
+    });
+}
+
+function deleteReview(reviewId){
+    var reviewData = new FormData();
+    reviewData.append('reviewId', reviewId);
+    $.ajax({type: "POST", url: "/admin/deleteReview", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: reviewData,
+        success: function(respond, status, jqXHR){
+            alert("Сообщение удалено");
+            $('#tr_'+reviewId).remove();
         },
         error: function(respond, status, jqXHR){
             alert(status);

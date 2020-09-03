@@ -8,12 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.amazonaws.services.s3.model.Bucket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -99,11 +97,10 @@ public class AdminController {
 			jsonResponse = jsonCreator.writeValueAsString(user);
 		}
 		catch(Exception exp) {
-			jsonResponse = "\"error\":\"" + exp.getMessage() + "\"";
+			jsonResponse = "{\"error\":\"" + exp.getMessage() + "\"}";
 		}
 		return jsonResponse;
-	}
-	
+	}	
 	
 	@GetMapping("recipes")
 	public String adminPageRecipes(Model model) {
@@ -120,7 +117,7 @@ public class AdminController {
 		return "adminpage_ingredients";
 	}
 	
-	@GetMapping("messages")
+	@GetMapping("reviews")
 	public String adminPageMessages(Model model) {
 		Iterable<Review> reviews = reviewRepo.findAll();
 		model.addAttribute("reviews", reviews);
@@ -137,6 +134,23 @@ public class AdminController {
 	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
 		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
 		return "{}";
+	}
+	
+	@PostMapping("sendAnswer")
+	@ResponseBody
+	public String answerReview(@RequestParam long reviewId, @RequestParam String answer) {		
+		Review review = this.reviewRepo.findById(reviewId);
+		review.setAnswer(answer);
+		this.reviewRepo.save(review);
+		return "{\"done\":\"true\"}";
+	}
+	
+	@PostMapping("deleteReview")
+	@ResponseBody
+	public String deleteReview(@RequestParam long reviewId) {
+		Review review = this.reviewRepo.findById(reviewId);
+		this.reviewRepo.delete(review);
+		return "{\"done\": \"true\"}";
 	}
 
 }
