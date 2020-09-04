@@ -45,7 +45,7 @@ function addPhotoToPhotoList(event){
 			}
 		}, 
 		error: function(respond, status, jqXHR){
-			alert('Не удалось удалить фото: ' + status);
+			alert('Не удалось зашрузить фото на сервер ' + status);
 		},
 		complete: function(){
 			photoUploadPopUpWindow.hideWindow();

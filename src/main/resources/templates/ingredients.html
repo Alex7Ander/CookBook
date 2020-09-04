@@ -7,6 +7,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+		<style>
+			.notVisible{
+				display: none;
+			}
+		</style>
 	</head>	
 	<body>
 		<nav class="navbar navbar-expand-lg navbar-default navbar-fixed-top" > 
@@ -53,19 +58,27 @@
 						<option value="none" hidden="">Выберите игредиент</option>
 					</select>
 				</div>
-                <div class="col-md-9 cookBookContainer">
+                <div class="col-md-3 cookBookContainer">
 					<h4 id="selectedIngrName"></h4>	
 					<input type="hidden" id="ingrId">					
-					<div style="width: 30%;">
+					<div>
 						<img id="image">
 						<div class="spinner-border" role="status" id="spinner_image">
 							<span class="sr-only">Loading...</span>
 						</div>
 					</div>
+				</div>
+				<div class="col-md-6 cookBookContainer">
 					<div id="imageUploader">
-						<input type="file" name="ingrImage" id="imageLoader"> <br>
-						<input type="button" value="Сохранить фото" onclick="sendIngrImage()">
+						<input type="file" name="ingrImage" id="imageLoader" class="notVisible">
+						<label for="imageLoader" class="dws-btn">Выберите файл</label>
+						<input type="button" class="dws-btn" value="Сохранить фото" onclick="sendIngrImage()">
 					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 cookBookContainer">
 					<table id="ingrTable">
 						<tr> 
 							<th>Белки</th>

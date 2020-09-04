@@ -9,6 +9,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
 		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+		<style>
+			.notVisible{
+				display: none;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -75,7 +80,7 @@
 							</td>
 							<td>
 								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
-								<input type="text" hidden="true" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredientVolume.id}')|">
+								<input type="text" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredientVolume.id}')|">
 							</td>
 							<td>
 								<input type="hidden" th:id="${ingredientVolume.id}+CalorieFactor" th:value="${ingredientVolume.getIngredient().calorie}">
@@ -116,8 +121,6 @@
 				</div>
 			</div>			
 		</div>
-
-
 
 		<!-- Pop up window with photo carousel -->
 		<div class="popup" id="carousel_recipe_photos">			
@@ -240,8 +243,9 @@
 					<div class="row">
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data">
-								<input type="file" class= "btn btn-primary" id="photoLoader" value="Загрузить фото" onchange="getCurrentlyUploadedPhoto()">
-								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
+								<input type="file" class= "notVisible" id="photoLoader" value="input file" onchange="getCurrentlyUploadedPhoto(event)">
+								<label for="photoLoader" class="dws-btn">Выберите файл</label>
+								<input type="button" class="dws-btn" value="Загрузить фото" onclick="addPhotoToPhotoList(event);">
 								<a href="javascript:hidePhotoUploadWindow()"> Отмена </a>
 							</form>
 						</div>

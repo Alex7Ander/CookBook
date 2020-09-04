@@ -34,20 +34,26 @@ public class Ingredient {
 	@ManyToOne
 	@JoinColumn(name="userId")
 	@JsonIgnore
-	private User user;
-	
+	private User user;	
+
 	private String name;
 	private String type;
+	
 	@JsonProperty("descr")
+	@Lob
 	private String description;
+	
 	@JsonProperty("prot")
 	private double protein;
+	
 	private double fat;
+	
 	@JsonProperty("carbo")
 	private double carbohydrate;
 
 	private double calorie;
 	private boolean common;
+	
 	@Column(name = "image", columnDefinition="longblob", length=2*1024*1024*1024)
     @Lob()
 	private byte[] image;

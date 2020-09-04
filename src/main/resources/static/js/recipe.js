@@ -17,6 +17,8 @@ $(document).ready(function(){
 	addIngredientWindow.hideWindow();
 	photoUploadWindow.hideWindow();
 	carouselWindow.hideWindow();
+
+	$("input[id$='VolumeTextField']").each(function(){$(this).hide();});
 });
 
 /*Working with main info*/
@@ -163,10 +165,10 @@ function deleteIngredient(recipeId, ingredientVolumeId){
 
 }
 function showVolumeTextField(ingredientVolumeId){
-	$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', false);
+	$("#" + ingredientVolumeId + "VolumeTextField").show();
 	var value = $("#" + ingredientVolumeId + "Volume").text();
 	$("#" + ingredientVolumeId + "VolumeTextField").attr('value', value);
-	$("#" + ingredientVolumeId + "Volume").attr('hidden', true);
+	$("#" + ingredientVolumeId + "Volume").hide();
 }
 function changeIngredientVolume(recipeId, ingredientVolumeId){	
 	var newValue = $("#" + ingredientVolumeId + "VolumeTextField").prop("value");
@@ -184,7 +186,9 @@ function changeIngredientVolume(recipeId, ingredientVolumeId){
 					$("#" + ingredientVolumeId + "Volume").text(newValue);
 					var calorieFactor = $("#" + ingredientVolumeId + "CalorieFactor").prop("value");
 					var calorieValue = calorieFactor * newValue / 100;
-					$("#" + ingredientVolumeId + "Calorie").text(calorieValue);						
+					$("#" + ingredientVolumeId + "Calorie").text(calorieValue);	
+					$("#" + ingredientVolumeId + "VolumeTextField").hide();
+					$("#" + ingredientVolumeId + "Volume").show();					
 				}
 				else {
 					alert('Ошибка при редактирования значения на сервере: ' + respond.data);
@@ -206,7 +210,6 @@ function getIngrListFromServer(){
 function setTotalCalorie(){
 
 }
-
 
 /* 
 	Working with photos 

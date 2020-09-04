@@ -31,12 +31,13 @@ function setIngredientValues(){
 	$('#description').empty();	
 	$('#description').append(description);
 	$('#selectedIngrName').empty();	
-	$('#selectedIngrName').append(currentIngredientsList[currentIngrIndex].name);
-
-	//$('#imageUploader').show();	
+	$('#selectedIngrName').append(currentIngredientsList[currentIngrIndex].name);	
 	loadImg();
 	if(currentIngredientsList[currentIngrIndex].common != true){
 		$('#imageUploader').show();
+	}
+	else{
+		$('#imageUploader').hide();
 	}
 	
 }

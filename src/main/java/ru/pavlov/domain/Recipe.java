@@ -24,6 +24,7 @@ public class Recipe {
 	private String name;
 	private String type;
 	private String tagline;
+	@Lob
 	private String text;
 	private String youtubeLink;
 	private String photoFolder;
