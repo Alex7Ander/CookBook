@@ -4,6 +4,7 @@ var editRecipeMainInfoWindow;
 var addIngredientWindow;
 var photoUploadWindow;
 var carouselWindow;
+var waitingWindow;
 
 var currentCaruselActiveSlide;
 
@@ -12,11 +13,13 @@ $(document).ready(function(){
 	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable);
 	photoUploadWindow = new PhotoUploadPopUpWindow("add_photo_popup");	
 	carouselWindow = new CarouselPopUpWindow("carousel_recipe_photos");
+	waitingWindow = new WaitingPopUpWindow("waiting_window");
 	//Hide PopUp windows
 	editRecipeMainInfoWindow.hideWindow();
 	addIngredientWindow.hideWindow();
 	photoUploadWindow.hideWindow();
 	carouselWindow.hideWindow();
+	waitingWindow.hideWindow();
 
 	$("input[id$='VolumeTextField']").each(function(){$(this).hide();});
 });
@@ -127,22 +130,29 @@ function saveIngredientInRecipe(recipeId, ingredientId, volume){
 	ingredientData.append("ingredientId", ingredientId);
 	ingredientData.append("volume", volume);
 	$.ajax({type: "POST", url: "/recipe/addExistingIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет добавление ингредиента");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
 				//Переназначение кнопок
 				var ingredientVolumeId = respond.ingredientVolumeId;
 				var deleteBtn = $("#" + ingredientVolumeId + "DeleteBtn");
-				deleteBtn.bind('click', deleteIngredient);
-				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
-				$("#" + ingredientVolumeId + "Volume").bind('click', showVolumeTextField);
-				$("#" + ingredientVolumeId + "VolumeTxtField").attr('hidden', true);
-				$("#" + ingredientVolumeId + "VolumeTxtField").bind('change', changeIngredientVolume);
+				deleteBtn.bind('click', deleteIngredient);		
+				$("#" + ingredientVolumeId + "VolumeTxtField").bind('change', changeIngredientVolume);	
+				$("#" + ingredientVolumeId + "Volume").bind('click', showVolumeTextField);				
+				$("#" + ingredientVolumeId + "VolumeTxtField").hide();
+				$("#" + ingredientVolumeId + "Volume").show();
 				alert('Игредиент успешно добавлен');						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
 			alert(respond.responseText);
 			alert('Ошибка при добавлении ингердиента на сервере: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();			
 		}
 	});
 }
@@ -151,6 +161,10 @@ function deleteIngredient(recipeId, ingredientVolumeId){
 	ingredientData.append("recipeId", recipeId);
 	ingredientData.append("ingredientVolumeId", ingredientVolumeId);
 	var response = $.ajax({type: "POST", url: "/recipe/deleteIngredient", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
+			waitingWindow.showWindow();
+		},	
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {
 				$("#" + ingredientVolumeId).closest("tr").remove();
@@ -159,6 +173,9 @@ function deleteIngredient(recipeId, ingredientVolumeId){
 		}, 
 		error: function(respond, status, jqXHR) {
 			alert('Ошибка при удалении ингердиента на сервере: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();			
 		}
 	});
 	var recipeInfo = JSON.parse(response.responseText);
@@ -181,6 +198,10 @@ function changeIngredientVolume(recipeId, ingredientVolumeId){
 		ingredientData.append("ingredientVolumeId", ingredientVolumeId);
 		ingredientData.append("newValue", newValue);
 		$.ajax({type: "POST", url: "/recipe/editIngredientVolume", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+			beforeSend: function(){
+				waitingWindow.setTitle("Ожидайте, идет редактирование количества ингредиента");
+				waitingWindow.showWindow();
+			},
 			success: function(respond, status, jqXHR) {``
 				if (typeof respond.error === 'undefined') {	
 					$("#" + ingredientVolumeId + "Volume").text(newValue);
@@ -200,6 +221,7 @@ function changeIngredientVolume(recipeId, ingredientVolumeId){
 			complete: function(){
 				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
 				$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', true);
+				waitingWindow.hideWindow();	
 			}
 		});
 	}
@@ -234,6 +256,11 @@ function addPhotoToPhotoList(event){
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
 	$.ajax({type: "POST", url: "/recipe/sendPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет отправка фотографии");
+			photoUploadWindow.hideWindow();
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				newPhotoCount++;
@@ -248,7 +275,7 @@ function addPhotoToPhotoList(event){
 			alert('Не удалось загрузить фото: ' + status);
 		},
 		complete: function(){
-			photoUploadWindow.hideWindow();
+			waitingWindow.hideWindow();			
 		}
 	});
 } 
@@ -301,6 +328,10 @@ function showUploadedPhotoOnMainPage(code){
 		var photoData = new FormData();
 		photoData.append("code", code);
 		$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+			beforeSend: function(){
+				waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
+				waitingWindow.showWindow();
+			},	
 			success: function(respond, status, jqXHR){
 				if( typeof respond.error === 'undefined' ){
 					newPhotoCard.remove();					
@@ -311,6 +342,9 @@ function showUploadedPhotoOnMainPage(code){
 			}, 
 			error: function(respond, status, jqXHR){
 				alert('Не удалось удалить фото: ' + status);
+			},
+			complete: function(){
+				waitingWindow.hideWindow();
 			}
 		});
 	}
@@ -322,6 +356,10 @@ function saveNewPhoto(code){
 	photoData.append("recipeId", $("#recipeId").val());
 	photoData.append("code", code);
 	$.ajax({type: "POST", url: "/recipe/saveUnsavedePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет сохранение новой фотографии");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				alert("Фото успешно сохранено");
@@ -340,6 +378,9 @@ function saveNewPhoto(code){
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось сохранить фото: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
 		}
 	});
 }
@@ -349,6 +390,10 @@ function deletePhoto(photoId){
 	photoData.append("recipeId", $("#recipeId").val());
 	photoData.append("photoId", photoId);
 	$.ajax({type: "POST", url: "/recipe/deletePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление фотографии");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				alert("Фото успешно удалено");
@@ -361,6 +406,9 @@ function deletePhoto(photoId){
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось удалить фото: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
 		}
 	});
 }
@@ -380,6 +428,10 @@ function deleteRecipe(){
 	var recipeData = new FormData();
 	recipeData.append("recipeId", $("#recipeId").val());
 	$.ajax({type: "POST", url: "/recipe/delete", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: recipeData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление рецепта");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				alert("Рецепт успешно удален");
@@ -392,6 +444,9 @@ function deleteRecipe(){
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось удалить рецепт:\n' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
 		}
 	});
 }

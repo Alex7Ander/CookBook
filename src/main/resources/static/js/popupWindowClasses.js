@@ -190,6 +190,17 @@ class CarouselPopUpWindow extends PopUpWindow{
 
 class AddNewUserPopUpWindow extends PopUpWindow{
     constructor(id){
+        super(id);      
+    }
+}
+
+class WaitingPopUpWindow extends PopUpWindow{
+    constructor(id){
         super(id);
+        this.title = $('#waitingWindowTitle');
+    }
+
+    setTitle(titleText){
+        this.title.text(titleText);
     }
 }

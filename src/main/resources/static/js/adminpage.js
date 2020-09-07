@@ -131,3 +131,15 @@ function deleteReview(reviewId){
         }
     });
 }
+
+function searchIngredients(){
+
+}
+
+function showNewIngredientPreview(){
+
+}
+
+function editIngredient(){
+
+}

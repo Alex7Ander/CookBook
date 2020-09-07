@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -111,8 +115,12 @@ public class AdminController {
 	
 	
 	@GetMapping("ingredients")
-	public String adminPageIngredinets(Model model) {
-		Iterable<Ingredient> ingredients = ingredientRepo.findAll();
+	public String adminPageIngredinets(Model model, @RequestParam(required = false) Integer pageIndex) {
+		if(pageIndex == null) {
+			pageIndex = 0;
+		}
+		Pageable findAllSortedByType = PageRequest.of(pageIndex, 10, Sort.by("type"));
+		Page<Ingredient> ingredients = ingredientRepo.findAll(findAllSortedByType);
 		model.addAttribute("ingredients", ingredients);
 		return "adminpage_ingredients";
 	}
