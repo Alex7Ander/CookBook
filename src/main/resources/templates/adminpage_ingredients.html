@@ -25,13 +25,12 @@
                 </div>
                 <div class="col-md-5">
                     <h2>Ингредиенты:</h2>
-                    <p><input type="radio" id="commonRB"  name="common">Общие</p>
-                    <p>
-                        <input type="radio" id="privateRB" name="common"> Пользовательские (id пользователя)
-                        <input type="text" id="userId">
-                    </p>
-                    <p><input type="radio" id="allRB" name="common" checked>Все</p>
-                    <input type="button" value="Искать" onclick="searchIngredients();"><br>
+                    <form id="searchIngredientsForm" method="get" action="/admin/ingredients">
+                        <p><input type="radio" id="commonRB"  name="common" value="1">Общие</p>
+                        <p><input type="radio" id="privateRB" name="common" value="0">Пользовательские</p>
+                        <p><input type="radio" id="allRB" name="common" value="-1" checked>Все</p>
+                        <input type="submit" value="Искать"><br>
+                    </form>
                     <table id="commonIngredientsTable" style="width: 100%;">
                         <tr>
                             <th class="idcol">id</th> 
@@ -44,8 +43,8 @@
                         </tr>
                         <tr th:each="ingredient : ${ingredients}" th:attr="onclick=|loadIngredient('${ingredient.id}')|">
                             <td class="idcol"><span th:text="${ingredient.id}"></td>
-                            <td><span th:text="${ingredient.name}"></td>
-                            <td><span th:text="${ingredient.type}"></td>
+                            <td><span th:id="${ingredient.id}+_name" th:text="${ingredient.name}"></td>
+                            <td><span th:id="${ingredient.id}+_type" th:text="${ingredient.type}"></td>
                             <td><span th:text="${ingredient.protein}"></td>
                             <td><span th:text="${ingredient.fat}"></td>
                             <td><span th:text="${ingredient.carbohydrate}"></td> 
@@ -54,11 +53,9 @@
                     </table>
                     <nav aria-label="Ingredients search results pages">
                         <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="/admin/ingredients/">Пред.</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">След.</a></li>
+                            <li class="page-item" th:each="wrapper: ${linkWrappers}">
+                                <a class="page-link" th:href="${wrapper.link}"><div th:text="${wrapper.index}"></a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -72,12 +69,33 @@
                     <p>Описание: </p><textarea id="descriptionEdit" style="width: 100%;"></textarea><br>
                     <input type="file" id="ingrPhotoLoader" onchange="showNewIngredientPreview();"><br>
                     <div>
-						<img id="image">
-						<div class="spinner-border" role="status" id="spinner_image">
-							<span class="sr-only">Loading...</span>
-						</div>
-					</div>
-                    <input type="button" id="editBtn" value="Редактировать" onclick="editIngredient();">
+                        <img id="image">
+                        <div class="spinner-border" role="status" id="spinner_image">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <input type="button" id="saveBtn" value="Сохранить" onclick="saveIngr()">
+                    <input type="button" id="deleteBtn" value="Удалить" onclick="deleteIngr()">
+                </div>
+            </div>
+
+            <!-- Waiting Pop up window -->
+            <div class="popup" id="waiting_window">
+                <div class="popup-content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <h1 style="text-align: center;" id="waitingWindowTitle">Заголовок</h1><br>
+                                <div class="d-flex justify-content-center">
+                                    <div class="spinner-border" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </div>	
                 </div>
             </div>
         </div>        

@@ -40,9 +40,9 @@ public class IngredientController {
 								 @RequestParam String carbo) {		
 		try {
 			String response = null;
-			Ingredient ingr = this.ingrRepo.findByName(name);
+			Ingredient ingr = this.ingrRepo.findByNameAndType(name, type);
 			if (ingr!= null) {
-				response = "{\"error\": \"Ингредиент с таким именем уже существует в списке ингредиентов. Его тип: " + ingr.getType() + "\"}";
+				response = "{\"error\": \"Ингредиент такого типа с таким именем уже существует в списке ингредиентов.\"}";
 				return response;
 			}
 			double protein = Double.parseDouble(prot);
@@ -61,7 +61,7 @@ public class IngredientController {
 	
 	@GetMapping("getProperties")
 	@ResponseBody
-	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model){
+	public String getProperties(@RequestParam String type, @RequestParam String name, Model model){
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		ObjectMapper jsonCreator = new ObjectMapper();
 		try {

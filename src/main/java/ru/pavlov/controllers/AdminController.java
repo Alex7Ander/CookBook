@@ -28,6 +28,7 @@ import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
+import ru.pavlov.wrappers.LinkWrapper;
 import ru.pavlov.mail.MailSender;
 
 @Controller
@@ -115,14 +116,51 @@ public class AdminController {
 	
 	
 	@GetMapping("ingredients")
-	public String adminPageIngredinets(Model model, @RequestParam(required = false) Integer pageIndex) {
+	public String adminPageIngredinets(Model model, 
+										@RequestParam(required = false) Integer pageIndex,
+										@RequestParam(required = false) Integer common) {
 		if(pageIndex == null) {
 			pageIndex = 0;
+		}		
+		Pageable findSortedByType = PageRequest.of(pageIndex, 10, Sort.by("type"));
+		Page<Ingredient> ingredients = null;
+		if(common == null || common == -1) {
+			ingredients = ingredientRepo.findAll(findSortedByType);
 		}
-		Pageable findAllSortedByType = PageRequest.of(pageIndex, 10, Sort.by("type"));
-		Page<Ingredient> ingredients = ingredientRepo.findAll(findAllSortedByType);
+		else {
+			boolean isCommon = false;
+			if(common == 1) isCommon = true;
+			ingredients = ingredientRepo.findByCommon(findSortedByType, isCommon);
+		}		
 		model.addAttribute("ingredients", ingredients);
+		int pagesCount = ingredients.getTotalPages();
+		List<LinkWrapper> links = new ArrayList<>();
+		for (int i=0; i<pagesCount; i++) {
+			LinkWrapper lw = new LinkWrapper();
+			String link = "/admin/ingredients?pageIndex=" + i;
+			if(common != null && common > -1)
+				link = link + ("&common=" + common);
+			lw.setLink(link);
+			lw.setIndex(i+1);
+			links.add(lw);
+		}
+		model.addAttribute("linkWrappers", links);
 		return "adminpage_ingredients";
+	}
+	
+	@PostMapping("deleteIngredient")
+	@ResponseBody
+	public String deleteIngredient(@RequestParam long id) {
+		String response = null;
+		Ingredient ingredient = this.ingredientRepo.findById(id);
+		try {
+			this.ingredientRepo.delete(ingredient);
+			response = "\"success\":\"user_deleted\"";
+		}
+		catch(Exception exp) {
+			response = "\"error\":\"" + exp.getMessage() + "\"";
+		}
+		return response;
 	}
 	
 	@GetMapping("reviews")
@@ -130,18 +168,6 @@ public class AdminController {
 		Iterable<Review> reviews = reviewRepo.findAll();
 		model.addAttribute("reviews", reviews);
 		return "adminpage_reviews";
-	}
-	
-	@GetMapping("sendmailwindow")
-	public String sendmailwindow() {
-		return "sendmailwindow";
-	}
-	
-	@PostMapping("sendemail")
-	@ResponseBody
-	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
-		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
-		return "{}";
 	}
 	
 	@PostMapping("sendAnswer")
@@ -160,5 +186,19 @@ public class AdminController {
 		this.reviewRepo.delete(review);
 		return "{\"done\": \"true\"}";
 	}
+	
+	@GetMapping("sendmailwindow")
+	public String sendmailwindow() {
+		return "sendmailwindow";
+	}
+	
+	@PostMapping("sendemail")
+	@ResponseBody
+	public String sendemail(@RequestParam String emailTo, @RequestParam String message) {
+		mailSender.send(emailTo, "Тестирование отправки сообщений", message);
+		return "{}";
+	}
+	
+
 
 }
