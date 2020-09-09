@@ -4,13 +4,16 @@ var photoCount = 0;  //Порядковый индекс загруженной 
 //PopUp windows
 var ingredientsPopUpWindow; 
 var photoUploadPopUpWindow; 
+var waitingWindow;
 
 $(document).ready(function(){
 	//Скрыть PopUp при загрузке страницы  
 	ingredientsPopUpWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable); 
 	photoUploadPopUpWindow = new PhotoUploadPopUpWindow("add_photo_popup"); 
+	waitingWindow = new WaitingPopUpWindow("waiting_window");
 	ingredientsPopUpWindow.hideWindow();
 	photoUploadPopUpWindow.hideWindow();
+	waitingWindow.hideWindow();
 });
 
 /*

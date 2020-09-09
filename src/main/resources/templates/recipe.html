@@ -75,22 +75,22 @@
 						</tr>		
 						<tr th:each="ingredientVolume : ${ingredientsVolumes}">
 							<td>
-								<span th:text="${ingredientVolume.getName()}"></span>
+								<span th:text="${ingredientVolume.name}"></span>
 								<input type="hidden" th:id="${ingredientVolume.id}">
 							</td>
-							<td>
+							<td th:id="${ingredientVolume.id}+volumeValues">
 								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
-								<input type="text" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredientVolume.id}')|">
+								<input type="text" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientVolume.id}')|">
 							</td>
 							<td>
 								<input type="hidden" th:id="${ingredientVolume.id}+CalorieFactor" th:value="${ingredientVolume.getIngredient().calorie}">
 								<b th:id="${ingredientVolume.id}+Calorie" th:text="${ingredientVolume.resultCalorie}"></b>
 							</td>
-							<td><input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${recipe.id}', '${ingredientVolume.id}')|" value="Удалить"></td>
+							<td><input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientVolume.id}')|" value="Удалить"></td>
 						</tr>
 						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
 					</table>
-					<b class="label">Итоговая калорийность: </b> <b th:text="${totalRecipeCalorie}"> - </b><br>	
+					<b class="label">Итоговая калорийность: </b> <b id="total_calorie"> - </b><br>	
 
 					<h4> Процедура приготовления:</h4><br>
 					<b><span id="text" th:text="${recipe.text}"> - </span></b>

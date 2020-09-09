@@ -1,6 +1,7 @@
 package ru.pavlov.domain;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,7 +38,7 @@ public class Recipe {
 	@JoinColumn(name="userId")
 	private User recipeAuther;
 	
-	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY, cascade=CascadeType.ALL) //
 	private List<IngredientVolume> ingredients;
 	
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)

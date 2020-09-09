@@ -62,19 +62,7 @@ public class RecipeController {
 	@GetMapping("show")
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
 		Recipe recipe = recipeRepo.findById(recipeId);
-		model.addAttribute("recipe", recipe);
-
-		double totalRecipeCalorie = 0;
-		for (IngredientVolume ingr : recipe.getIngredients()) {
-			try {
-				totalRecipeCalorie += ingr.getResultCalorie();
-			}			
-			catch(NullPointerException npExp) {
-				npExp.printStackTrace();
-			}
-		}
-		model.addAttribute("totalRecipeCalorie", totalRecipeCalorie);
-		
+		model.addAttribute("recipe", recipe);		
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);
 		
@@ -116,7 +104,7 @@ public class RecipeController {
 		}
 		response += "]\"}";
 		recipeRepo.save(recipe);
-		return "{}";
+		return response;
 	}
 	
 	@PostMapping("addNewIngredient")
@@ -151,33 +139,38 @@ public class RecipeController {
 	
 	@PostMapping("deleteIngredient")
 	@ResponseBody
-	public String deleteIngredient(@RequestParam long recipeId, @RequestParam long ingredientVolumeId) {
-		Recipe recipe = recipeRepo.findById(recipeId);		
-		List<IngredientVolume> currentRecipeIngredientsVolumes = recipe.getIngredients();
+	public String deleteIngredient(@RequestParam long ingredientVolumeId) {
+		System.out.println("Удаление ингредиента из рецепта (ingredientVolume)");		
 		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientVolumeId);
-		for(IngredientVolume ingredientFromList : currentRecipeIngredientsVolumes) {
-			if(ingredientFromList.equals(currentIngredient)) {
-				ingrVolumeRepo.delete(ingredientFromList);
-				break;
-			}
+		System.out.println("ingredientVolume по id="+ingredientVolumeId+" найден");
+		System.out.println("Удаляем");
+		ingrVolumeRepo.delete(currentIngredient);
+		System.out.println("Удалено. Проверим.");
+		IngredientVolume currentIngredient2 = ingrVolumeRepo.findById(ingredientVolumeId);
+		if(currentIngredient2 != null) {
+			System.out.println("Не удалено");
+			return "{\"error\": \"Не удалено\"}";
 		}
-		return "{\"message\": \"success\"}";
+		else {
+			System.out.println("Удалено");
+			return "{\"message\": \"success\"}";
+		}		
 	}
 	
 	@PostMapping("editIngredientVolume")
 	@ResponseBody 
-	public String editIngredientVolume(@RequestParam long recipeId, @RequestParam long ingredientVolumeId, @RequestParam double newValue) {
-		Recipe recipe = recipeRepo.findById(recipeId);		
-		List<IngredientVolume> currenRecipeIngredients = recipe.getIngredients();
+	public String editIngredientVolume(@RequestParam long ingredientVolumeId, @RequestParam double newValue) {
 		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientVolumeId);
-		for(IngredientVolume ingredietnFromList : currenRecipeIngredients) {
-			if(ingredietnFromList.equals(currentIngredient)) {
-				ingredietnFromList.setVolume(newValue);
-				ingrVolumeRepo.save(ingredietnFromList);
-				break;
-			}
-		}		
-		return "{}";
+		currentIngredient.setVolume(newValue);
+		ingrVolumeRepo.save(currentIngredient);	
+		IngredientVolume currentIngredient2 = ingrVolumeRepo.findById(ingredientVolumeId);
+		if(currentIngredient2.getVolume() != newValue) {
+			return "{\"error\": \"Значение не изменено\"}";
+			
+		}
+		else {
+			return "{\"message\": \"success\"}";
+		}
 	}
 
 	/* PHOTOS */

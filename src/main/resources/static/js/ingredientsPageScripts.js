@@ -43,13 +43,10 @@ function setIngredientValues(){
 }
 
 function loadImg(){
-	var currentIngrId = $('#ingrId').val();
+	var currentIngrId = $('#currentIngrId').val();
 	$("#spinner_image").show();
 	$("#image").hide();
-    jQuery.ajax({	
-        type: "GET",
-        url: "/ingredient/loadImg?ingrId=" + currentIngrId,
-        cache: false,
+    jQuery.ajax({type: "GET", url: "/ingredient/loadImg?ingrId=" + currentIngrId, cache: false,
         xhr:function(){
             var xhr = new XMLHttpRequest();
             xhr.responseType = 'blob';

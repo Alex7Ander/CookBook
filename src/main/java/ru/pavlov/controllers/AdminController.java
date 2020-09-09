@@ -79,10 +79,10 @@ public class AdminController {
 		String jsonResponse = null;
 		try {
 			this.userRepo.delete(user);
-			jsonResponse = "\"success\":\"user_deleted\"";
+			jsonResponse = "{\"success\":\"user_deleted\"}";
 		}
 		catch(Exception exp) {
-			jsonResponse = "\"error\":\"" + exp.getMessage() + "\"";
+			jsonResponse = "{\"error\":\"" + exp.getMessage() + "\"}";
 		}
 		return jsonResponse;
 	}
@@ -155,10 +155,10 @@ public class AdminController {
 		Ingredient ingredient = this.ingredientRepo.findById(id);
 		try {
 			this.ingredientRepo.delete(ingredient);
-			response = "\"success\":\"user_deleted\"";
+			response = "{\"success\":\"user_deleted\"}";
 		}
 		catch(Exception exp) {
-			response = "\"error\":\"" + exp.getMessage() + "\"";
+			response = "{\"error\":\"" + exp.getMessage() + "\"}";
 		}
 		return response;
 	}

@@ -66,7 +66,7 @@
                     <p>Белки: </p><input type="text" id="protEdit"><br>
                     <p>Жиры: </p><input type="text" id="fatEdit"><br>
                     <p>Углеводы: </p><input type="text" id="carboEdit"><br>
-                    <p>Описание: </p><textarea id="descriptionEdit" style="width: 100%;"></textarea><br>
+                    <p>Описание: </p><textarea id="descriptionEdit" rows="12" style="width: 100%;"></textarea><br>
                     <input type="file" id="ingrPhotoLoader" onchange="showNewIngredientPreview();"><br>
                     <div>
                         <img id="image">
@@ -106,6 +106,7 @@
         
         <script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
         <script th:src="@{/js/adminpage.js}" src="../static/js/adminpage.js"></script>
+        <script th:src="@{/js/ingredientsPageScripts.js}" src="../static/js/ingredientsPageScripts.js"></script>
     </body>
 
 </html>

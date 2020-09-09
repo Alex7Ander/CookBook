@@ -2,13 +2,15 @@ var newUserPopupWindow;
 var waitingWindow;
 
 $(document).ready(function(){
+    $("#spinner_image").hide();
     try{
         newUserPopupWindow = new AddNewUserPopUpWindow("new_user_window");
         newUserPopupWindow.hideWindow();
     }
     catch{}
     waitingWindow = new WaitingPopUpWindow("waiting_window");
-    waitingWindow.hideWindow();    
+    waitingWindow.hideWindow(); 
+       
 });
 
 function loadUser(id){
@@ -135,21 +137,30 @@ function deleteReview(reviewId){
 }
 
 function loadIngredient(id){
-    var name = $("#"+id+"_name").text;
-    var type = $("#"+id+"_type").text;
+    var name = $("#"+id+"_name").text();
+    var type = $("#"+id+"_type").text();
     $.ajax({type: "GET", url: "/ingredient/getProperties?type="+type+"&name="+name, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте, идет загрузка ингредиента");
+            waitingWindow.showWindow();
+        },
         success: function(respond, status, jqXHR){
             if (typeof respond.error === 'undefined') {
+                $("#currentIngrId").val(respond.id);
                 $("#nameEdit").val(respond.name);
                 $("#protEdit").val(respond.prot);
                 $("#carboEdit").val(respond.carbo);
                 $("#fatEdit").val(respond.fat);
-                $("#descriptionEdit").val(respond.descr);            
+                $("#descriptionEdit").val(respond.descr);
+                loadImg();            
             }
         },
         error: function(respond, status, jqXHR){
             alert(status);
-        }
+        },
+        complete: function(){
+			waitingWindow.hideWindow();			
+		}
     });
 }
 
@@ -177,7 +188,8 @@ function saveIngredient(){
             alert(status);
         },
         complete: function(){
-			waitingWindow.hideWindow();			
+            waitingWindow.setTitle("Ингредиент сохранен. Страница будет перезагружена для актуализации информации.");	
+            location.reload();		
 		}
     });
 }
@@ -202,7 +214,8 @@ function deleteIngr(){
             alert(status);
         },
         complete: function(){
-			waitingWindow.hideWindow();			
+            waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации.");
+            location.reload();			
 		}
     });
 }
