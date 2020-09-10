@@ -146,8 +146,9 @@ function loadIngredient(id){
         },
         success: function(respond, status, jqXHR){
             if (typeof respond.error === 'undefined') {
-                $("#currentIngrId").val(respond.id);
+                $("#currentIngrId").val(respond.id);               
                 $("#nameEdit").val(respond.name);
+                $("#typeEdit").val(respond.type);
                 $("#protEdit").val(respond.prot);
                 $("#carboEdit").val(respond.carbo);
                 $("#fatEdit").val(respond.fat);
@@ -182,15 +183,13 @@ function saveIngredient(){
             waitingWindow.showWindow();
         },
         success: function(respond, status, jqXHR){
-            alert("Ингредиент добавлен");
+            waitingWindow.setTitle("Ингредиент сохранен. Страница будет перезагружена для актуализации информации.");	
+            location.reload();
         },
         error: function(respond, status, jqXHR){
+            waitingWindow.hideWindow();
             alert(status);
-        },
-        complete: function(){
-            waitingWindow.setTitle("Ингредиент сохранен. Страница будет перезагружена для актуализации информации.");	
-            location.reload();		
-		}
+        }
     });
 }
 
@@ -208,14 +207,46 @@ function deleteIngr(){
             waitingWindow.showWindow();
         },
         success: function(respond, status, jqXHR){
-            alert("Ингредиент удален");
+            waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации.");
+            location.reload();
         },
         error: function(respond, status, jqXHR){
+            waitingWindow.hideWindow();
             alert(status);
+        }
+    });
+}
+
+function saveIngrBtnClick(){
+    var selected = $("input[type='radio'][name='editRb']:checked").val();
+    if(selected == 1){
+        alert("Редактирование");
+    }
+    else{
+        saveIngr();
+    }
+}
+
+function saveIngr(){
+    var ingrData = new FormData();
+    ingrData.append('name', $("#nameEdit").val());
+    ingrData.append('type', $("#typeEdit").val());
+    ingrData.append('prot', $("#protEdit").val());
+    ingrData.append('fat',  $("#fatEdit").val());
+    ingrData.append('carbo', $("#carboEdit").val());
+    ingrData.append('description', $("#descriptionEdit").val());
+    $.ajax({type: "POST", url: "/admin/addIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: ingrData,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте, идет добавление ингредиента");
+            waitingWindow.showWindow();
         },
-        complete: function(){
-            waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации.");
-            location.reload();			
-		}
+        success: function(respond, status, jqXHR){
+            waitingWindow.setTitle("Ингредиент добавлен. Страница будет перезагружена для актуализации информации.");
+            location.reload();
+        },
+        error: function(respond, status, jqXHR){
+            waitingWindow.hideWindow();
+            alert(status);
+        }
     });
 }

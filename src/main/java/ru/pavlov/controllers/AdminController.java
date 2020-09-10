@@ -79,7 +79,7 @@ public class AdminController {
 		String jsonResponse = null;
 		try {
 			this.userRepo.delete(user);
-			jsonResponse = "{\"success\":\"user_deleted\"}";
+			jsonResponse = "{\"done\":\"true\"}";
 		}
 		catch(Exception exp) {
 			jsonResponse = "{\"error\":\"" + exp.getMessage() + "\"}";
@@ -148,6 +148,32 @@ public class AdminController {
 		return "adminpage_ingredients";
 	}
 	
+	@PostMapping("addIngredient")
+	@ResponseBody
+	public String addIngredient(@RequestParam String name, @RequestParam String type, @RequestParam float prot, @RequestParam float fat, @RequestParam float carbo, @RequestParam String description) {
+		Ingredient existiedIngredient = this.ingredientRepo.findByNameAndType(name, type);
+		if(existiedIngredient != null) {
+			return "{\"error\":\"Ингредиент данного типа с таким именем уже существует\"}";
+		}
+		Ingredient ingredient = new Ingredient();
+		ingredient.setCommon(true);
+		ingredient.setName(name);
+		ingredient.setType(type);
+		ingredient.setProtein(prot);
+		ingredient.setFat(fat);
+		ingredient.setCarbohydrate(carbo);
+		ingredient.setDescription(description);
+		ingredient.setCalorie(fat*9+prot*4+carbo*4);
+		this.ingredientRepo.save(ingredient);
+		Ingredient savedIngredient = this.ingredientRepo.findByNameAndType(name, type);
+		if(savedIngredient == null) {
+			return "{\"error\":\"Ингредиент не сохранен\"}";
+		}
+		else {
+			return "{\"done\":\"true\", \"id\":\""+savedIngredient.getId()+"\"}";
+		}
+	}
+	
 	@PostMapping("deleteIngredient")
 	@ResponseBody
 	public String deleteIngredient(@RequestParam long id) {
@@ -155,7 +181,7 @@ public class AdminController {
 		Ingredient ingredient = this.ingredientRepo.findById(id);
 		try {
 			this.ingredientRepo.delete(ingredient);
-			response = "{\"success\":\"user_deleted\"}";
+			response = "{\"done\":\"true\"}";
 		}
 		catch(Exception exp) {
 			response = "{\"error\":\"" + exp.getMessage() + "\"}";

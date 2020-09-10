@@ -73,24 +73,29 @@
 							<th>Калорийность (гр/мл)</th>
 							<th></th>
 						</tr>		
-						<tr th:each="ingredientVolume : ${ingredientsVolumes}">
+						<tr th:each="ingredientWrapper : ${ingredientsVolumesWrappers}">
+							<!--Имя и id рецепта-->
 							<td>
-								<span th:text="${ingredientVolume.name}"></span>
-								<input type="hidden" th:id="${ingredientVolume.id}">
+								<span th:text="${ingredientWrapper.getName()}"></span>
+								<input type="hidden" th:id="${ingredientWrapper.getId()}">
 							</td>
-							<td th:id="${ingredientVolume.id}+volumeValues">
-								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
-								<input type="text" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientVolume.id}')|">
-							</td>
+							<!--Количество-->
 							<td>
-								<input type="hidden" th:id="${ingredientVolume.id}+CalorieFactor" th:value="${ingredientVolume.getIngredient().calorie}">
-								<b th:id="${ingredientVolume.id}+Calorie" th:text="${ingredientVolume.resultCalorie}"></b>
+								<b th:id="${ingredientWrapper.getId()}+Volume" th:text="${ingredientWrapper.getVolume()}" th:attr="onclick=|showVolumeTextField('${ingredientWrapper.getId()}')|"></b>
+								<input type="text" th:id="${ingredientWrapper.getId()}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientWrapper.getId()}')|">
 							</td>
-							<td><input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientVolume.id}')|" value="Удалить"></td>
+							<!--Калорийность с учетом количества рецепта-->
+							<td>
+								<b th:id="${ingredientWrapper.getId()}+Calorie" th:text="${ingredientWrapper.getResultCalorie()}"></b>
+							</td>
+							<!--Кнопка удаления-->
+							<td>
+								<input type="button" th:if="${editable}" th:id="${ingredientWrapper.getId()}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientWrapper.getId()}')|" value="Удалить">
+							</td>
 						</tr>
 						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
 					</table>
-					<b class="label">Итоговая калорийность: </b> <b id="total_calorie"> - </b><br>	
+					<b class="label">Итоговая калорийность: </b> <b id="total_calorie" th:text="${totalResultCalorie}"> - </b><br>	
 
 					<h4> Процедура приготовления:</h4><br>
 					<b><span id="text" th:text="${recipe.text}"> - </span></b>
@@ -227,7 +232,7 @@
 								<b>Углеводы:</b><br>
 								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр"><br>
 								<b>Описание:<b></br>
-								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
+								<textarea id= "newIngrDesription" name= "descr" rows=7 style="width: 100%;"> - </textarea><br>
 								<a href="javascript:addNewIngredienttoRecipe()">Сохранить новый и добавить его к рецепту</a>
 								/
 								<a href="javascript:hideAddIngredientWindow()">Отмена</a>

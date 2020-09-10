@@ -23,8 +23,6 @@ $(document).ready(function(){
 	waitingWindow.hideWindow();
 
 	$("input[id$='VolumeTextField']").each(function(){$(this).hide();});
-
-	countTotalCalorieAmmount();
 });
 
 /*Working with main info*/
@@ -87,7 +85,6 @@ function addIngrToTable(ingredientVolume){
 		resultCalorificValueField.innerText = ingredientVolume.calorie * volumeTextField.value / 100;
 	}
 	var volumeLabel = document.createElement('b');
-	//volumeLabel.hidden= true;
 	volumeLabel.id = "new" + newIngrCount + "Volume";
 
 	//Кнопка удаления ингредиента
@@ -163,7 +160,8 @@ function saveIngredientInRecipe(newIngrIndex, recipeId, ingredientId, volume){
 				volumeLabel.attr('id', ingredientVolumeId + "Volume");
 				volumeLabel.text(volumeTxtField.val());
 				volumeLabel.attr('hidden', false);
-				countTotalCalorieAmmount();						
+
+				$("#total_calorie").text(respond.totalCalorie);						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
@@ -186,7 +184,7 @@ function deleteIngredient(ingredientVolumeId){
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {
 				$("#" + ingredientVolumeId).closest("tr").remove();
-				countTotalCalorieAmmount();						
+				$("#total_calorie").text(respond.totalCalorie);						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
@@ -196,17 +194,17 @@ function deleteIngredient(ingredientVolumeId){
 			waitingWindow.hideWindow();			
 		}
 	});
-	var recipeInfo = JSON.parse(response.responseText);
-
 }
 function showVolumeTextField(ingredientVolumeId){
 	$("#" + ingredientVolumeId + "VolumeTextField").show();
 	var value = $("#" + ingredientVolumeId + "Volume").text();
 	$("#" + ingredientVolumeId + "VolumeTextField").attr('value', value);
-	//$("#" + ingredientVolumeId + "Volume").hide();
+	$("#" + ingredientVolumeId + "Volume").hide();
 }
 function changeIngredientVolume(ingredientVolumeId){	
 	var newValue = $("#" + ingredientVolumeId + "VolumeTextField").prop("value");
+	var re = '/./g';
+	newValue.replace(re, '.');
 	if (isNaN(newValue)==true){
 		alert("Вы ввели значение, не являющееся числом");
 	}
@@ -219,14 +217,11 @@ function changeIngredientVolume(ingredientVolumeId){
 				waitingWindow.setTitle("Ожидайте, идет редактирование количества ингредиента");
 				waitingWindow.showWindow();
 			},
-			success: function(respond, status, jqXHR) {``
+			success: function(respond, status, jqXHR) {
 				if (typeof respond.error === 'undefined') {	
 					$("#" + ingredientVolumeId + "Volume").text(newValue);
-					var calorieFactor = $("#" + ingredientVolumeId + "CalorieFactor").prop("value");
-					var calorieValue = calorieFactor * newValue / 100;
-					$("#" + ingredientVolumeId + "Calorie").text(calorieValue);	
-					$("#" + ingredientVolumeId + "VolumeTextField").hide();
-					$("#" + ingredientVolumeId + "Volume").show();										
+					$("#" + ingredientVolumeId + "Calorie").text(respond.calorie);
+					$("#total_calorie").text(respond.totalCalorie);									
 				}
 				else {
 					alert('Ошибка при редактирования значения на сервере: ' + respond.data);
@@ -236,8 +231,8 @@ function changeIngredientVolume(ingredientVolumeId){
 				alert('Ошибка при редактирования значения на сервере: ' + status);
 			},
 			complete: function(){
-				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
-				$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', true);
+				$("#" + ingredientVolumeId + "VolumeTextField").hide();
+				$("#" + ingredientVolumeId + "Volume").show();
 				waitingWindow.hideWindow();	
 			}
 		});
@@ -245,9 +240,6 @@ function changeIngredientVolume(ingredientVolumeId){
 }
 function getIngrListFromServer(){
 	addIngredientWindow.getIngrListFromServer();
-}
-function setTotalCalorie(){
-
 }
 
 /* 
@@ -466,16 +458,4 @@ function deleteRecipe(){
 			waitingWindow.hideWindow();
 		}
 	});
-}
-
-function countTotalCalorieAmmount(){
-	var totalCalorieAmmount = 0.0;
-	$("b[id$='Calorie']").each(
-		function(totalCalorieAmmount){
-			var currentCalorieAmmount = $(this).text();
-			totalCalorieAmmount = totalCalorieAmmount + currentCalorieAmmount;
-		}
-	);
-	var oldText = $("#total_calorie").text();
-	$("#total_calorie").text(totalCalorieAmmount);
 }
