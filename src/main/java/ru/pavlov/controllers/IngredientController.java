@@ -35,9 +35,10 @@ public class IngredientController {
 								 @RequestParam String name, 
 								 @RequestParam String type, 
 								 @RequestParam String descr,
-								 @RequestParam String prot, 
-								 @RequestParam String fat, 
-								 @RequestParam String carbo) {		
+								 @RequestParam Double prot, 
+								 @RequestParam Double fat, 
+								 @RequestParam Double carbo,
+								 @RequestParam Boolean common) {		
 		try {
 			String response = null;
 			Ingredient ingr = this.ingrRepo.findByNameAndType(name, type);
@@ -45,18 +46,73 @@ public class IngredientController {
 				response = "{\"error\": \"Ингредиент такого типа с таким именем уже существует в списке ингредиентов.\"}";
 				return response;
 			}
-			double protein = Double.parseDouble(prot);
-			double fatInt = Double.parseDouble(fat);
-			double carbohydrate = Double.parseDouble(carbo);
-			Ingredient newIngredient = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			Ingredient newIngredient = new Ingredient(name, type, descr, prot, fat, carbo);
+			newIngredient.setCommon(common);
 			newIngredient.setUser(currentUserDetails.getUser());
-			newIngredient.setCommon(false);
+			//newIngredient.setCommon(false);
 			this.ingrRepo.save(newIngredient);
 			response = "{\"id\": \"" + newIngredient.getId().toString() + "\"}";
 			return response;
 		} catch (Exception exp) {
 			return "{\"error\": \"" + exp.getMessage() + "\"}";
 		}		
+	}
+	
+	@PostMapping("edit")
+	@ResponseBody
+	public String edit(@RequestParam long id, @RequestParam(required = false) String name, 
+						@RequestParam(required = false) String type, 
+						@RequestParam(required = false) String description, 
+						@RequestParam(required = false) Double protein, 
+						@RequestParam(required = false) Double fat,
+						@RequestParam(required = false) Double carbohydrate) {
+		String response = null;
+		Ingredient ingredient = this.ingrRepo.findById(id);
+		if(type!= null) {
+			ingredient.setType(type);
+		}
+		if(name != null) {
+			ingredient.setName(name);
+		}
+		if(description != null) {
+			ingredient.setDescription(description);
+		}
+		if(protein != null) {
+			ingredient.setProtein(protein);
+		}
+		if(fat != null) {
+			ingredient.setFat(fat);
+		}
+		if(carbohydrate != null) {
+			ingredient.setCarbohydrate(carbohydrate);
+		}
+		try {
+			this.ingrRepo.save(ingredient);
+			response = "{\"done\":\" + true + \"}";
+		}
+		catch(Exception exp) {
+			response = "{\"error\":\"Не удалось сохранить изменения\"}";
+		}		
+		return response;
+	}
+	
+	@PostMapping("delete")
+	@ResponseBody
+	public String delete(@RequestParam long id) {
+		String response = null;
+		Ingredient ingredient = this.ingrRepo.findById(id);
+		if(ingredient == null) {
+			response = "{\"error\": \"Ингредиента с таким id нет в БД\"}";
+			return response;
+		}
+		try {
+			this.ingrRepo.delete(ingredient);
+			response = "{\"done\":\" + true + \"}";
+		}
+		catch(Exception exp) {
+			response = "{\"error\": \"" + exp.getMessage() + "\"}";
+		}
+		return response;
 	}
 	
 	@GetMapping("getProperties")
@@ -137,5 +193,7 @@ public class IngredientController {
 		response = "{\"done\":\" + true + \"}";
 		return response;
 	}
+	
+	
 	
 }

@@ -11,6 +11,15 @@ function getIngrListFromServer(ingrType, currentIngredientsList){
         }
     });
 	$.each(requestedIngredientsList, function(index,value){
-		currentIngredientsList.push(requestedIngredientsList[index]);
+        var ingredient = new Ingredient();
+        ingredient.id = requestedIngredientsList[index].id,
+        ingredient.name = requestedIngredientsList[index].name,
+        ingredient.type = requestedIngredientsList[index].type,
+        ingredient.descr = requestedIngredientsList[index].descr,
+        ingredient.prot = requestedIngredientsList[index].prot,
+        ingredient.fat = requestedIngredientsList[index].fat,
+        ingredient.carbo = requestedIngredientsList[index].carbo;
+        currentIngredientsList.push(ingredient);
+		//currentIngredientsList.push(requestedIngredientsList[index]);
 	});
 }

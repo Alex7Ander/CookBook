@@ -9,7 +9,7 @@ function ipws_saveNewIngredient(){
         alert("Одно из введенных Вами значений БЖУ не является числом")
     }
     else{
-        var ingr = new ingredient("-", name, type, descr, prot, fat, carbo);
+        var ingr = new Ingredient("-", name, type, descr, prot, fat, carbo);
         ingr.save();
         if (ingr.isSaved()) {
             return 0;

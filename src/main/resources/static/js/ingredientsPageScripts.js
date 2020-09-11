@@ -17,6 +17,31 @@ function setIngredientsNames(){
 	});
 }
 
+function getIngrListFromServer(ingrType, currentIngredientsList){
+	var typeData = new FormData();
+	var requestedIngredientsList = new Array();
+    typeData.append("ingrType", ingrType);
+    $.ajax({type: "GET", url: "/ingredient/getIngredients?ingrType=" + ingrType, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+        success: function(respond, status, jqXHR){
+            if (typeof respond.error === 'undefined') {
+				requestedIngredientsList = respond;
+            }
+        }
+    });
+	$.each(requestedIngredientsList, function(index,value){
+        var ingredient = new Ingredient();
+		ingredient.id = requestedIngredientsList[index].id;
+		ingredient.name = requestedIngredientsList[index].name;
+		ingredient.type = requestedIngredientsList[index].type;
+		ingredient.descr = requestedIngredientsList[index].descr;
+		ingredient.prot = requestedIngredientsList[index].prot;
+		ingredient.fat = requestedIngredientsList[index].fat;
+		ingredient.carbo = requestedIngredientsList[index].carbo;
+		ingredient.common = requestedIngredientsList[index].common;
+		currentIngredientsList.push(ingredient);
+	});
+}
+
 function setIngredientValues(){	
 	var currentIngrIndex = $("#ingrName").prop('selectedIndex') - 1;
 	var prot = currentIngredientsList[currentIngrIndex].prot;
@@ -38,31 +63,18 @@ function setIngredientValues(){
 	}
 	else{
 		$('#imageUploader').hide();
-	}
-	
+	}	
 }
 
 function loadImg(){
-	var currentIngrId = $('#currentIngrId').val();
+	var currentIngrIndex = $("#ingrName").prop('selectedIndex') - 1;
 	$("#spinner_image").show();
-	$("#image").hide();
-    jQuery.ajax({type: "GET", url: "/ingredient/loadImg?ingrId=" + currentIngrId, cache: false,
-        xhr:function(){
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'blob';
-            return xhr;
-        },
-        success: function(data){
-            var img = document.getElementById('image');
-            var url = window.URL || window.webkitURL;
-			img.src = url.createObjectURL(data);
-			$("#image").show();
-			$("#spinner_image").hide();
-        },
-        error: function(respond, status, jqXHR) {
-            alert(respond.statusText);
-        }
-    });
+	currentIngredientsList[currentIngrIndex].loadImage("image", finishImageLoading);
+}
+
+function finishImageLoading(){
+	$("#image").show();
+	$("#spinner_image").hide();
 }
 
 function sendIngrImage(){

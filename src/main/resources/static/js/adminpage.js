@@ -1,6 +1,8 @@
 var newUserPopupWindow;
 var waitingWindow;
 
+var currentUploadedIngredient;
+
 $(document).ready(function(){
     $("#spinner_image").hide();
     try{
@@ -79,14 +81,6 @@ function addNewUser(){
     });
 }
 
-function loadRecipe(){
-
-}
-
-function loadReview(){
-
-}
-
 function startEdit(id){
     $("#" + id + "TextField").attr('hidden', false);
     $("#" + id + "TextField").prop("value", $("#" + id).text());
@@ -136,117 +130,85 @@ function deleteReview(reviewId){
     });
 }
 
+/*
+Ingredients
+*/
+function saveIngrBtnClick(){
+    var selected = $("input[type='radio'][name='editRb']:checked").val();
+    var name = $("#nameEdit").val();
+    var type = $("#typeEdit").val();
+    var descr = $("#descriptionEdit").val();
+    var prot = $("#protEdit").val();
+    var fat = $("#fatEdit").val();
+    var carbo = $("#carboEdit").val();
+    if(selected == 1){
+        waitingWindow.setTitle("Ожидайте, идет редактирование ингредиента");
+        waitingWindow.showWindow();
+        var successFinish = function(){
+            waitingWindow.setTitle("Изменения сохранены. Страница будет перезагружена для актуализации информации.");
+            waitingWindow.hideWindow();
+            location.reload();
+        }
+        var errorFinish = function(){
+            alert("Произошла ошибка на сервере. Изменения не сохранены");
+            waitingWindow.hideWindow();
+        }
+        currentUploadedIngredient.edit(name, type,  descr, prot, fat, carbo, successFinish, errorFinish);
+    }
+    else{
+        var newIngredient = new Ingredient();
+        newIngredient.name = name;
+        newIngredient.type = type;
+        newIngredient.descr = descr;
+        newIngredient.prot = prot;
+        newIngredient.fat = fat;
+        newIngredient.carbo = carbo;
+        newIngredient.common = true;
+        //waitingWindow.setTitle("Ожидайте, идет сохранение ингредиента");
+        newIngredient.save();
+    }
+}
+
 function loadIngredient(id){
     var name = $("#"+id+"_name").text();
     var type = $("#"+id+"_type").text();
-    $.ajax({type: "GET", url: "/ingredient/getProperties?type="+type+"&name="+name, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
-        beforeSend: function(){
-            waitingWindow.setTitle("Ожидайте, идет загрузка ингредиента");
-            waitingWindow.showWindow();
-        },
-        success: function(respond, status, jqXHR){
-            if (typeof respond.error === 'undefined') {
-                $("#currentIngrId").val(respond.id);               
-                $("#nameEdit").val(respond.name);
-                $("#typeEdit").val(respond.type);
-                $("#protEdit").val(respond.prot);
-                $("#carboEdit").val(respond.carbo);
-                $("#fatEdit").val(respond.fat);
-                $("#descriptionEdit").val(respond.descr);
-                loadImg();            
-            }
-        },
-        error: function(respond, status, jqXHR){
-            alert(status);
-        },
-        complete: function(){
-			waitingWindow.hideWindow();			
-		}
-    });
+    currentUploadedIngredient = new Ingredient();
+    currentUploadedIngredient.getDataFromServer(name, type);
+    $("#currentIngrId").val(currentUploadedIngredient.id);
+    $("#nameEdit").val(currentUploadedIngredient.name);
+    $("#typeEdit").val(currentUploadedIngredient.type);
+    $("#protEdit").val(currentUploadedIngredient.prot);
+    $("#carboEdit").val(currentUploadedIngredient.carbo);
+    $("#fatEdit").val(currentUploadedIngredient.fat);
+    $("#descriptionEdit").val(currentUploadedIngredient.descr);
+
+    $("#spinner_image").show();
+    currentUploadedIngredient.loadImage("image", finishLoadingImage);
 }
 
-function saveIngredient(){
-    var ingrData = new FormData();
-    var id = $("#currentIngrId").val();
-    if(id != 0){
-        ingrData.append('id', id);
-    }
-    ingrData.append('name', $("#nameEdit").val());
-    ingrData.append('type', $("#typeEdit").val());
-    ingrData.append('descr', $("#descriptionEdit").val());
-    ingrData.append('prot', $("#protEdit").val());
-    ingrData.append('fat', $("#fatEdit").val());
-    ingrData.append('carbo', $("#carboEdit").val());
-    $.ajax({type: "POST", url: "/admin/addIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: ingrData,
-        beforeSend: function(){
-            waitingWindow.setTitle("Ожидайте, идет добавление ингредиента");
-            waitingWindow.showWindow();
-        },
-        success: function(respond, status, jqXHR){
-            waitingWindow.setTitle("Ингредиент сохранен. Страница будет перезагружена для актуализации информации.");	
-            location.reload();
-        },
-        error: function(respond, status, jqXHR){
-            waitingWindow.hideWindow();
-            alert(status);
-        }
-    });
+function finishLoadingImage(){
+    $("#spinner_image").hide();
+    $("#image").show();
 }
 
 function deleteIngr(){
-    var ingrData = new FormData();
     var id = $("#currentIngrId").val();
     if(id == 0){
         alert("Этот ингредитент еще не сохранен, что бы быть удаленным");
         return;
-    }   
-    ingrData.append('id', id);
-    $.ajax({type: "POST", url: "/admin/deleteIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: ingrData,
-        beforeSend: function(){
-            waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
-            waitingWindow.showWindow();
-        },
-        success: function(respond, status, jqXHR){
-            waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации.");
-            location.reload();
-        },
-        error: function(respond, status, jqXHR){
-            waitingWindow.hideWindow();
-            alert(status);
-        }
-    });
+    }
+    var successFinish = function(){
+        waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации.");
+        waitingWindow.hideWindow();
+        location.reload();
+    }
+    var errorFinish = function(){
+        alert("Произошла ошибка на сервере. Изменения не сохранены");
+        waitingWindow.hideWindow();
+    } 
+    waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
+    waitingWindow.showWindow();
+    currentUploadedIngredient.delete(successFinish, errorFinish);
 }
 
-function saveIngrBtnClick(){
-    var selected = $("input[type='radio'][name='editRb']:checked").val();
-    if(selected == 1){
-        alert("Редактирование");
-    }
-    else{
-        saveIngr();
-    }
-}
 
-function saveIngr(){
-    var ingrData = new FormData();
-    ingrData.append('name', $("#nameEdit").val());
-    ingrData.append('type', $("#typeEdit").val());
-    ingrData.append('prot', $("#protEdit").val());
-    ingrData.append('fat',  $("#fatEdit").val());
-    ingrData.append('carbo', $("#carboEdit").val());
-    ingrData.append('description', $("#descriptionEdit").val());
-    $.ajax({type: "POST", url: "/admin/addIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: ingrData,
-        beforeSend: function(){
-            waitingWindow.setTitle("Ожидайте, идет добавление ингредиента");
-            waitingWindow.showWindow();
-        },
-        success: function(respond, status, jqXHR){
-            waitingWindow.setTitle("Ингредиент добавлен. Страница будет перезагружена для актуализации информации.");
-            location.reload();
-        },
-        error: function(respond, status, jqXHR){
-            waitingWindow.hideWindow();
-            alert(status);
-        }
-    });
-}
