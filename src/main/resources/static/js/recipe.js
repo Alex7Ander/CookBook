@@ -69,7 +69,7 @@ function addNewIngredienttoRecipe(){
 	addIngredientWindow.saveNewIngredient();
 }
 
-function addIngrToTable(ingredientVolume){ 
+function addIngrToTable(ingredient){ 
 	newIngrCount++;
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
@@ -82,7 +82,7 @@ function addIngrToTable(ingredientVolume){
 	volumeTextField.setAttribute("type", "text");
 	volumeTextField.id = "new" + newIngrCount + "VolumeTextField";
 	volumeTextField.oninput = function() {
-		resultCalorificValueField.innerText = ingredientVolume.calorie * volumeTextField.value / 100;
+		resultCalorificValueField.innerText = ingredient.calorie * volumeTextField.value / 100;
 	}
 	var volumeLabel = document.createElement('b');
 	volumeLabel.id = "new" + newIngrCount + "Volume";
@@ -92,7 +92,7 @@ function addIngrToTable(ingredientVolume){
 	deleteBtn.setAttribute("type", "button");
 	deleteBtn.setAttribute("value", "Удалить");
 	deleteBtn.setAttribute("id", "new" + newIngrCount + "DeleteBtn");
-	deleteBtn.onclick = function(){
+	deleteBtn.onclick = function(event){
 		event.target.parentNode.parentNode.remove();
 	}
 
@@ -101,13 +101,13 @@ function addIngrToTable(ingredientVolume){
 	saveBtn.setAttribute("type", "button");
 	saveBtn.setAttribute("value", "Сохранить");
 	var recipeId = document.getElementById("recipeId").value;
-	saveBtn.onclick = function(){
-		saveIngredientInRecipe(newIngrCount, recipeId, ingredientVolume.ingrId, volumeTextField.value);
+	saveBtn.onclick = function(event){
+		saveIngredientInRecipe(newIngrCount, recipeId, ingredient.id, volumeTextField.value);
 		event.target.parentNode.remove();		
 	}
 
 	var col1 = document.createElement("TD");
-	col1.appendChild(document.createTextNode(ingredientVolume.name));
+	col1.appendChild(document.createTextNode(ingredient.name));
 	var col2 = document.createElement("TD");
 	col2.appendChild(volumeTextField);
 	col2.appendChild(volumeLabel);

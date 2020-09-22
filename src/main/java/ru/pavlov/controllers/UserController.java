@@ -108,10 +108,17 @@ public class UserController {
 		model.addAttribute("user", currentUser);
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
+		if(currentUser.getActivationCode() == null) {
+			System.out.println("Activation code is null. User is activated");
+			model.addAttribute("activated", true);
+		} 
+		else {
+			System.out.println("Activation code is " + currentUser.getActivationCode() + ". User is NOT activated");
+			model.addAttribute("activated", false);
+		}
 		return "user";
 	}
-	
-	//AJAX 	
+		
 	@PostMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {
 		

@@ -87,7 +87,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
             alert("Одно из введенных Вами значений БЖУ не является числом")
         }
         else{
-            var ingr = new Ingredient("-", name, type, descr, prot, fat, carbo);
+            var ingr = new Ingredient("-", name, type, descr, prot, fat, carbo, false);
             var savingMessage = ingr.save();
             if (ingr.isSaved()) {
                 try{

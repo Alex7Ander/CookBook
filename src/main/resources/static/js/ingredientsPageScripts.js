@@ -50,7 +50,7 @@ function setIngredientValues(){
 	var calorie = prot*4 + carbo*4 + fat*9;
 	var description = currentIngredientsList[currentIngrIndex].descr;
 
-	$('#ingrId').val(currentIngredientsList[currentIngrIndex].id);
+	$('#currentIngrId').val(currentIngredientsList[currentIngrIndex].id);
 	$('#ingrTable').find('tr').eq(1).remove();
 	$('#ingrTable').append('<tr><td>'+prot+'</td><td>'+fat+'</td><td>'+carbo+'</td><td>'+calorie+' ккал</td></tr>');
 	$('#description').empty();	
@@ -77,9 +77,21 @@ function finishImageLoading(){
 	$("#spinner_image").hide();
 }
 
+function showChosenPhoto(){
+	let photoFileLoader = document.getElementById('imageLoader');
+	currentlyUploadedPhoto = photoFileLoader.files[0];
+	let output  = document.getElementById('image');
+	output.src = URL.createObjectURL(currentlyUploadedPhoto); 
+	/*
+	var chosenPhoto = ('#imageLoader').files[0];	
+	var chosenPhotoSrc = URL.createObjectURL(chosenPhoto);
+	$("#image").attr("src", chosenPhotoSrc);
+	*/
+}
+
 function sendIngrImage(){
 	var ingredientData = new FormData();
-	var currentIngrId = $('#ingrId').val(); 		
+	var currentIngrId = $('#currentIngrId').val(); 		
 	var currentlyUploadedPhoto = $('#imageLoader').prop('files')[0];
 	ingredientData.append('ingrImage', currentlyUploadedPhoto);
 	ingredientData.append('ingrId', currentIngrId);
