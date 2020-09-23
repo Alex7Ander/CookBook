@@ -45,7 +45,7 @@ public class MainController {
 						Model model) {
 		
 		System.out.println("Начата регистрация нового пользователя");
-		if(!code.equals("CookBookGuest2043")) {
+		if(!code.equals("CookBookGuest5000")) {
 			return "notinvited";
 		}
 		

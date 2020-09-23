@@ -11,14 +11,18 @@ $(document).ready(function(){
     }
     catch{}
     waitingWindow = new WaitingPopUpWindow("waiting_window");
-    waitingWindow.hideWindow(); 
-       
+    waitingWindow.hideWindow();        
 });
 
 function loadUser(id){
     $.ajax({type: "GET", url: "/admin/loadUser?id=" + id, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте. Идет загрузка информации о пользователе");
+            waitingWindow.showWindow();
+        },
         success: function(respond, status, jqXHR){
             if (typeof respond.error === 'undefined') {
+                $("#userId").val(respond.id);
                 $("#name").text(respond.name);
                 $("#surname").text(respond.surname);
                 $("#login").text(respond.login);
@@ -30,29 +34,33 @@ function loadUser(id){
             }
         },
         error: function(respond, status, jqXHR){
-            alert(status);
+            alert("Ошибка при загрузке пользователя: " + status);
+        },
+        complete: function(){
+            waitingWindow.hideWindow();
         }
     });
 }
 function deleteUser(){
-    var id = $('#id').prop("value");
+    var id = $('#userId').val();
     var userData = new FormData();
     userData.append("id", id);
     $.ajax({type: "POST", url: "/admin/deleteUser", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: userData,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте. Идет удаление пользователя");
+            waitingWindow.showWindow();
+        },
         success: function(respond, status, jqXHR){
             if (typeof respond.error === 'undefined') {
-                $("#name").text("-");
-                $("#surname").text("-");
-                $("#login").text("-");
-                $("#password").text("-");
-                $("#city").text("-");
-                $("#temperament").text("-");
-                $("#email").text("-");
-                $("#phone").text("-");
+                waitingWindow.setTitle("Пользователь удален. Страница будет перезагружена для актуализации информации.");
+                location.reload();
             }
         },
         error: function(respond, status, jqXHR){
-            alert(status);
+            alert("Ошибка при удалении пользователя: " + status);
+        },
+        complete: function(){
+            waitingWindow.hideWindow();
         }
     });
 }
