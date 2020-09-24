@@ -9,7 +9,7 @@ class Ingredient{
 		this.fat=fat;
 		this.carbo=carbo;
 		this.common=common;
-		this.calorie = this.fat*9 + this.carbo*4 + this.prot*4;
+		this.calorie = Math.floor((this.fat*9 + this.carbo*4 + this.prot*4)*100)/100;
 		this.saved=false;
 	}
 
@@ -29,7 +29,8 @@ class Ingredient{
 			success: function(respond, status, jqXHR) {
 				if (typeof respond.error === 'undefined') {		
 					doneSuccessfully = true;
-					tempId = respond.id;				
+					tempId = respond.id;
+					message = "Ингредиент сохранен успешно";				
 				}
 				else {
 					doneSuccessfully = false;
@@ -125,5 +126,9 @@ class Ingredient{
 				errorFinishFunction();
 			}	
 		});
+	}
+
+	calculateCalorie(){
+		this.calorie = Math.floor((this.fat*9 + this.carbo*4 + this.prot*4)*100)/100;
 	}
 }

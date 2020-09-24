@@ -146,9 +146,9 @@ function saveIngrBtnClick(){
     var name = $("#nameEdit").val();
     var type = $("#typeEdit").val();
     var descr = $("#descriptionEdit").val();
-    var prot = $("#protEdit").val();
-    var fat = $("#fatEdit").val();
-    var carbo = $("#carboEdit").val();
+    var prot = getFloat('protEdit');  //$("#protEdit").val();   
+    var fat = getFloat('fatEdit');    //$("#fatEdit").val();
+    var carbo = getFloat('carboEdit');//$("#carboEdit").val();
     if(selected == 1){
         waitingWindow.setTitle("Ожидайте, идет редактирование ингредиента");
         waitingWindow.showWindow();
@@ -172,8 +172,15 @@ function saveIngrBtnClick(){
         newIngredient.fat = fat;
         newIngredient.carbo = carbo;
         newIngredient.common = true;
-        //waitingWindow.setTitle("Ожидайте, идет сохранение ингредиента");
-        newIngredient.save();
+
+        waitingWindow.setTitle("Ожидайте, идет сохранение ингредиента");
+        waitingWindow.showWindow();
+        var msg = newIngredient.save();
+        alert(msg);
+        waitingWindow.hideWindow();
+        if(msg == "Ингредиент сохранен успешно"){
+            location.reload();
+        }
     }
 }
 
@@ -199,6 +206,44 @@ function finishLoadingImage(){
     $("#image").show();
 }
 
+function showNewIngredientPreview(){
+	var photoFileLoader = document.getElementById('ingrPhotoLoader');
+	var currentlyUploadedPhoto = photoFileLoader.files[0];
+	var output  = document.getElementById('image');
+    output.src = URL.createObjectURL(currentlyUploadedPhoto); 
+    $('#savePreviewBtn').show();
+}
+
+function saveNewIngredientPreview(){
+	var ingredientData = new FormData();
+	var currentIngrId = $('#currentIngrId').val(); 		
+	var currentlyUploadedPhoto = $('#ingrPhotoLoader').prop('files')[0];
+	ingredientData.append('ingrImage', currentlyUploadedPhoto);
+	ingredientData.append('ingrId', currentIngrId);
+
+	$.ajax({type: "POST", url: "/ingredient/saveImage", async:false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте. Идет сохранение фотографии для превью");
+            waitingWindow.showWindow();
+        },
+        success: function(respond, status, jqXHR) {
+			if (typeof respond.error === 'undefined') {		
+                alert("Фото успешно сохранено");
+                $('#savePreviewBtn').hide();
+			}
+			else {
+				alert("Ошибка при загрузке изображения: " + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert(respond.statusText);
+        },
+        complete: function(){
+            waitingWindow.hideWindow();
+        }
+	});   
+}
+
 function deleteIngr(){
     var id = $("#currentIngrId").val();
     if(id == 0){
@@ -219,4 +264,9 @@ function deleteIngr(){
     currentUploadedIngredient.delete(successFinish, errorFinish);
 }
 
+function getFloat(id){
+    var initValue = $('#' + id).val();
+    var newValue = initValue.replace(/,/, '.');
+    return newValue;
+}
 

@@ -38,6 +38,7 @@ function getIngrListFromServer(ingrType, currentIngredientsList){
 		ingredient.fat = requestedIngredientsList[index].fat;
 		ingredient.carbo = requestedIngredientsList[index].carbo;
 		ingredient.common = requestedIngredientsList[index].common;
+		ingredient.calculateCalorie();
 		currentIngredientsList.push(ingredient);
 	});
 }
@@ -47,7 +48,7 @@ function setIngredientValues(){
 	var prot = currentIngredientsList[currentIngrIndex].prot;
 	var carbo = currentIngredientsList[currentIngrIndex].carbo;
 	var fat = currentIngredientsList[currentIngrIndex].fat;
-	var calorie = prot*4 + carbo*4 + fat*9;
+	var calorie = currentIngredientsList[currentIngrIndex].calorie;//  prot*4 + carbo*4 + fat*9;
 	var description = currentIngredientsList[currentIngrIndex].descr;
 
 	$('#currentIngrId').val(currentIngredientsList[currentIngrIndex].id);
@@ -69,6 +70,7 @@ function setIngredientValues(){
 function loadImg(){
 	var currentIngrIndex = $("#ingrName").prop('selectedIndex') - 1;
 	$("#spinner_image").show();
+	$("#image").hide();
 	currentIngredientsList[currentIngrIndex].loadImage("image", finishImageLoading);
 }
 

@@ -29,7 +29,7 @@ public class Ingredient {
 		this.protein = protein;
 		this.fat = fat;
 		this.carbohydrate = carbohydrate;
-		this.calorie = this.fat * 9 + this.protein * 4 + this.carbohydrate * 4;
+		this.calorie = (double)Math.round((this.fat * 9 + this.protein * 4 + this.carbohydrate * 4)*100) / 100;
 	}
 	
 	@Id

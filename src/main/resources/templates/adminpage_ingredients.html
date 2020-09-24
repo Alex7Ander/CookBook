@@ -70,15 +70,17 @@
                     <p>Жиры: </p><input type="text" id="fatEdit"><br>
                     <p>Углеводы: </p><input type="text" id="carboEdit"><br>
                     <p>Описание: </p><textarea id="descriptionEdit" rows="12" style="width: 100%;"></textarea><br>
+                    <input type="button" id="saveBtn" value="Сохранить" onclick="saveIngrBtnClick()">
+                    <input type="button" id="deleteBtn" value="Удалить" onclick="deleteIngr()"> <br>
+
                     <input type="file" id="ingrPhotoLoader" onchange="showNewIngredientPreview();"><br>
                     <div>
-                        <img id="image">
+                        <img style="width: 100%;" id="image">
                         <div class="spinner-border" role="status" id="spinner_image">
                             <span class="sr-only">Loading...</span>
                         </div>
                     </div>
-                    <input type="button" id="saveBtn" value="Сохранить" onclick="saveIngrBtnClick()">
-                    <input type="button" id="deleteBtn" value="Удалить" onclick="deleteIngr()">
+                    <input id="savePreviewBtn" type="button" value="Сохранить новое превью" onclick="saveNewIngredientPreview();">
                 </div>
             </div>
 
