@@ -58,6 +58,7 @@ public class Ingredient {
 
 	private double calorie;
 	private boolean common;
+	private String previewPhotoName;
 	
 	@OneToMany(mappedBy="ingredient", fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonIgnore
@@ -132,6 +133,12 @@ public class Ingredient {
 	}
 	public void setImage(byte[] image) {
 		this.image = image;
+	}
+	public String getPreviewPhotoName() {
+		return previewPhotoName;
+	}
+	public void setPreviewPhotoName(String previewPhotoName) {
+		this.previewPhotoName = previewPhotoName;
 	}
 
 }

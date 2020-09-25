@@ -70,7 +70,7 @@ class Ingredient{
 	}
 
 	loadImage(imageId, successFinishFunction, errorFinishFunction){
-		jQuery.ajax({type: "GET", url: "/ingredient/loadImg?ingrId=" + this.id, cache: false,
+		jQuery.ajax({type: "GET", url: "/ingredient/loadPhoto?ingrId=" + this.id, cache: false,
 			xhr:function(){
 				var xhr = new XMLHttpRequest();
 				xhr.responseType = 'blob';

@@ -349,6 +349,11 @@ public class RecipeController {
 				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder, uniqPhotoName, resultFullPhotoName);
 			}
 		}
+		
+		for (File f : uploadDir.listFiles()) {				
+			f.delete();
+		}
+		uploadDir.delete();
 		//Clear container for photos - newRecipePhotos
 		this.newRecipePhotos.clear();	
 		recipe.setPhotos(photos);

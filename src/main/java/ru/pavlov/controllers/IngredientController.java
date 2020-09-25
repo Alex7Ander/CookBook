@@ -1,8 +1,11 @@
 package ru.pavlov.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
 @RequestMapping("/ingredient/**")
@@ -28,6 +33,9 @@ public class IngredientController {
 
 	@Autowired
 	private IngredientRepository ingrRepo;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@PostMapping("save")
 	@ResponseBody
@@ -46,14 +54,17 @@ public class IngredientController {
 				response = "{\"error\": \"Ингредиент такого типа с таким именем уже существует в списке ингредиентов.\"}";
 				return response;
 			}
+			
+			//Creating ingredient object and setting main info
 			Ingredient newIngredient = new Ingredient(name, type, descr, prot, fat, carbo);
 			newIngredient.setCommon(common);
 			newIngredient.setUser(currentUserDetails.getUser());
-			//newIngredient.setCommon(false);
+					
 			this.ingrRepo.save(newIngredient);
 			response = "{\"id\": \"" + newIngredient.getId().toString() + "\"}";
 			return response;
-		} catch (Exception exp) {
+		} 
+		catch (Exception exp) {
 			return "{\"error\": \"" + exp.getMessage() + "\"}";
 		}		
 	}
@@ -163,12 +174,18 @@ public class IngredientController {
 		return answer.toString();
 	}
 	
-	@GetMapping("loadImg")
+	@GetMapping("loadPhoto")
 	@ResponseBody
-	public byte[] loadImg(@RequestParam long ingrId) {
+	public byte[] loadPhoto(@RequestParam long ingrId) {
 		Ingredient ingredient = this.ingrRepo.findById(ingrId);
-		byte[] imgByteArray = ingredient.getImage();				
-		return imgByteArray;
+		String photoName = ingredient.getPreviewPhotoName();
+		byte[] bytes = null;
+		try {
+			bytes = yandexDiskConnector.getTargetFileByteArrayByPath("/ApplicationsFolder/CookBook/_IngredientsPhotos/"+photoName);
+		} catch (IOException | YandexDiskException exp) {
+			System.out.println("При загрузке превью фото для ингредиента " + ingrId + ") " + ingredient.getName() + " произошла ошибка: " + exp.getMessage());
+		}
+		return bytes;
 	}
 	
 	@PostMapping("saveImage")
@@ -183,17 +200,52 @@ public class IngredientController {
 			response = "{\"error\":\"нет файла с изображением, возможно он был поврежден при передаче.\"}";
 			return response;
 		}
+				
 		Ingredient ingredient = this.ingrRepo.findById(ingrId);
 		if(ingredient == null) {
-			response = "{\"error\":\"ингредиент не найден\"}";
+			response = "{\"error\":\"Ингредиент не найден\"}";
 			return response;
 		}
-		ingredient.setImage(byteArray);
-		this.ingrRepo.save(ingredient);
-		response = "{\"done\":\" + true + \"}";
-		return response;
-	}
-	
-	
-	
+		
+		if (byteArray.length != 0) {	
+			String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+			uniqPhotoName.replace(' ', '_');
+			String uploadTempDirPath = new File(".").getAbsolutePath() + "/temp";
+			String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
+			File uploadDir = new File(uploadTempDirPath);
+			if(!uploadDir.exists()){
+				uploadDir.mkdir();
+			}									
+			try {
+				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
+				fos.write(byteArray);
+				fos.close();
+				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/_IngredientsPhotos", uniqPhotoName, resultFullPhotoName);
+				
+				String oldPreviewPhotoName = ingredient.getPreviewPhotoName();
+				ingredient.setPreviewPhotoName(uniqPhotoName);
+				this.ingrRepo.save(ingredient);
+				
+				if(oldPreviewPhotoName != null) {
+					yandexDiskConnector.delete("/ApplicationsFolder/CookBook/_IngredientsPhotos/" + oldPreviewPhotoName);
+				}
+				
+				for (File f : uploadDir.listFiles()) {				
+					f.delete();
+				}
+				uploadDir.delete();
+				
+				response = "{\"done\":\"true\"}";
+				return response;
+			} catch (IOException | YandexDiskException exp) {
+				exp.printStackTrace();
+				response = "{\"error\":\""+exp.getMessage()+"\"}";
+				return response;
+			}				
+		}
+		else {
+			response = "{\"error\":\"Массив байт загруженной фотографии пуст\"}";
+			return response;
+		}
+	}	
 }
