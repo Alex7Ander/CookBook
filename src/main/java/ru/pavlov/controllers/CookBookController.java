@@ -1,5 +1,6 @@
 package ru.pavlov.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ru.pavlov.domain.Recipe;
+import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.Review;
 import ru.pavlov.domain.User;
 import ru.pavlov.repos.IngredientRepository;
@@ -21,9 +23,11 @@ import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
 import ru.pavlov.security.CookBookUserDetails;
 import ru.pavlov.services.RecipeService;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
-@RequestMapping("/cookbook/**") 
+@RequestMapping("/cookbook/**")
 public class CookBookController {
 	
 	@Value("${upload.path}")
@@ -46,6 +50,9 @@ public class CookBookController {
 	
 	@Autowired
 	private RecipeService recipeService;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@GetMapping("showCookbook")
 	public String cookbook(@RequestParam(required = false) String name, 
@@ -88,7 +95,22 @@ public class CookBookController {
 	@ResponseBody
 	public byte[] loadPreviews(@RequestParam long recipeId) {
 		Recipe recipe = this.recipeRepo.findById(recipeId);
-		byte[] previewImageByteArray = recipe.getPreviewImage();
+		String recipePhotoPath = null;
+		for(RecipePhoto recipePhoto : recipe.getPhotos()) {
+			if(recipePhoto.isPreview()) {
+				recipePhotoPath = recipePhoto.getPhotoPath();
+				break;
+			}
+		}		
+		byte[] previewImageByteArray = null;		
+		try {
+			if(recipePhotoPath == null) {
+				recipePhotoPath = "/ApplicationsFolder/CookBook/photos/nopreview.jpg";
+			}		
+			previewImageByteArray = yandexDiskConnector.getTargetFileByteArrayByPath(recipePhotoPath);
+		} catch (IOException | YandexDiskException exp) {
+			exp.printStackTrace();
+		}		
 		return previewImageByteArray;
 	}
 	

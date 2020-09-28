@@ -25,9 +25,6 @@ function load(index){
             img.src = url.createObjectURL(data);
             $('#spinner_' + currentRecipeId).hide();
         },
-        error: function(respond, status, jqXHR) {
-            alert(respond.statusText);
-        },
         complete: function(){
             if(index != recipeIdInputs.length - 1){
                 index++;

@@ -2,7 +2,6 @@ package ru.pavlov.domain;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,10 +28,6 @@ public class Recipe {
 	private String text;
 	private String youtubeLink;
 	private String photoFolder;
-	
-	@Column(name = "preview_image", columnDefinition="longblob", length=2*1024*1024*1024)
-    @Lob()
-	private byte[] previewImage;	
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
@@ -127,11 +122,4 @@ public class Recipe {
 		this.photoFolder = photoFolder;
 	}
 
-	public byte[] getPreviewImage() {
-		return previewImage;
-	}
-
-	public void setPreviewImage(byte[] previewImage) {
-		this.previewImage = previewImage;
-	}		
 }

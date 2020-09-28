@@ -374,6 +374,19 @@ function saveNewPhoto(code){
 				alert("Фото успешно сохранено");
 				var newPhotoId = respond.id;
 				$("#saveBtn"+code).remove();
+
+				var previewLabel = document.createElement('label');
+				var previewInput = document.createElement('input');
+				previewInput.type = "radio";
+				previewInput.value = code;
+				previewInput.name = "previewRb";	
+				previewInput.onclick = function(){
+					setPhotoAsPreviewForRecipe(respond.id);
+				}
+				previewLabel.append(previewInput);
+				previewLabel.append("Установить как обложку для рецепта");
+				$("#photoCard_" + code).append(previewLabel);
+
 				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);
 				$("#deleteBtn" + code).val("Удалить");
 				$("#deleteBtn" + code).on('click', function() {					
@@ -409,12 +422,34 @@ function deletePhoto(photoId){
 				$("#photoCard_" + photoId).remove();							
 			}
 			else{
-				console.log(respond.error);
 				alert('Ошибка удаления фотографии:' + respond.error + '.\nПовторите попытку.');
 			}
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось удалить фото: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
+		}
+	});
+}
+
+function setPhotoAsPreviewForRecipe(id){
+	var photoData = new FormData();
+	photoData.append('recipeId',  $("#recipeId").val());
+	photoData.append('photoId', id);
+	$.ajax({type: "POST", url: "/recipe/setPreview", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет установка превью для рецепта");
+			waitingWindow.showWindow();
+		},
+		success: function(respond, status, jqXHR){
+			if(! typeof respond.error === 'undefined' ){
+				alert('Не удалось установить превью для рецепта: ' + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось установить превью для рецепта: ' + status);
 		},
 		complete: function(){
 			waitingWindow.hideWindow();

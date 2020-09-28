@@ -13,13 +13,13 @@ import javax.persistence.Table;
 public class RecipePhoto {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	
+	private Long id;	
 	private String photoPath;
-
 	@ManyToOne
 	@JoinColumn(name="recipeId")
 	private Recipe recipe;
+	private boolean isPreview;
+	
 	
 	public RecipePhoto() {}
 	
@@ -50,5 +50,13 @@ public class RecipePhoto {
 
 	public void setRecipe(Recipe recipe) {
 		this.recipe = recipe;
+	}
+
+	public boolean isPreview() {
+		return isPreview;
+	}
+
+	public void setPreview(boolean isPreview) {
+		this.isPreview = isPreview;
 	}	
 }

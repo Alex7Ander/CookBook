@@ -276,13 +276,34 @@ public class RecipeController {
 				}
 				break;
 			}
-			response = "{\"error\":\" Фото не найдено на диске + \"}";
+			response = "{\"error\":\"Фото не найдено на диске\"}";
 		}
 		return response;
+	}
+	
+	@PostMapping("setPreview")
+	@ResponseBody
+	public String setRecipePhotoAsPreview(@RequestParam long recipeId, @RequestParam long photoId) {
+		Recipe recipe = this.recipeRepo.findById(recipeId);
+		RecipePhoto previewPhoto = this.recipePhotoRepo.findById(photoId);
+		if(!previewPhoto.getRecipe().equals(recipe)) {
+			return "{\"error\":\" Фото с id = "+photoId+" не соответствет рецепту с id = "+recipeId+"\"}";
+		}
+		for(RecipePhoto recipePhoto : recipe.getPhotos()) {
+			if(recipePhoto.isPreview()) {
+				recipePhoto.setPreview(false);
+				this.recipePhotoRepo.save(recipePhoto);
+				break;
+			}
+		}
+		previewPhoto.setPreview(true);
+		this.recipePhotoRepo.save(previewPhoto);
+		return "{\"done\":\" + true + \"}";
 	}
 	//---------------------------------------------------------------------
 	
 	@PostMapping("save")
+	@ResponseBody
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
 								@RequestParam Map<String, String> allParametrs,
 								Model model) throws IOException, YandexDiskException {		
@@ -298,6 +319,9 @@ public class RecipeController {
 		allParametrs.remove("youtubeLink");
 		String text = allParametrs.get("text");
 		allParametrs.remove("text");
+		
+		String previewPhotoCode = allParametrs.get("previewRb");
+		allParametrs.remove("previewRB");
 		
 		List<IngredientVolume> ingredients = new ArrayList<>();
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
@@ -334,9 +358,6 @@ public class RecipeController {
 		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
-			if(recipe.getPreviewImage() == null) {
-				recipe.setPreviewImage(byteArray);
-			}
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
 				String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
@@ -345,8 +366,12 @@ public class RecipeController {
 				fos.write(byteArray);
 				fos.close();				
 				RecipePhoto uploadedPhoto = new RecipePhoto("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder + "/" + uniqPhotoName, recipe);
-				photos.add(uploadedPhoto);
+				photos.add(uploadedPhoto);				
 				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder, uniqPhotoName, resultFullPhotoName);
+				
+				if(photoKey.toString().equals(previewPhotoCode)) {
+					uploadedPhoto.setPreview(true);
+				}
 			}
 		}
 		
@@ -362,7 +387,7 @@ public class RecipeController {
 		ingrVolumeRepo.saveAll(ingredients);				
 		Iterable<Recipe> recipes = recipeRepo.findAll();
 		model.addAttribute("recipes", recipes);
-		return "cookbook";
+		return "{\"done\":\" + true + \"}";
 	}
 	
 	@PostMapping("delete")
@@ -373,6 +398,9 @@ public class RecipeController {
 		User currentUser = currentUserDetails.getUser();
 		if (recipe.getRecipeAuther().equals(currentUser)) {
 			String yandexDiskPhotosFilePath = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
+			for (RecipePhoto photo : recipe.getPhotos()) {
+				this.recipePhotoRepo.delete(photo);
+			}
 			this.recipeRepo.delete(recipe);			
 			this.yandexDiskConnector.delete(yandexDiskPhotosFilePath);
 			response = "{\"done\":\" + true + \"}";

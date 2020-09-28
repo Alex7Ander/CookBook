@@ -16,6 +16,38 @@ $(document).ready(function(){
 	waitingWindow.hideWindow();
 });
 
+function saveRecipe(){
+	var recipeData = new FormData();
+	recipeData.append("name", $("#name").val());
+	recipeData.append("type", $("#name").val());
+	recipeData.append("tagline", $("#name").val());
+	recipeData.append("youtubeLink", $("#name").val());
+	recipeData.append("text", $("#name").val());	
+	recipeData.append("previewRB", $("input[type='radio'][name='previewRb']:checked").val());
+	$.ajax({type: "POST", url: "/recipe/save", cache: false, dataType: 'json', contentType: false, processData : false, data: recipeData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет сохранение рецепта");
+			waitingWindow.showWindow();
+		},
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				waitingWindow.setTitle("Рецепт успешно сохранен. Вы будете перенаправлены на страницу книги рецептов");
+				var url = "/cookbook/showCookbook";
+				$(location).attr('href', url);							
+			}
+			else{
+				alert('При сохранении рецепта произошла ошибка: ' + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('При сохранении рецепта произошла ошибка: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
+		}
+	});
+}
+
 /*
 Управление фотографиями
 */
@@ -80,12 +112,21 @@ function showUploadedPhotoOnMainPage(code){
 	codeInput.className = "hiddenInput";
 	codeInput.value = code;
 	newPhotoCardBody.append(codeInput);
+	//Set as preview image input
+	var previewLabel = document.createElement('label');
+	var previewInput = document.createElement('input');
+	previewInput.type = "radio";
+	previewInput.value = code;
+	previewInput.name = "previewRb";	
+	previewInput.form = "saverecipeform";
+	previewLabel.append(previewInput);
+	previewLabel.append("Установить как обложку для рецепта");
+	newPhotoCardBody.append(previewLabel);	
 	// Delete link
 	var deleteBtn = document.createElement('input');
 	deleteBtn.type="button";
 	deleteBtn.value = "Удалить";
 	deleteBtn.className = "btn btn-primary";
-	//deleteBtn.setAttribute('onclick', 'deletePhotoCard()');
 	deleteBtn.id = photoCount;
 	deleteBtn.onclick = function(){
 		newPhotoCard.remove();

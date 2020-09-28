@@ -112,7 +112,11 @@
 							  <span class="sr-only">Loading...</span>
 							</div>
 						</div>
-						<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|"><br>
+						<label>
+							<input type="radio" name="previewRb" th:value="${photo.id}" th:attr="onclick=|setPhotoAsPreviewForRecipe('${photo.id}')|">
+							Установить как обложку для рецепта
+						</label>
 						<input th:if="${editable}" type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>

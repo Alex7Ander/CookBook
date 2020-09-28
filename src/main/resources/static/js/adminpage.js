@@ -146,9 +146,9 @@ function saveIngrBtnClick(){
     var name = $("#nameEdit").val();
     var type = $("#typeEdit").val();
     var descr = $("#descriptionEdit").val();
-    var prot = getFloat('protEdit');  //$("#protEdit").val();   
-    var fat = getFloat('fatEdit');    //$("#fatEdit").val();
-    var carbo = getFloat('carboEdit');//$("#carboEdit").val();
+    var prot = getFloat('protEdit');   
+    var fat = getFloat('fatEdit');    
+    var carbo = getFloat('carboEdit');
     if(selected == 1){
         waitingWindow.setTitle("Ожидайте, идет редактирование ингредиента");
         waitingWindow.showWindow();
