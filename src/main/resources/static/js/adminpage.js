@@ -139,6 +139,64 @@ function deleteReview(reviewId){
 }
 
 /*
+Recipes
+*/
+function deleteRecipe(){
+    var recipeData = new FormData();
+    recipeData.append("recipeId", $("#recipeId").val());
+    $.ajax({type: "POST", url: "/recipe/delete", async: false, cache: false, dataType: 'json', contentType: false, processData: false, data: recipeData,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте. Идет удаление рецепта");
+            waitingWindow.showWindow();
+        },
+        success: function(respond, status, jqXHR){
+            if(typeof respond.error === 'undefined'){
+                waitingWindow.setTitle("Ингредиент удален. Страница будет перезагружена для актуализации информации");
+                location.reload();               
+            }
+            else{
+                alert(respond.error);
+            }
+        },
+        error: function(respond, status, jqXHR){
+            alert(status);
+        },
+        complete: function(){
+            waitingWindow.hideWindow();
+        }
+    });
+}
+
+function loadRecipe(id){
+    $.ajax({type: "GET", url: "/admin/loadRecipe?id="+id, async: false, cache: false, dataType: 'json', contentType: false, processData: false,
+        beforeSend: function(){
+            waitingWindow.setTitle("Ожидайте. Идет загрузка рецепта");
+            waitingWindow.showWindow();
+        },
+        success: function(respond, status, jqXHR){
+            if(typeof respond.error === 'undefined'){
+                $("#recipeId").val(respond.id);
+                $("#name").text(respond.name);
+                $("#type").text(respond.type);
+                $("#auther").text("id - " + respond.recipeAuther.id + "; login - " + respond.recipeAuther.login);
+                $("#tagline").text(respond.tagline);
+                $("#youtubeLink").text(respond.youtubeLink);
+                $("#text").text(respond.text);               
+            }
+            else{
+                alert(respond.error);
+            }
+        },
+        error: function(respond, status, jqXHR){
+            alert(status);
+        },
+        complete: function(){
+            waitingWindow.hideWindow();
+        }
+    });
+}
+
+/*
 Ingredients
 */
 function saveIngrBtnClick(){

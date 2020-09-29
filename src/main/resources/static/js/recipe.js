@@ -125,6 +125,7 @@ function addIngrToTable(ingredient){
 	row.appendChild(col5);
 	tbody.appendChild(row);
 }
+
 function saveIngredientInRecipe(newIngrIndex, recipeId, ingredientId, volume){
 	var ingredientData = new FormData();
 	ingredientData.append("recipeId", recipeId);
@@ -260,6 +261,10 @@ function getCurrentlyUploadedPhoto(){
 }
 
 function addPhotoToPhotoList(event){
+	if(currentlyUploadedPhoto.size >= 1048576){
+		alert("Размер фото превышает максимально допустимый (1 мб)");
+		return;
+	}
 	event.stopPropagation(); // остановка всех текущих JS событий
 	event.preventDefault();  // остановка дефолтного события для текущего элемента
 	let photoData = new FormData();
@@ -373,8 +378,8 @@ function saveNewPhoto(code){
 			if( typeof respond.error === 'undefined' ){
 				alert("Фото успешно сохранено");
 				var newPhotoId = respond.id;
+				
 				$("#saveBtn"+code).remove();
-
 				var previewLabel = document.createElement('label');
 				var previewInput = document.createElement('input');
 				previewInput.type = "radio";
@@ -387,11 +392,17 @@ function saveNewPhoto(code){
 				previewLabel.append("Установить как обложку для рецепта");
 				$("#photoCard_" + code).append(previewLabel);
 
-				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);
-				$("#deleteBtn" + code).val("Удалить");
-				$("#deleteBtn" + code).on('click', function() {					
+				$("#deleteBtn" + code).remove();
+				var newDeleteBtn = document.createElement('input');
+				newDeleteBtn.type = "button";
+				newDeleteBtn.value = "Удалить";
+				newDeleteBtn.id = "deleteBtn" + code;
+				newDeleteBtn.className = "btn btn-primary";
+				newDeleteBtn.onclick = function(){
 					deletePhoto(newPhotoId);
-				});							
+				};
+				$("#photoCard_" + code).append(newDeleteBtn);
+				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);						
 			}
 			else {
 				console.log(respond.error);

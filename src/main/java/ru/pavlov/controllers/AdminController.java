@@ -114,6 +114,20 @@ public class AdminController {
 		return "adminpage_recipes";
 	}
 	
+	@GetMapping("loadRecipe")
+	@ResponseBody
+	public String loadRecipe(@RequestParam long id) {
+		Recipe recipe = this.recipeRepo.findById(id);
+		ObjectMapper jsonCreator = new ObjectMapper();
+		String jsonResponse = null;
+		try {
+			jsonResponse = jsonCreator.writeValueAsString(recipe);
+		}
+		catch(JsonProcessingException jpExp) {
+			jsonResponse = "{\"error\":\"" + jpExp.getMessage() + "\"}";
+		}
+		return jsonResponse;
+	}
 	
 	@GetMapping("ingredients")
 	public String adminPageIngredinets(Model model, 

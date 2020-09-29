@@ -20,9 +20,6 @@ function loadavatar(){
             img.src = url.createObjectURL(data);
             $("#avatar").show();
             $("#spinner_avatar").hide();
-        },
-        error: function(respond, status, jqXHR) {
-            alert(respond.statusText);
         }
     });
 }

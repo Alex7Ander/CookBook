@@ -112,11 +112,13 @@
 							  <span class="sr-only">Loading...</span>
 							</div>
 						</div>
-						<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|"><br>
-						<label>
-							<input type="radio" name="previewRb" th:value="${photo.id}" th:attr="onclick=|setPhotoAsPreviewForRecipe('${photo.id}')|">
-							Установить как обложку для рецепта
-						</label>
+						<div>
+							<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|"><br>
+							<label>
+								<input type="radio" name="previewRb" th:value="${photo.id}" th:attr="onclick=|setPhotoAsPreviewForRecipe('${photo.id}')|">
+								Установить как обложку для рецепта
+							</label>
+						</div>
 						<input th:if="${editable}" type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>
@@ -142,7 +144,7 @@
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
 								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="slide_+${photo.id}">
-									<img class="d-block w-100" th:id="carousel_img_+${photo.id}" th:alt="${photo.photoPath}">
+									<img class="d-block h-100" th:id="carousel_img_+${photo.id}" th:alt="${photo.photoPath}"> 
 									<div class="spinner-border" role="status" th:id="carousel_spinner_+${photo.id}">
 										<span class="sr-only">Loading...</span>
 									</div>

@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "recipelist")
 public class Recipe {
@@ -33,9 +35,11 @@ public class Recipe {
 	@JoinColumn(name="userId")
 	private User recipeAuther;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY, cascade=CascadeType.ALL) //
 	private List<IngredientVolume> ingredients;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
 		

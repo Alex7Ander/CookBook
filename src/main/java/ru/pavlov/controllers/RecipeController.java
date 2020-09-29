@@ -27,6 +27,7 @@ import ru.pavlov.domain.IngredientVolume;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.RecipePhoto;
 import ru.pavlov.domain.User;
+import ru.pavlov.domain.UserRole;
 import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.IngredientVolumeRepository;
 import ru.pavlov.repos.RecipePhotoRepository;
@@ -37,7 +38,7 @@ import ru.pavlov.yandex.disk.YandexDiskConnector;
 import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
-@RequestMapping("/recipe/**")  
+@RequestMapping("/recipe/**")
 public class RecipeController {
 	
 	@Value("${upload.path}")
@@ -186,8 +187,7 @@ public class RecipeController {
 		//Проверка сохранения
 		IngredientVolume currentIngredient2 = ingrVolumeRepo.findById(ingredientVolumeId);
 		if(currentIngredient2.getVolume() != newValue) {
-			return "{\"error\": \"Значение не изменено\"}";
-			
+			return "{\"error\": \"Значение не изменено\"}";			
 		}
 		else {
 			//расчет калорийности нового количесва ингредиента
@@ -321,7 +321,7 @@ public class RecipeController {
 		allParametrs.remove("text");
 		
 		String previewPhotoCode = allParametrs.get("previewRb");
-		allParametrs.remove("previewRB");
+		allParametrs.remove("previewRb");
 		
 		List<IngredientVolume> ingredients = new ArrayList<>();
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
@@ -332,8 +332,6 @@ public class RecipeController {
 			try {
 				volume = Double.parseDouble(allParametrs.get(ingredientName));
 			} catch(NumberFormatException nfExp) {
-				System.out.println("Ошибка перевода строки в число");
-				System.out.println("");
 				volume = 0.0;
 			} 
 			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);		
@@ -396,7 +394,15 @@ public class RecipeController {
 		String response = "";
 		Recipe recipe = this.recipeRepo.findById(recipeId);
 		User currentUser = currentUserDetails.getUser();
-		if (recipe.getRecipeAuther().equals(currentUser)) {
+		boolean currentUserIsAdmin = false;
+		UserRole userRole = new UserRole("ADMIN");
+		for(UserRole role : currentUser.getRoles()) {
+			if(role.equals(userRole)) {
+				currentUserIsAdmin = true;
+				break;
+			}
+		}		
+		if (recipe.getRecipeAuther().equals(currentUser) || currentUserIsAdmin) {
 			String yandexDiskPhotosFilePath = "/ApplicationsFolder/CookBook/" + recipe.getPhotoFolder();
 			for (RecipePhoto photo : recipe.getPhotos()) {
 				this.recipePhotoRepo.delete(photo);

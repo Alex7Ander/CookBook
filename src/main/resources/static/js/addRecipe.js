@@ -19,18 +19,31 @@ $(document).ready(function(){
 function saveRecipe(){
 	var recipeData = new FormData();
 	recipeData.append("name", $("#name").val());
-	recipeData.append("type", $("#name").val());
-	recipeData.append("tagline", $("#name").val());
-	recipeData.append("youtubeLink", $("#name").val());
-	recipeData.append("text", $("#name").val());	
-	recipeData.append("previewRB", $("input[type='radio'][name='previewRb']:checked").val());
+	recipeData.append("type", $("#type").val());
+	recipeData.append("tagline", $("#tagline").val());
+	recipeData.append("youtubeLink", $("#youtubeLink").val());
+	recipeData.append("text", $("#text").val());
+	
+	var previewCode = $("input[type='radio'][name='previewRb']:checked").val();
+	if(typeof previewCode === 'undefined'){
+		previewCode = null;
+	}
+	recipeData.append("previewRb", previewCode);
+	var cells = $('#ingrTable td.ingredientCount');
+	cells.each(function(){
+		var param =  $(this).children().attr("name");
+		var value = $(this).children().val();
+		recipeData.append(param, value);
+	});
+
+
 	$.ajax({type: "POST", url: "/recipe/save", cache: false, dataType: 'json', contentType: false, processData : false, data: recipeData,
 		beforeSend: function(){
 			waitingWindow.setTitle("Ожидайте, идет сохранение рецепта");
 			waitingWindow.showWindow();
 		},
 		success: function(respond, status, jqXHR){
-			if( typeof respond.error === 'undefined' ){
+			if(typeof respond.error === 'undefined' ){
 				waitingWindow.setTitle("Рецепт успешно сохранен. Вы будете перенаправлены на страницу книги рецептов");
 				var url = "/cookbook/showCookbook";
 				$(location).attr('href', url);							
@@ -65,8 +78,12 @@ function getCurrentlyUploadedPhoto(event){
 }
 
 function addPhotoToPhotoList(event){
+	if(currentlyUploadedPhoto.size >= 1048576){
+		alert("Размер фото превышает максимально допустимый (1 мб)");
+		return;
+	}
 	event.stopPropagation(); // остановка всех текущих JS событий
-	event.preventDefault();  // остановка дефолтного события для текущего элемента
+	event.preventDefault();  // остановка дефолтного события для текущего элемента	
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
 	$.ajax({type: "POST", url: "/recipe/sendPhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
@@ -206,12 +223,13 @@ function addIngrToTable(ingredientVolume){
 	//Поле с итоговой калорийностью для ингредиента
 	var resultCalorificValueField = document.createElement('b');
 	//Поле для ввода количества ингредиента
-	var volumeInput = document.createElement('input'); 
+	var volumeInput = document.createElement('input');
 	volumeInput.setAttribute('form', 'saverecipeform');
 	volumeInput.setAttribute('name', ingredientVolume.name);
 	volumeInput.oninput = function() {
 		var resultCalValue = ingredientVolume.calorie * volumeInput.value / 100;
-		resultCalorificValueField.innerText = resultCalValue;
+		var roundedResultCalValue = Math.floor(resultCalValue*100)/100; 
+		resultCalorificValueField.innerText = roundedResultCalValue;
 	}
 	//Кнопка удаления ингредиента
 	var deleteBtn = document.createElement('input'); 
@@ -225,6 +243,7 @@ function addIngrToTable(ingredientVolume){
 	col2.appendChild(document.createTextNode(ingredientVolume.calorie));
 	var col3 = document.createElement("TD");
 	col3.appendChild(volumeInput);
+	col3.className="ingredientCount";
 	var col4 = document.createElement("TD");
 	col4.appendChild(resultCalorificValueField);
 	var col5 = document.createElement("TD");		
