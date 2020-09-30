@@ -39,7 +39,7 @@ public class Recipe {
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY, cascade=CascadeType.ALL) //
 	private List<IngredientVolume> ingredients;
 	
-	@JsonIgnore
+	//@JsonIgnore
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
 		

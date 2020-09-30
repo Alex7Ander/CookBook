@@ -4,7 +4,7 @@ $(document).ready(function(){
     photoIdInputs = $("input[id^='photoPath']");
     if(photoIdInputs.length > 0){
         load(0);
-    }    
+    } 
 });
 
 function load(index){

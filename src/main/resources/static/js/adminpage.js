@@ -196,6 +196,10 @@ function loadRecipe(id){
     });
 }
 
+function loadRecipePhotos(){
+    
+}
+
 /*
 Ingredients
 */

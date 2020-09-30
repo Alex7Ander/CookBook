@@ -12,7 +12,11 @@ class Ingredient{
 		this.calorie = Math.floor((this.fat*9 + this.carbo*4 + this.prot*4)*100)/100;
 		this.saved=false;
 	}
+/*
+	#setParametrsFromAjaxResponse(response){
 
+	}
+*/
 	save() {
 		var ingredientData = new FormData();
 		ingredientData.append("name", this.name);
@@ -60,13 +64,15 @@ class Ingredient{
 				alert("Ошибка при получении данных с сервера:");
 			}
 		});
-		var ingredientInfo = JSON.parse(response.responseText);
-		this.id = ingredientInfo.id;
-		this.descr = ingredientInfo.descr;
-		this.prot = ingredientInfo.prot;
-		this.fat = ingredientInfo.fat;
-		this.carbo = ingredientInfo.carbo;
-		this.calorie = ingredientInfo.calorie;
+		if(typeof response.error === 'undefined'){
+			var ingredientInfo = JSON.parse(response.responseText);
+			this.id = ingredientInfo.id;
+			this.descr = ingredientInfo.descr;
+			this.prot = ingredientInfo.prot;
+			this.fat = ingredientInfo.fat;
+			this.carbo = ingredientInfo.carbo;
+			this.calorie = ingredientInfo.calorie;
+		}
 	}
 
 	loadImage(imageId, successFinishFunction, errorFinishFunction){

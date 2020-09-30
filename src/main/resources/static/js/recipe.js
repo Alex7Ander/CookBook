@@ -261,15 +261,15 @@ function getCurrentlyUploadedPhoto(){
 }
 
 function addPhotoToPhotoList(event){
-	if(currentlyUploadedPhoto.size >= 1048576){
-		alert("Размер фото превышает максимально допустимый (1 мб)");
+	if(currentlyUploadedPhoto.size >= 10 * 1048576){
+		alert("Размер фото превышает максимально допустимый (10 мб)");
 		return;
 	}
 	event.stopPropagation(); // остановка всех текущих JS событий
 	event.preventDefault();  // остановка дефолтного события для текущего элемента
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
-	$.ajax({type: "POST", url: "/recipe/sendPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/sendPhoto", mimeType: "multipart/form-data", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		beforeSend: function(){
 			waitingWindow.setTitle("Ожидайте, идет отправка фотографии");
 			photoUploadWindow.hideWindow();
