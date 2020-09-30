@@ -143,7 +143,7 @@
 					<div class="col-md-10">				
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
-								<div class="carousel-item" style="height: 100%;" th:each="photo : ${recipePhotos}" th:id="slide_+${photo.id}">									
+								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="slide_+${photo.id}">									
 									<div class="d-flex justify-content-center">
 										<img th:id="carousel_img_+${photo.id}" th:alt="${photo.photoPath}"> 
 										<div class="spinner-border" role="status" th:id="carousel_spinner_+${photo.id}">

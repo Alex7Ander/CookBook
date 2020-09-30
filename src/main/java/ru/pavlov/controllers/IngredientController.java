@@ -143,18 +143,25 @@ public class IngredientController {
 	
 	@GetMapping("getIngredients")
 	@ResponseBody
-	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType, Model model) {
+	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType) {
+		System.out.println("-----------------------");
+		System.out.println("In 'getIngredients'");
+		System.out.println("ingrType: " + ingrType);
+		
+		System.out.println("Serching ingredients...");
 		List<Ingredient> allIngredientsofThisType = ingrRepo.findByType(ingrType);
+		System.out.println("Founded " + allIngredientsofThisType.size() + " ingredients of type " + ingrType);
+		
 		List<Ingredient> requestedIngredientsofThisType = new ArrayList<>();
 		for (int i = 0; i < allIngredientsofThisType.size(); i++ ) {
 			Ingredient ingredient = allIngredientsofThisType.get(i);
 			if(ingredient.isCommon() || ingredient.getUser().equals(currentUserDetails.getUser())) {
 				requestedIngredientsofThisType.add(ingredient);
 			}
-		}		
-		model.addAttribute("ingredients", requestedIngredientsofThisType);
-		ObjectMapper jsonCreator = new ObjectMapper();
+		}
+		System.out.println("Requested (common and "+currentUserDetails.getUsername()+"'s) " + requestedIngredientsofThisType.size() + " ingredients of type " + ingrType);
 		
+		ObjectMapper jsonCreator = new ObjectMapper();		
 		StringBuilder answer = new StringBuilder();
 		answer.append("[");
 		for(int i = 0; i< requestedIngredientsofThisType.size(); i++) {
@@ -163,7 +170,7 @@ public class IngredientController {
 				String jsonResponse = jsonCreator.writeValueAsString(ingredient);
 				answer.append(jsonResponse);
 				if (i < requestedIngredientsofThisType.size()-1) answer.append(", ");
-				
+				System.out.println(jsonResponse);
  			}
 			catch(JsonProcessingException jpExp) {
 				System.err.println("Error [ingredient -> json] for ingredient with id= " + ingredient.getId());
@@ -171,6 +178,7 @@ public class IngredientController {
 			}
 		}
 		answer.append("]");
+		System.out.println("FINISH");
 		return answer.toString();
 	}
 	
