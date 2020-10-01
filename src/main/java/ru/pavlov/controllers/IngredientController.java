@@ -129,16 +129,25 @@ public class IngredientController {
 	@GetMapping("getProperties")
 	@ResponseBody
 	public String getProperties(@RequestParam String type, @RequestParam String name, Model model){
+		System.out.println("-----------------------");
+		System.out.println("In 'getProperties'");
+		
+		System.out.println("Serching ingredient parametrs by name="+name+" and type="+type+"...");
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
+		
 		ObjectMapper jsonCreator = new ObjectMapper();
+		String jsonResponse = null;
 		try {
-			String jsonResponse = jsonCreator.writeValueAsString(ingr);
-			return jsonResponse;
+			jsonResponse = jsonCreator.writeValueAsString(ingr);
 		}
 		catch(JsonProcessingException jpExp) {
 			jpExp.printStackTrace();
-			return "{\"error\": \"" + jpExp.getMessage() + "\"}";
+			jsonResponse = "{\"error\": \"" + jpExp.getMessage() + "\"}";
 		}		
+		System.out.println("jsonResponse = " + jsonResponse);
+		System.out.println("FINISH");
+		System.out.println("-----------------------");
+		return jsonResponse;
 	}
 	
 	@GetMapping("getIngredients")
@@ -179,6 +188,7 @@ public class IngredientController {
 		}
 		answer.append("]");
 		System.out.println("FINISH");
+		System.out.println("-----------------------");
 		return answer.toString();
 	}
 	
