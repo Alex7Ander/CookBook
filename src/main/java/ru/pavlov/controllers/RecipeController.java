@@ -95,16 +95,22 @@ public class RecipeController {
 	@PostMapping("editMainInfo")
 	@ResponseBody
 	public String editMainInfo(@RequestParam Map<String, String> allParametrs) {
+		System.out.println("-----------------------");
+		System.out.println("In 'editMainInfo'");		
 		Long id = Long.parseLong(allParametrs.get("id"));
+		System.out.println("Recipe id = " + id);
 		allParametrs.remove("id");
 		Recipe recipe = recipeRepo.findById(id);	
 		String response = "{\"wrongFields\":\"[";
 		for(String key : allParametrs.keySet()) {
 			String value = allParametrs.get(key);
+			System.out.println("Editing " + key);
+			System.out.println("New value of field " + key + " is " + value);			
 			try {
 				Field field = recipe.getClass().getDeclaredField(key);
 				field.setAccessible(true);
 				field.set(recipe, value);	
+				System.out.println("New value is setted");
 			}
 			catch(NoSuchFieldException | IllegalAccessException reflExp) {
 				System.out.println("Ошибка при изменении значения поля: " + key);
@@ -114,6 +120,10 @@ public class RecipeController {
 		}
 		response += "]\"}";
 		recipeRepo.save(recipe);
+		System.out.println("Changes is saved");
+		System.out.println("Answer: " + response);
+		System.out.println("FINISH");
+		System.out.println("-----------------------");
 		return response;
 	}
 	
