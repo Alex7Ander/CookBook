@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">	
+	<head>
+		<meta charset="utf-8">
+		<title>Администратор - Пользователи</title>
+		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="../static/styles/style.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/table.css}"  href="../static/styles/table.css" type="text/css">
+		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
+        <link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+	</head>
+
+	<body>
+        <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-2">
+                    <h2>Функции: </h2>
+                    <input type="button" value="На свою страницу пользователя" class="btn btn-secondary" onclick="javascript:document.location.href='/user/show'"><br>
+                    <input type="button" value="Пользователи" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/users'"><br>
+                    <input type="button" value="Рецепты" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/recipes'"><br>
+                    <input type="button" value="Ингредиенты" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/ingredients'"><br>
+                    <input type="button" value="Сообщения" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/reviews'"><br>
+                    <input type="button" value="Отправить email" class="btn btn-secondary" onclick="javascript:document.location.href='/admin/sendmailwindow'"><br>
+                </div>
+                <div class="col-md-5">
+                    <h2>Ингредиенты:</h2>
+                    <form id="searchIngredientsForm" method="get" action="/admin/ingredients">
+                        <p><input type="radio" id="commonRB"  name="common" value="1">Общие</p>
+                        <p><input type="radio" id="privateRB" name="common" value="0">Пользовательские</p>
+                        <p><input type="radio" id="allRB" name="common" value="-1" checked>Все</p>
+                        <input type="submit" value="Искать"><br>
+                    </form>
+                    <table id="commonIngredientsTable" style="width: 100%;">
+                        <tr>
+                            <th class="idcol">id</th> 
+                            <th>Название</th>
+                            <th>Тип</th>
+                            <th>Белки</th>
+                            <th>Жиры</th>
+                            <th>Углеводы</th>
+                            <th>Калорийность</th>
+                        </tr>
+                        <tr th:each="ingredient : ${ingredients}" th:attr="onclick=|loadIngredient('${ingredient.id}')|">
+                            <td class="idcol"><span th:text="${ingredient.id}"></td>
+                            <td><span th:id="${ingredient.id}+_name" th:text="${ingredient.name}"></td>
+                            <td><span th:id="${ingredient.id}+_type" th:text="${ingredient.type}"></td>
+                            <td><span th:text="${ingredient.protein}"></td>
+                            <td><span th:text="${ingredient.fat}"></td>
+                            <td><span th:text="${ingredient.carbohydrate}"></td> 
+                            <td><span th:text="${ingredient.calorie}"></td>
+                        </tr>	
+                    </table>
+                    <nav aria-label="Ingredients search results pages">
+                        <ul class="pagination">
+                            <li class="page-item" th:each="wrapper: ${linkWrappers}">
+                                <a class="page-link" th:href="${wrapper.link}"><div th:text="${wrapper.index}"></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-md-5">
+                    <h4>Редактировать/Сохранение</h4>
+                    <p><input type="radio" id="editChekedRB" name="editRb" value="1">Редактировать</p>
+                    <p><input type="radio" id="saveChekedRB" name="editRb" value="2" checked>Сохранить как новый</p>
+                    <input type="hidden" id="currentIngrId">
+                    <p>Название: </p><input type="text" id="nameEdit"><br>
+                    <p>Тип: </p><input type="text" id="typeEdit"><br>
+                    <p>Белки: </p><input type="text" id="protEdit"><br>
+                    <p>Жиры: </p><input type="text" id="fatEdit"><br>
+                    <p>Углеводы: </p><input type="text" id="carboEdit"><br>
+                    <p>Описание: </p><textarea id="descriptionEdit" rows="12" style="width: 100%;"></textarea><br>
+                    <input type="button" id="saveBtn" value="Сохранить" onclick="saveIngrBtnClick()">
+                    <input type="button" id="deleteBtn" value="Удалить" onclick="deleteIngr()"> <br>
+
+                    <input type="file" id="ingrPhotoLoader" onchange="showNewIngredientPreview();"><br>
+                    <div>
+                        <img style="width: 100%;" id="image">
+                        <div class="spinner-border" role="status" id="spinner_image">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <input id="savePreviewBtn" type="button" value="Сохранить новое превью" onclick="saveNewIngredientPreview();">
+                </div>
+            </div>
+
+            <!-- Waiting Pop up window -->
+            <div class="popup" id="waiting_window">
+                <div class="popup-content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <h1 style="text-align: center;" id="waitingWindowTitle">Заголовок</h1><br>
+                                <div class="d-flex justify-content-center">
+                                    <div class="spinner-border" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </div>	
+                </div>
+            </div>
+        </div>        
+
+        <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        
+        <script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>
+        <script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
+        <script th:src="@{/js/adminpage.js}" src="../static/js/adminpage.js"></script>
+        <script th:src="@{/js/ingredientsPageScripts.js}" src="../static/js/ingredientsPageScripts.js"></script>
+    </body>
+
+</html>

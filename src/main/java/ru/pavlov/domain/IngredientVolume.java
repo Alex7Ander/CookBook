@@ -65,7 +65,9 @@ public class IngredientVolume {
 	public void setResultCalorie(Double resultCalorie) {
 		this.resultCalorie = resultCalorie;
 	}
-	
+	public Recipe getRecipe() {
+		return recipe;
+	}
 	@Override
 	public boolean equals(Object o) {
 		try {
@@ -81,4 +83,6 @@ public class IngredientVolume {
 			return false;
 		}
 	}
+
+
 }

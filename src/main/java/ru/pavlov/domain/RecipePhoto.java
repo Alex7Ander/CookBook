@@ -13,14 +13,13 @@ import javax.persistence.Table;
 public class RecipePhoto {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	
+	private Long id;	
 	private String photoPath;
-	private String downloadedPhotoPath;
-
 	@ManyToOne
 	@JoinColumn(name="recipeId")
 	private Recipe recipe;
+	private boolean isPreview;
+	
 	
 	public RecipePhoto() {}
 	
@@ -53,11 +52,11 @@ public class RecipePhoto {
 		this.recipe = recipe;
 	}
 
-	public String getDownloadedPhotoPath() {
-		return downloadedPhotoPath;
+	public boolean isPreview() {
+		return isPreview;
 	}
 
-	public void setDownloadedPhotoPath(String downloadedPhotoPath) {
-		this.downloadedPhotoPath = downloadedPhotoPath;
+	public void setPreview(boolean isPreview) {
+		this.isPreview = isPreview;
 	}	
 }

@@ -9,6 +9,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">	
 		<link rel="stylesheet" th:href="@{/styles/bootstrap_elements.css}"  href="../static/styles/bootstrap_elements.css" type="text/css">
+		<style>
+			.notVisible{
+				display: none;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -57,7 +62,7 @@
 					<b class="label"> Название:</b> <b> <span id="name" th:text="${recipe.name}"> - </span> </b><br>
 					<b class="label"> Категория:</b> <b><span id="type" th:text="${recipe.type}"> - </span></b><br>
 					<b class="label"> Слоган:</b> <b><span id="tagline" th:text="${recipe.tagline}"> - </span></b><br>	
-					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> - </a><br>					
+					<b class="label"> Ссылка на youtube:</b> <a id="youtubeLink" th:href="${recipe.youtubeLink}" name="Ссылка"> youtube link </a><br>					
 				</div>
 				<div class="col-md-9">
 					<h4>Ингредиенты</h4><br>
@@ -68,24 +73,29 @@
 							<th>Калорийность (гр/мл)</th>
 							<th></th>
 						</tr>		
-						<tr th:each="ingredientVolume : ${ingredientsVolumes}">
+						<tr th:each="ingredientWrapper : ${ingredientsVolumesWrappers}">
+							<!--Имя и id рецепта-->
 							<td>
-								<span th:text="${ingredientVolume.getName()}"></span>
-								<input type="hidden" th:id="${ingredientVolume.id}">
+								<span th:text="${ingredientWrapper.getName()}"></span>
+								<input type="hidden" th:id="${ingredientWrapper.getId()}">
 							</td>
+							<!--Количество-->
 							<td>
-								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
-								<input type="text" hidden="true" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${recipe.id}', '${ingredientVolume.id}')|">
+								<b th:id="${ingredientWrapper.getId()}+Volume" th:text="${ingredientWrapper.getVolume()}" th:attr="onclick=|showVolumeTextField('${ingredientWrapper.getId()}')|"></b>
+								<input type="text" th:id="${ingredientWrapper.getId()}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientWrapper.getId()}')|">
 							</td>
+							<!--Калорийность с учетом количества рецепта-->
 							<td>
-								<input type="hidden" th:id="${ingredientVolume.id}+CalorieFactor" th:value="${ingredientVolume.getIngredient().calorie}">
-								<b th:id="${ingredientVolume.id}+Calorie" th:text="${ingredientVolume.resultCalorie}"></b>
+								<b th:id="${ingredientWrapper.getId()}+Calorie" th:text="${ingredientWrapper.getResultCalorie()}"></b>
 							</td>
-							<td><input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${recipe.id}', '${ingredientVolume.id}')|" value="Удалить"></td>
+							<!--Кнопка удаления-->
+							<td>
+								<input type="button" th:if="${editable}" th:id="${ingredientWrapper.getId()}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientWrapper.getId()}')|" value="Удалить">
+							</td>
 						</tr>
 						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
 					</table>
-					<b class="label">Итоговая калорийность: </b> <b th:text="${totalRecipeCalorie}"> - </b><br>	
+					<b class="label">Итоговая калорийность: </b> <b id="total_calorie" th:text="${totalResultCalorie}"> - </b><br>	
 
 					<h4> Процедура приготовления:</h4><br>
 					<b><span id="text" th:text="${recipe.text}"> - </span></b>
@@ -94,15 +104,34 @@
 
 			<!-- Photo cards -->			
 			<div class="row" id="photoList">				
-				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_ + ${photo.id}">
+				<div class="card" th:each="photo : ${recipePhotos}" th:id="photoCard_+${photo.id}">
 					<div class="card-body">
-						<img class="d-block w-100" th:src="${photo.getDownloadedPhotoPath()}" alt="no photo" th:attr="onclick=|showCarouselWindow('${photo.id}')|">
+						<input type="hidden" th:id="photoPath_+${photo.id}" th:value="${photo.id}">
+						<div class="d-flex justify-content-center" >
+							<div class="spinner-border" role="status" th:id="spinner_+${photo.id}">
+							  <span class="sr-only">Loading...</span>
+							</div>
+						</div>
+						<div>
+							<img class="d-block w-100" th:id="img_+${photo.id}" th:attr="onclick=|showCarouselWindow('${photo.id}')|"><br>
+							<label>
+								<input type="radio" name="previewRb" th:value="${photo.id}" th:attr="onclick=|setPhotoAsPreviewForRecipe('${photo.id}')|">
+								Установить как обложку для рецепта
+							</label>
+						</div>
 						<input th:if="${editable}" type="button" class="btn btn-primary" value="Удалить" th:attr="onclick=|deletePhoto('${photo.id}')|">
 					</div>
 				</div>
 			</div>
-			<div th:if="${editable}" class="row">
+			<div class="row" th:if="${editable}" >
 				<input type="button" value="Добавить фото" class = "dws-btn" onclick="showPhotoUploadWindow();">
+			</div>
+
+			<div class="row" th:if="${editable}">
+				<div class="col-md-9"></div>
+				<div class="col-md-3">
+					<button type="button" class="btn btn-link" onclick="deleteRecipe()">Удалить рецепт</button>
+				</div>
 			</div>			
 		</div>
 
@@ -114,8 +143,13 @@
 					<div class="col-md-10">				
 						<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner"> 
-								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="${photo.id} + Slide">
-									<img class="d-block w-100" th:src="${photo.getDownloadedPhotoPath()}" th:alt="${photo.photoPath}">
+								<div class="carousel-item" th:each="photo : ${recipePhotos}" th:id="slide_+${photo.id}">									
+									<div class="d-flex justify-content-center">
+										<img th:id="carousel_img_+${photo.id}" th:alt="${photo.photoPath}"> 
+										<div class="spinner-border" role="status" th:id="carousel_spinner_+${photo.id}">
+											<span class="sr-only">Loading...</span>
+										</div>
+									</div>
 								</div>						
 							</div>
 							<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
@@ -206,7 +240,7 @@
 								<b>Углеводы:</b><br>
 								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр"><br>
 								<b>Описание:<b></br>
-								<textarea id= "newIngrDesription" name= "descr" cols=20 rows=7> - </textarea><br>
+								<textarea id= "newIngrDesription" name= "descr" rows=7 style="width: 100%;"> - </textarea><br>
 								<a href="javascript:addNewIngredienttoRecipe()">Сохранить новый и добавить его к рецепту</a>
 								/
 								<a href="javascript:hideAddIngredientWindow()">Отмена</a>
@@ -224,8 +258,9 @@
 					<div class="row">
 						<div class="col-md-3">
 							<form action="" method="get" enctype="multipart/form-data">
-								<input type="file" class= "btn btn-primary" id="photoLoader" value="Загрузить фото" onchange="getCurrentlyUploadedPhoto()">
-								<input type="button" class= "dws-btn" value="Добавить фото" onclick="addPhotoToPhotoList(event);"> 
+								<input type="file" class= "notVisible" id="photoLoader" value="input file" onchange="getCurrentlyUploadedPhoto(event)">
+								<label for="photoLoader" class="dws-btn">Выберите файл</label>
+								<input type="button" class="dws-btn" value="Загрузить фото" onclick="addPhotoToPhotoList(event);">
 								<a href="javascript:hidePhotoUploadWindow()"> Отмена </a>
 							</form>
 						</div>
@@ -237,15 +272,35 @@
 			</div>
 		</div>
 
+		<!-- Waiting Pop up window -->
+		<div class="popup" id="waiting_window">
+			<div class="popup-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-3"></div>
+						<div class="col-md-6">
+							<h1 style="text-align: center;" id="waitingWindowTitle">Заголовок</h1><br>
+							<div class="d-flex justify-content-center">
+								<div class="spinner-border" role="status">
+								  <span class="sr-only">Loading...</span>
+								</div>
+							  </div>
+						</div>
+						<div class="col-md-3"></div>
+					</div>
+				</div>	
+			</div>
+		</div>
+
 		<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
+		<script th:src="@{/js/loadphotos.js}"			src="../static/js/loadphotos.js"></script>
 		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
 		<script th:src="@{/js/recipe.js}"       		src="../static/js/recipe.js" ></script>
 		<script th:src="@{/js/ingredient.js}"   		src="../static/js/ingredient.js"></script>	
 		<script th:src="@{/js/ingredientVolume.js}"   	src="../static/js/ingredientVolume.js"></script>			
 			
 	</body>
-	
 </html>

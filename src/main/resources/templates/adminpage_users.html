@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">	
 	<head>
 		<meta charset="utf-8">
-		<title>Рецепт</title>
+		<title>Администратор - Пользователи</title>
 		<link rel="stylesheet" th:href="@{/styles/style.css}"  href="../static/styles/style.css" type="text/css">
 		<link rel="stylesheet" th:href="@{/styles/table.css}"  href="../static/styles/table.css" type="text/css">
 		<link rel="stylesheet" th:href="@{/styles/popup.css}" href="../static/styles/popup.css" type="text/css">
@@ -12,6 +12,7 @@
 	</head>
 
 	<body>
+        <h1>Администратор - Пользователи - CookBook v 0.1.4 </h1>
         <div class="container-fluid">
 			<div class="row">
 				<div class="col-md-2">
@@ -29,20 +30,22 @@
                     <table id="ingrTable">
                         <tr>
                             <th class="idcol">id</th> 
-                            <th>Имя</th>
-                            <th>Фамилия</th>
+                            <th>Логин</th>
+                            <th>Пароль</th>
+                            <th>E-mail</th>
                         </tr>
                         <tr th:each="user : ${users}" th:attr="onclick=|loadUser('${user.id}')|">
                             <td class="idcol"><span th:text="${user.id}"></td>
-                            <td><span th:text="${user.name}"></td>
-                            <td><span th:text="${user.surname}"></td> 
+                            <td><span th:text="${user.userLoginName}"></td>
+                            <td><span th:text="${user.password}"></td>
+                            <td><span th:text="${user.email}"></td> 
                         </tr>	
                     </table>
                 </div>
                 <div class="col-md-6">
                     <h2>Информация: </h2>
                     <b>online: </b> <b></b> <br>
-                    <input type="hidden" id="id">
+                    <input type="hidden" id="userId">
                     <b>Имя: </b> <b id="name"> - </b> <br>
                     <b>Фамилия: </b> <b id="surname"> - </b> <br>
                     <b>Логин: </b> <b id="login"> - </b> <br>
@@ -51,9 +54,8 @@
                     <b>Темперамент: </b> <b id="temperament"> - </b> <br>
                     <b>email: </b> <b id="email"> - </b> <br>
                     <b>Телефон: </b> <b id="phone"> - </b> <br>
-                    <input type="button" value="Редактировать">
-                    <input type="button" value="В бан">
-                    <input type="button" value="Удалить">
+                    <input type="button" value="Редактировать" style="width: 100%;"> <br>
+                    <input type="button" value="Удалить" style="width: 100%;" onclick="deleteUser();"> <br>                   
                 </div>
             </div>
         </div>
@@ -82,7 +84,25 @@
 			</div>
         </div>
         
-
+        <!-- Waiting Pop up window -->
+        <div class="popup" id="waiting_window">
+            <div class="popup-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            <h1 style="text-align: center;" id="waitingWindowTitle">Заголовок</h1><br>
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                </div>	
+            </div>
+        </div>
         <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>

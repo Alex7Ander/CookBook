@@ -4,7 +4,7 @@ public class YandexDiskInternalException extends YandexDiskException{
 	private static final long serialVersionUID = 1L;
 
 	YandexDiskInternalException(String code) {
-		super("������ �� ������� �������. ��� ������: " + code);
+		super("yandex disk error code: " + code);
 	}
 
 }

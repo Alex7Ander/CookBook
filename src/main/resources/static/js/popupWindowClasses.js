@@ -87,7 +87,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
             alert("Одно из введенных Вами значений БЖУ не является числом")
         }
         else{
-            var ingr = new ingredient("-", name, type, descr, prot, fat, carbo);
+            var ingr = new Ingredient("-", name, type, descr, prot, fat, carbo, false);
             var savingMessage = ingr.save();
             if (ingr.isSaved()) {
                 try{
@@ -103,7 +103,7 @@ class IngredientsPopUpWindow extends PopUpWindow{
         }
     }
     addExistingIngrToRecipe(){
-        var ingr = new ingredient();
+        var ingr = new Ingredient();
         var selectedType = $('#ingrType').val();
         var selectedName = $('#ingrName').val();
         ingr.getDataFromServer(selectedName, selectedType);
@@ -190,6 +190,17 @@ class CarouselPopUpWindow extends PopUpWindow{
 
 class AddNewUserPopUpWindow extends PopUpWindow{
     constructor(id){
+        super(id);      
+    }
+}
+
+class WaitingPopUpWindow extends PopUpWindow{
+    constructor(id){
         super(id);
+        this.title = $('#waitingWindowTitle');
+    }
+
+    setTitle(titleText){
+        this.title.text(titleText);
     }
 }

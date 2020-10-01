@@ -1,11 +1,18 @@
 package ru.pavlov.domain;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +29,7 @@ public class Ingredient {
 		this.protein = protein;
 		this.fat = fat;
 		this.carbohydrate = carbohydrate;
-		this.calorie = this.fat * 9 + this.protein * 4 + this.carbohydrate * 4;
+		this.calorie = (double)Math.round((this.fat * 9 + this.protein * 4 + this.carbohydrate * 4)*100) / 100;
 	}
 	
 	@Id
@@ -32,24 +39,35 @@ public class Ingredient {
 	@ManyToOne
 	@JoinColumn(name="userId")
 	@JsonIgnore
-	private User user;
-	
+	private User user;	
+
 	private String name;
 	private String type;
+	
 	@JsonProperty("descr")
+	@Lob
 	private String description;
+	
 	@JsonProperty("prot")
 	private double protein;
+	
 	private double fat;
+	
 	@JsonProperty("carbo")
 	private double carbohydrate;
 
 	private double calorie;
-
 	private boolean common;
+	private String previewPhotoName;
 	
-
+	@OneToMany(mappedBy="ingredient", fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonIgnore
+	private List<IngredientVolume> volumes;
 	
+	@Column(name = "image", columnDefinition="longblob", length=2*1024*1024*1024)
+    @Lob()
+	private byte[] image;
+		
 	public Long getId() {
 		return id;
 	}
@@ -109,6 +127,18 @@ public class Ingredient {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public byte[] getImage() {
+		return image;
+	}
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+	public String getPreviewPhotoName() {
+		return previewPhotoName;
+	}
+	public void setPreviewPhotoName(String previewPhotoName) {
+		this.previewPhotoName = previewPhotoName;
 	}
 
 }

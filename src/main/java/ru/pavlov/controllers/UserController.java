@@ -1,8 +1,5 @@
 package ru.pavlov.controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,57 +51,30 @@ public class UserController {
 	
 	private String curentIngrType = null;
 	private List<Ingredient> newRecipeIngredients = new ArrayList<>();
-	//private Map<Integer, byte[]> newRecipePhotos = new HashMap<>();
 		
 	@GetMapping("show")
 	public String user(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, Model model){
 		User currentUser = currentUserDetails.getUser();
-		model.addAttribute("user", currentUser);
-		
-		String avatarImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
-        try(FileOutputStream fos=new FileOutputStream(avatarImageFilePath))
-        {
-        	byte[] avatarImageByteArray = currentUser.getImage();
-        	if(avatarImageByteArray != null) {
-        		fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
-                String avatarFileName = currentUser.getName() + "_avatar.jpg";
-                model.addAttribute("avatarPath", avatarFileName);
-        	}          
-        }
-        catch(IOException ioExp){              
-            System.out.println(ioExp.getMessage());
-        }	
-        
-        Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);       
-        for(Recipe recipe : recipes) {
-			String previewImageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + recipe.getName() + "_preview.jpg";
-	        try(FileOutputStream fos = new FileOutputStream(previewImageFilePath)) {
-	        	byte[] previewImageByteArray = recipe.getPreviewImage();
-	        	if(previewImageByteArray != null) {
-	        		fos.write(previewImageByteArray, 0, previewImageByteArray.length);
-	        	}
-	        	else{
-	        		String noImagePath = new File(".").getAbsolutePath() + "/target/classes/static/img/noimg.png";
-	        		FileInputStream fis = new FileInputStream(noImagePath);
-	        		int b = -1;
-	        		List<Byte> bytes = new ArrayList<>();
-	        		while((b = fis.read()) != -1) {
-	        			bytes.add((byte) b);
-	        		}
-	        		previewImageByteArray = new byte[bytes.size()];
-	        		for(int i = 0; i < bytes.size(); i++) {
-	        			previewImageByteArray[i] = bytes.get(i);
-	        		}	        		
-	        		fis.close();
-	        	} 
-	        	fos.write(previewImageByteArray, 0, previewImageByteArray.length);
-	        }
-	        catch(IOException ioExp) {              
-	            System.out.println(ioExp.getMessage());
-	        }
-        }		
+		model.addAttribute("user", currentUser);	
+		if(currentUser.getActivationCode() == null) {
+			System.out.println("Activation code is null. User is activated");
+			model.addAttribute("activated", true);
+		} 
+		else {
+			System.out.println("Activation code is " + currentUser.getActivationCode() + ". User is NOT activated");
+			model.addAttribute("activated", false);
+		}
+		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
 		return "user";
+	}
+	
+	@GetMapping("loadAvatar")
+	@ResponseBody
+	public byte[] loadAvatar(@RequestParam long userId) {
+		User user = this.userRepo.findById(userId);
+		byte[] avatarByteArray = user.getImage();
+		return avatarByteArray;
 	}
 	
 	@GetMapping("editpage")
@@ -130,15 +100,7 @@ public class UserController {
 		if (phone != ValueConstants.DEFAULT_NONE) currentUser.setPhone(phone);
 		if(avatar != null && avatar.getBytes().length != 0) {
 			byte[] avatarImageByteArray = avatar.getBytes();
-			currentUser.setImage(avatarImageByteArray);			
-			String imageFilePath = new File(".").getAbsolutePath() + "/target/classes/static/img/" + currentUser.getName() + "_avatar.jpg";
-	        try(FileOutputStream fos=new FileOutputStream(imageFilePath))
-	        {              
-	            fos.write(avatarImageByteArray, 0, avatarImageByteArray.length);
-	        }
-	        catch(IOException ioExp){              
-	            System.out.println(ioExp.getMessage());
-	        }	
+			currentUser.setImage(avatarImageByteArray);				
 		}
         String avatarFileName = currentUser.getName() + "_avatar.jpg";
         model.addAttribute("avatarPath", avatarFileName);
@@ -146,10 +108,17 @@ public class UserController {
 		model.addAttribute("user", currentUser);
 		Iterable<Recipe> recipes = recipeRepo.findByRecipeAuther(currentUser);
 		model.addAttribute("recipes", recipes);
+		if(currentUser.getActivationCode() == null) {
+			System.out.println("Activation code is null. User is activated");
+			model.addAttribute("activated", true);
+		} 
+		else {
+			System.out.println("Activation code is " + currentUser.getActivationCode() + ". User is NOT activated");
+			model.addAttribute("activated", false);
+		}
 		return "user";
 	}
-	
-	//AJAX 	
+		
 	@PostMapping("getIngrList")
 	public String getIngrList(@RequestParam String type, Model model) {
 		
@@ -179,12 +148,11 @@ public class UserController {
 		model.addAttribute("ingredients", ingredients);
 		ObjectMapper jsonCreator = new ObjectMapper();
 		try {
-			String jsonResponse = jsonCreator.writeValueAsString(ingr);
-			return jsonResponse;
+			return jsonCreator.writeValueAsString(ingr);
 		}
 		catch(JsonProcessingException jpExp) {
 			System.out.println(jpExp.getMessage());
-			return "{name:'Error'}";
+			return "{\"name\": \"Error\"}";
 		}		
 	}
 		
@@ -200,14 +168,15 @@ public class UserController {
 	}
 	
 	@PostMapping("saveReview")
-	public String saveReview(@AuthenticationPrincipal CookBookUserDetails currentUserDetails,
-							 @RequestParam String reviewText) {
+	@ResponseBody
+	public String saveReview(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String reviewText) {
 		User user = currentUserDetails.getUser();
 		Review review = new Review();
 		review.setText(reviewText);
 		review.setUserId(user.getId());
 		reviewRepo.save(review);
-		return "user";
+		
+		return "{\"done\": \"true\"}";
 	}
 	
 }

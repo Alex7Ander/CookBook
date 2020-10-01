@@ -1,7 +1,7 @@
 package ru.pavlov.domain;
 import java.util.List;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +12,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "recipelist")
@@ -24,21 +26,20 @@ public class Recipe {
 	private String name;
 	private String type;
 	private String tagline;
+	@Lob
 	private String text;
 	private String youtubeLink;
 	private String photoFolder;
-	
-	@Column(name = "preview_image", columnDefinition="longblob", length=2*1024*1024*1024)
-    @Lob()
-	private byte[] previewImage;	
 	
 	@ManyToOne
 	@JoinColumn(name="userId")
 	private User recipeAuther;
 	
-	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
+	@JsonIgnore
+	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY, cascade=CascadeType.ALL) //
 	private List<IngredientVolume> ingredients;
 	
+	//@JsonIgnore
 	@OneToMany(mappedBy="recipe", fetch = FetchType.LAZY)
 	private List<RecipePhoto> photos;
 		
@@ -125,11 +126,4 @@ public class Recipe {
 		this.photoFolder = photoFolder;
 	}
 
-	public byte[] getPreviewImage() {
-		return previewImage;
-	}
-
-	public void setPreviewImage(byte[] previewImage) {
-		this.previewImage = previewImage;
-	}		
 }

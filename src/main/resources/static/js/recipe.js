@@ -1,9 +1,11 @@
 var newPhotoCount = 0;
+var newIngrCount = 0;
 
 var editRecipeMainInfoWindow;
 var addIngredientWindow;
 var photoUploadWindow;
 var carouselWindow;
+var waitingWindow;
 
 var currentCaruselActiveSlide;
 
@@ -12,11 +14,15 @@ $(document).ready(function(){
 	addIngredientWindow = new IngredientsPopUpWindow("add_ingr_popup", addIngrToTable);
 	photoUploadWindow = new PhotoUploadPopUpWindow("add_photo_popup");	
 	carouselWindow = new CarouselPopUpWindow("carousel_recipe_photos");
+	waitingWindow = new WaitingPopUpWindow("waiting_window");
 	//Hide PopUp windows
 	editRecipeMainInfoWindow.hideWindow();
 	addIngredientWindow.hideWindow();
 	photoUploadWindow.hideWindow();
 	carouselWindow.hideWindow();
+	waitingWindow.hideWindow();
+
+	$("input[id$='VolumeTextField']").each(function(){$(this).hide();});
 });
 
 /*Working with main info*/
@@ -49,7 +55,6 @@ function hideEditRecipeMainInfoWindow(){
 	this.editRecipeMainInfoWindow.hideWindow();
 }
 
-
 /* Working with ingredients list */
 function showAddIngredientWindow(){
 	addIngredientWindow.showWindow();
@@ -64,7 +69,8 @@ function addNewIngredienttoRecipe(){
 	addIngredientWindow.saveNewIngredient();
 }
 
-function addIngrToTable(ingredientVolume){ 
+function addIngrToTable(ingredient){ 
+	newIngrCount++;
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
 
@@ -74,20 +80,19 @@ function addIngrToTable(ingredientVolume){
 	//Поле с количеством ингредиента и поле для редактирования
 	var volumeTextField = document.createElement('input');
 	volumeTextField.setAttribute("type", "text");
-	volumeTextField.id = ingredientVolume.ingrId + "VolumeTextField";
+	volumeTextField.id = "new" + newIngrCount + "VolumeTextField";
 	volumeTextField.oninput = function() {
-		resultCalorificValueField.innerText = ingredientVolume.calorie * volumeTextField.value / 100;
+		resultCalorificValueField.innerText = ingredient.calorie * volumeTextField.value / 100;
 	}
 	var volumeLabel = document.createElement('b');
-	volumeLabel.hidden= true;
-	volumeLabel.id = ingredientVolume.ingrId + "Volume";
+	volumeLabel.id = "new" + newIngrCount + "Volume";
 
 	//Кнопка удаления ингредиента
 	var deleteBtn = document.createElement('input'); 
 	deleteBtn.setAttribute("type", "button");
 	deleteBtn.setAttribute("value", "Удалить");
-	deleteBtn.setAttribute("id", ingredientVolume.ingrId + "DeleteBtn");
-	deleteBtn.onclick = function(){
+	deleteBtn.setAttribute("id", "new" + newIngrCount + "DeleteBtn");
+	deleteBtn.onclick = function(event){
 		event.target.parentNode.parentNode.remove();
 	}
 
@@ -96,15 +101,16 @@ function addIngrToTable(ingredientVolume){
 	saveBtn.setAttribute("type", "button");
 	saveBtn.setAttribute("value", "Сохранить");
 	var recipeId = document.getElementById("recipeId").value;
-	saveBtn.onclick = function(){
-		saveIngredientInRecipe(recipeId, ingredientVolume.ingrId, volumeTextField.value);
+	saveBtn.onclick = function(event){
+		saveIngredientInRecipe(newIngrCount, recipeId, ingredient.id, volumeTextField.value);
 		event.target.parentNode.remove();		
 	}
 
 	var col1 = document.createElement("TD");
-	col1.appendChild(document.createTextNode(ingredientVolume.name));
+	col1.appendChild(document.createTextNode(ingredient.name));
 	var col2 = document.createElement("TD");
 	col2.appendChild(volumeTextField);
+	col2.appendChild(volumeLabel);
 	var col3 = document.createElement("TD");
 	col3.appendChild(resultCalorificValueField);
 	var col4 = document.createElement("TD");
@@ -119,72 +125,104 @@ function addIngrToTable(ingredientVolume){
 	row.appendChild(col5);
 	tbody.appendChild(row);
 }
-function saveIngredientInRecipe(recipeId, ingredientId, volume){
+
+function saveIngredientInRecipe(newIngrIndex, recipeId, ingredientId, volume){
 	var ingredientData = new FormData();
 	ingredientData.append("recipeId", recipeId);
 	ingredientData.append("ingredientId", ingredientId);
 	ingredientData.append("volume", volume);
 	$.ajax({type: "POST", url: "/recipe/addExistingIngredient", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет добавление ингредиента");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {	
 				//Переназначение кнопок
 				var ingredientVolumeId = respond.ingredientVolumeId;
-				var deleteBtn = $("#" + ingredientVolumeId + "DeleteBtn");
-				deleteBtn.bind('click', deleteIngredient);
-				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
-				$("#" + ingredientVolumeId + "Volume").bind('click', showVolumeTextField);
-				$("#" + ingredientVolumeId + "VolumeTxtField").attr('hidden', true);
-				$("#" + ingredientVolumeId + "VolumeTxtField").bind('change', changeIngredientVolume);
-				alert('Игредиент успешно добавлен');						
+				//кнопка удаление
+				var deleteBtn = $("#new" + newIngrIndex + "DeleteBtn");
+				deleteBtn.on('click', function(){
+					deleteIngredient(ingredientVolumeId);
+				});
+				deleteBtn.attr('id', ingredientVolumeId + "DeleteBtn");
+				//текстовое поле с количеством ингредиента
+				var volumeTxtField=$("#new" + newIngrIndex + "VolumeTextField");
+				volumeTxtField.on('change', function(){
+					changeIngredientVolume(ingredientVolumeId);
+				});	
+				volumeTxtField.attr('id', ingredientVolumeId + "VolumeTextField");
+				volumeTxtField.hide();
+				//кол-во ингредиента в теге b
+				var volumeLabel = $("#new" + newIngrIndex + "Volume");
+				volumeLabel.on('click', function(){
+					showVolumeTextField(ingredientVolumeId);
+				});
+				volumeLabel.attr('id', ingredientVolumeId + "Volume");
+				volumeLabel.text(volumeTxtField.val());
+				volumeLabel.attr('hidden', false);
+
+				$("#total_calorie").text(respond.totalCalorie);						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
 			alert(respond.responseText);
 			alert('Ошибка при добавлении ингердиента на сервере: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();			
 		}
 	});
 }
-function deleteIngredient(recipeId, ingredientVolumeId){	 
+function deleteIngredient(ingredientVolumeId){	 
 	var ingredientData = new FormData();
-	ingredientData.append("recipeId", recipeId);
 	ingredientData.append("ingredientVolumeId", ingredientVolumeId);
 	var response = $.ajax({type: "POST", url: "/recipe/deleteIngredient", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
+			waitingWindow.showWindow();
+		},	
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {
 				$("#" + ingredientVolumeId).closest("tr").remove();
-				alert('Игредиент успешно удален');						
+				$("#total_calorie").text(respond.totalCalorie);						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
 			alert('Ошибка при удалении ингердиента на сервере: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();			
 		}
 	});
-	var recipeInfo = JSON.parse(response.responseText);
-
 }
 function showVolumeTextField(ingredientVolumeId){
-	$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', false);
+	$("#" + ingredientVolumeId + "VolumeTextField").show();
 	var value = $("#" + ingredientVolumeId + "Volume").text();
 	$("#" + ingredientVolumeId + "VolumeTextField").attr('value', value);
-	$("#" + ingredientVolumeId + "Volume").attr('hidden', true);
+	$("#" + ingredientVolumeId + "Volume").hide();
 }
-function changeIngredientVolume(recipeId, ingredientVolumeId){	
+function changeIngredientVolume(ingredientVolumeId){	
 	var newValue = $("#" + ingredientVolumeId + "VolumeTextField").prop("value");
+	var re = '/./g';
+	newValue.replace(re, '.');
 	if (isNaN(newValue)==true){
 		alert("Вы ввели значение, не являющееся числом");
 	}
 	else{
 		var ingredientData = new FormData(); 
-		ingredientData.append("recipeId", recipeId);
 		ingredientData.append("ingredientVolumeId", ingredientVolumeId);
 		ingredientData.append("newValue", newValue);
 		$.ajax({type: "POST", url: "/recipe/editIngredientVolume", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
-			success: function(respond, status, jqXHR) {``
+			beforeSend: function(){
+				waitingWindow.setTitle("Ожидайте, идет редактирование количества ингредиента");
+				waitingWindow.showWindow();
+			},
+			success: function(respond, status, jqXHR) {
 				if (typeof respond.error === 'undefined') {	
 					$("#" + ingredientVolumeId + "Volume").text(newValue);
-					var calorieFactor = $("#" + ingredientVolumeId + "CalorieFactor").prop("value");
-					var calorieValue = calorieFactor * newValue / 100;
-					$("#" + ingredientVolumeId + "Calorie").text(calorieValue);						
+					$("#" + ingredientVolumeId + "Calorie").text(respond.calorie);
+					$("#total_calorie").text(respond.totalCalorie);									
 				}
 				else {
 					alert('Ошибка при редактирования значения на сервере: ' + respond.data);
@@ -194,8 +232,9 @@ function changeIngredientVolume(recipeId, ingredientVolumeId){
 				alert('Ошибка при редактирования значения на сервере: ' + status);
 			},
 			complete: function(){
-				$("#" + ingredientVolumeId + "Volume").attr('hidden', false);
-				$("#" + ingredientVolumeId + "VolumeTextField").attr('hidden', true);
+				$("#" + ingredientVolumeId + "VolumeTextField").hide();
+				$("#" + ingredientVolumeId + "Volume").show();
+				waitingWindow.hideWindow();	
 			}
 		});
 	}
@@ -203,10 +242,6 @@ function changeIngredientVolume(recipeId, ingredientVolumeId){
 function getIngrListFromServer(){
 	addIngredientWindow.getIngrListFromServer();
 }
-function setTotalCalorie(){
-
-}
-
 
 /* 
 	Working with photos 
@@ -226,11 +261,20 @@ function getCurrentlyUploadedPhoto(){
 }
 
 function addPhotoToPhotoList(event){
+	if(currentlyUploadedPhoto.size >= 10 * 1048576){
+		alert("Размер фото превышает максимально допустимый (10 мб)");
+		return;
+	}
 	event.stopPropagation(); // остановка всех текущих JS событий
 	event.preventDefault();  // остановка дефолтного события для текущего элемента
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
-	$.ajax({type: "POST", url: "/recipe/sendPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/sendPhoto", mimeType: "multipart/form-data", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет отправка фотографии");
+			photoUploadWindow.hideWindow();
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				newPhotoCount++;
@@ -245,7 +289,7 @@ function addPhotoToPhotoList(event){
 			alert('Не удалось загрузить фото: ' + status);
 		},
 		complete: function(){
-			photoUploadWindow.hideWindow();
+			waitingWindow.hideWindow();			
 		}
 	});
 } 
@@ -298,6 +342,10 @@ function showUploadedPhotoOnMainPage(code){
 		var photoData = new FormData();
 		photoData.append("code", code);
 		$.ajax({type: "POST", url: "/recipe/dropUnsavedPhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+			beforeSend: function(){
+				waitingWindow.setTitle("Ожидайте, идет удаление ингредиента");
+				waitingWindow.showWindow();
+			},	
 			success: function(respond, status, jqXHR){
 				if( typeof respond.error === 'undefined' ){
 					newPhotoCard.remove();					
@@ -308,6 +356,9 @@ function showUploadedPhotoOnMainPage(code){
 			}, 
 			error: function(respond, status, jqXHR){
 				alert('Не удалось удалить фото: ' + status);
+			},
+			complete: function(){
+				waitingWindow.hideWindow();
 			}
 		});
 	}
@@ -319,16 +370,39 @@ function saveNewPhoto(code){
 	photoData.append("recipeId", $("#recipeId").val());
 	photoData.append("code", code);
 	$.ajax({type: "POST", url: "/recipe/saveUnsavedePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет сохранение новой фотографии");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				alert("Фото успешно сохранено");
 				var newPhotoId = respond.id;
+				
 				$("#saveBtn"+code).remove();
-				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);
-				$("#deleteBtn" + code).val("Удалить");
-				$("#deleteBtn" + code).on('click', function() {					
+				var previewLabel = document.createElement('label');
+				var previewInput = document.createElement('input');
+				previewInput.type = "radio";
+				previewInput.value = code;
+				previewInput.name = "previewRb";	
+				previewInput.onclick = function(){
+					setPhotoAsPreviewForRecipe(respond.id);
+				}
+				previewLabel.append(previewInput);
+				previewLabel.append("Установить как обложку для рецепта");
+				$("#photoCard_" + code).append(previewLabel);
+
+				$("#deleteBtn" + code).remove();
+				var newDeleteBtn = document.createElement('input');
+				newDeleteBtn.type = "button";
+				newDeleteBtn.value = "Удалить";
+				newDeleteBtn.id = "deleteBtn" + code;
+				newDeleteBtn.className = "btn btn-primary";
+				newDeleteBtn.onclick = function(){
 					deletePhoto(newPhotoId);
-				});							
+				};
+				$("#photoCard_" + code).append(newDeleteBtn);
+				$("#photoCard_" + code).attr("id", "photoCard_" + newPhotoId);						
 			}
 			else {
 				console.log(respond.error);
@@ -337,6 +411,9 @@ function saveNewPhoto(code){
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось сохранить фото: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
 		}
 	});
 }
@@ -346,29 +423,85 @@ function deletePhoto(photoId){
 	photoData.append("recipeId", $("#recipeId").val());
 	photoData.append("photoId", photoId);
 	$.ajax({type: "POST", url: "/recipe/deletePhoto", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление фотографии");
+			waitingWindow.showWindow();
+		},
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				alert("Фото успешно удалено");
 				$("#photoCard_" + photoId).remove();							
 			}
 			else{
-				console.log(respond.error);
 				alert('Ошибка удаления фотографии:' + respond.error + '.\nПовторите попытку.');
 			}
 		}, 
 		error: function(respond, status, jqXHR){
 			alert('Не удалось удалить фото: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
+		}
+	});
+}
+
+function setPhotoAsPreviewForRecipe(id){
+	var photoData = new FormData();
+	photoData.append('recipeId',  $("#recipeId").val());
+	photoData.append('photoId', id);
+	$.ajax({type: "POST", url: "/recipe/setPreview", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет установка превью для рецепта");
+			waitingWindow.showWindow();
+		},
+		success: function(respond, status, jqXHR){
+			if(! typeof respond.error === 'undefined' ){
+				alert('Не удалось установить превью для рецепта: ' + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось установить превью для рецепта: ' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
 		}
 	});
 }
 
 function showCarouselWindow(photoId){
 	carouselWindow.showWindow();
-	currentCaruselActiveSlide = $("#" + photoId + "Slide");
+	currentCaruselActiveSlide = $("#slide_" + photoId);
 	currentCaruselActiveSlide.addClass("active");
 }
 function hideCarouselWindow(){
 	carouselWindow.hideWindow();
 	currentCaruselActiveSlide.removeClass("active");	
 	currentCaruselActiveSlide = null;
+}
+
+function deleteRecipe(){
+	var recipeData = new FormData();
+	recipeData.append("recipeId", $("#recipeId").val());
+	$.ajax({type: "POST", url: "/recipe/delete", async: false, cache: false, dataType: 'json', contentType: false, processData : false, data: recipeData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет удаление рецепта");
+			waitingWindow.showWindow();
+		},
+		success: function(respond, status, jqXHR){
+			if( typeof respond.error === 'undefined' ){
+				alert("Рецепт успешно удален");
+				$(location).attr('href', '/cookbook/showCookbook');						
+			}
+			else{
+				console.log(respond.error);
+				alert('Ошибка удаления рецепта:\n' + respond.error);
+			}
+		}, 
+		error: function(respond, status, jqXHR){
+			alert('Не удалось удалить рецепт:\n' + status);
+		},
+		complete: function(){
+			waitingWindow.hideWindow();
+		}
+	});
 }

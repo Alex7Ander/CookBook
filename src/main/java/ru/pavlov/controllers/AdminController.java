@@ -4,20 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.amazonaws.services.s3.model.Bucket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ru.pavlov.aws.AWSConnector;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.domain.Recipe;
 import ru.pavlov.domain.Review;
@@ -27,6 +28,7 @@ import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.repos.ReviewRepository;
 import ru.pavlov.repos.UserRepository;
+import ru.pavlov.wrappers.LinkWrapper;
 import ru.pavlov.mail.MailSender;
 
 @Controller
@@ -47,9 +49,6 @@ public class AdminController {
 	
 	@Autowired
 	private MailSender mailSender;
-	
-	@Autowired
-	private AWSConnector awsConnector;
 	
 	@GetMapping("users")	
 	public String adminPageUsers(Model model) {
@@ -80,10 +79,10 @@ public class AdminController {
 		String jsonResponse = null;
 		try {
 			this.userRepo.delete(user);
-			jsonResponse = "\"success\":\"user_deleted\"";
+			jsonResponse = "{\"done\":\"true\"}";
 		}
 		catch(Exception exp) {
-			jsonResponse = "\"error\":\"" + exp.getMessage() + "\"";
+			jsonResponse = "{\"error\":\"" + exp.getMessage() + "\"}";
 		}
 		return jsonResponse;
 	}
@@ -103,11 +102,10 @@ public class AdminController {
 			jsonResponse = jsonCreator.writeValueAsString(user);
 		}
 		catch(Exception exp) {
-			jsonResponse = "\"error\":\"" + exp.getMessage() + "\"";
+			jsonResponse = "{\"error\":\"" + exp.getMessage() + "\"}";
 		}
 		return jsonResponse;
-	}
-	
+	}	
 	
 	@GetMapping("recipes")
 	public String adminPageRecipes(Model model) {
@@ -116,19 +114,91 @@ public class AdminController {
 		return "adminpage_recipes";
 	}
 	
+	@GetMapping("loadRecipe")
+	@ResponseBody
+	public String loadRecipe(@RequestParam long id) {
+		Recipe recipe = this.recipeRepo.findById(id);
+		ObjectMapper jsonCreator = new ObjectMapper();
+		String jsonResponse = null;
+		try {
+			jsonResponse = jsonCreator.writeValueAsString(recipe);
+		}
+		catch(JsonProcessingException jpExp) {
+			jsonResponse = "{\"error\":\"" + jpExp.getMessage() + "\"}";
+		}
+		return jsonResponse;
+	}
 	
 	@GetMapping("ingredients")
-	public String adminPageIngredinets(Model model) {
-		Iterable<Ingredient> ingredients = ingredientRepo.findAll();
+	public String adminPageIngredinets(Model model, 
+										@RequestParam(required = false) Integer pageIndex,
+										@RequestParam(required = false) Integer common) {
+		if(pageIndex == null) {
+			pageIndex = 0;
+		}		
+		Pageable findSortedByType = PageRequest.of(pageIndex, 10, Sort.by("type"));
+		Page<Ingredient> ingredients = null;
+		if(common == null || common == -1) {
+			ingredients = ingredientRepo.findAll(findSortedByType);
+		}
+		else {
+			boolean isCommon = false;
+			if(common == 1) isCommon = true;
+			ingredients = ingredientRepo.findByCommon(findSortedByType, isCommon);
+		}		
 		model.addAttribute("ingredients", ingredients);
+		int pagesCount = ingredients.getTotalPages();
+		List<LinkWrapper> links = new ArrayList<>();
+		for (int i=0; i<pagesCount; i++) {
+			LinkWrapper lw = new LinkWrapper();
+			String link = "/admin/ingredients?pageIndex=" + i;
+			if(common != null && common > -1)
+				link = link + ("&common=" + common);
+			lw.setLink(link);
+			lw.setIndex(i+1);
+			links.add(lw);
+		}
+		model.addAttribute("linkWrappers", links);
 		return "adminpage_ingredients";
 	}
 	
-	@GetMapping("messages")
+	@PostMapping("deleteIngredient")
+	@ResponseBody
+	public String deleteIngredient(@RequestParam long id) {
+		String response = null;
+		Ingredient ingredient = this.ingredientRepo.findById(id);
+		try {
+			this.ingredientRepo.delete(ingredient);
+			response = "{\"done\":\"true\"}";
+		}
+		catch(Exception exp) {
+			response = "{\"error\":\"" + exp.getMessage() + "\"}";
+		}
+		return response;
+	}
+	
+	@GetMapping("reviews")
 	public String adminPageMessages(Model model) {
 		Iterable<Review> reviews = reviewRepo.findAll();
 		model.addAttribute("reviews", reviews);
 		return "adminpage_reviews";
+	}
+	
+	@PostMapping("sendAnswer")
+	@ResponseBody
+	public String answerReview(@RequestParam long reviewId, @RequestParam String answer) {		
+		Review review = this.reviewRepo.findById(reviewId);
+		review.setAnswer(answer);
+		this.reviewRepo.save(review);
+		return "{\"done\":\"true\"}";
+	}
+	
+	@PostMapping("deleteReview")
+	@ResponseBody
+	public String deleteReview(@RequestParam long reviewId) {
+		Review review = this.reviewRepo.findById(reviewId);
+		this.reviewRepo.delete(review);
+		return "{\"done\": \"true\"}";
 	}
 	
 	@GetMapping("sendmailwindow")
@@ -143,12 +213,6 @@ public class AdminController {
 		return "{}";
 	}
 	
-	@PostMapping("getAWSBuckets")
-	@ResponseBody
-	public String getAWSBuckets() {
-		for (Bucket bucket : awsConnector.getAllBuckets()) {
-			System.out.println(bucket.getName());
-		}
-		return "";
-	}
+
+
 }

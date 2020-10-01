@@ -1,7 +1,11 @@
 package ru.pavlov.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,13 +24,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.pavlov.domain.Ingredient;
 import ru.pavlov.repos.IngredientRepository;
 import ru.pavlov.security.CookBookUserDetails;
+import ru.pavlov.yandex.disk.YandexDiskConnector;
+import ru.pavlov.yandex.disk.YandexDiskException;
 
 @Controller
-@RequestMapping("/ingredient/**") // /ingredient/getIngredients
+@RequestMapping("/ingredient/**")
 public class IngredientController {
 
 	@Autowired
 	private IngredientRepository ingrRepo;
+	
+	@Autowired
+	private YandexDiskConnector yandexDiskConnector;
 	
 	@PostMapping("save")
 	@ResponseBody
@@ -33,33 +43,92 @@ public class IngredientController {
 								 @RequestParam String name, 
 								 @RequestParam String type, 
 								 @RequestParam String descr,
-								 @RequestParam String prot, 
-								 @RequestParam String fat, 
-								 @RequestParam String carbo) {		
+								 @RequestParam Double prot, 
+								 @RequestParam Double fat, 
+								 @RequestParam Double carbo,
+								 @RequestParam Boolean common) {		
 		try {
 			String response = null;
-			Ingredient ingr = this.ingrRepo.findByName(name);
+			Ingredient ingr = this.ingrRepo.findByNameAndType(name, type);
 			if (ingr!= null) {
-				response = "{\"error\": \"Ингредиент с таким именем уже существует в списке ингредиентов. Его тип: " + ingr.getType() + "\"}";
+				response = "{\"error\": \"Ингредиент такого типа с таким именем уже существует в списке ингредиентов.\"}";
 				return response;
 			}
-			double protein = Double.parseDouble(prot);
-			double fatInt = Double.parseDouble(fat);
-			double carbohydrate = Double.parseDouble(carbo);
-			Ingredient newIngredient = new Ingredient(name, type, descr, protein, fatInt, carbohydrate);
+			
+			//Creating ingredient object and setting main info
+			Ingredient newIngredient = new Ingredient(name, type, descr, prot, fat, carbo);
+			newIngredient.setCommon(common);
 			newIngredient.setUser(currentUserDetails.getUser());
-			newIngredient.setCommon(false);
+					
 			this.ingrRepo.save(newIngredient);
 			response = "{\"id\": \"" + newIngredient.getId().toString() + "\"}";
 			return response;
-		} catch (Exception exp) {
+		} 
+		catch (Exception exp) {
 			return "{\"error\": \"" + exp.getMessage() + "\"}";
 		}		
 	}
 	
+	@PostMapping("edit")
+	@ResponseBody
+	public String edit(@RequestParam long id, @RequestParam(required = false) String name, 
+						@RequestParam(required = false) String type, 
+						@RequestParam(required = false) String description, 
+						@RequestParam(required = false) Double protein, 
+						@RequestParam(required = false) Double fat,
+						@RequestParam(required = false) Double carbohydrate) {
+		String response = null;
+		Ingredient ingredient = this.ingrRepo.findById(id);
+		if(type!= null) {
+			ingredient.setType(type);
+		}
+		if(name != null) {
+			ingredient.setName(name);
+		}
+		if(description != null) {
+			ingredient.setDescription(description);
+		}
+		if(protein != null) {
+			ingredient.setProtein(protein);
+		}
+		if(fat != null) {
+			ingredient.setFat(fat);
+		}
+		if(carbohydrate != null) {
+			ingredient.setCarbohydrate(carbohydrate);
+		}
+		try {
+			this.ingrRepo.save(ingredient);
+			response = "{\"done\":\" + true + \"}";
+		}
+		catch(Exception exp) {
+			response = "{\"error\":\"Не удалось сохранить изменения\"}";
+		}		
+		return response;
+	}
+	
+	@PostMapping("delete")
+	@ResponseBody
+	public String delete(@RequestParam long id) {
+		String response = null;
+		Ingredient ingredient = this.ingrRepo.findById(id);
+		if(ingredient == null) {
+			response = "{\"error\": \"Ингредиента с таким id нет в БД\"}";
+			return response;
+		}
+		try {
+			this.ingrRepo.delete(ingredient);
+			response = "{\"done\":\" + true + \"}";
+		}
+		catch(Exception exp) {
+			response = "{\"error\": \"" + exp.getMessage() + "\"}";
+		}
+		return response;
+	}
+	
 	@GetMapping("getProperties")
 	@ResponseBody
-	public String addIngrToList(@RequestParam String type, @RequestParam String name, Model model){
+	public String getProperties(@RequestParam String type, @RequestParam String name, Model model){
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
 		ObjectMapper jsonCreator = new ObjectMapper();
 		try {
@@ -74,18 +143,25 @@ public class IngredientController {
 	
 	@GetMapping("getIngredients")
 	@ResponseBody
-	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType, Model model) {
+	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType) {
+		System.out.println("-----------------------");
+		System.out.println("In 'getIngredients'");
+		System.out.println("ingrType: " + ingrType);
+		
+		System.out.println("Serching ingredients...");
 		List<Ingredient> allIngredientsofThisType = ingrRepo.findByType(ingrType);
+		System.out.println("Founded " + allIngredientsofThisType.size() + " ingredients of type " + ingrType);
+		
 		List<Ingredient> requestedIngredientsofThisType = new ArrayList<>();
 		for (int i = 0; i < allIngredientsofThisType.size(); i++ ) {
 			Ingredient ingredient = allIngredientsofThisType.get(i);
 			if(ingredient.isCommon() || ingredient.getUser().equals(currentUserDetails.getUser())) {
 				requestedIngredientsofThisType.add(ingredient);
 			}
-		}		
-		model.addAttribute("ingredients", requestedIngredientsofThisType);
-		ObjectMapper jsonCreator = new ObjectMapper();
+		}
+		System.out.println("Requested (common and "+currentUserDetails.getUsername()+"'s) " + requestedIngredientsofThisType.size() + " ingredients of type " + ingrType);
 		
+		ObjectMapper jsonCreator = new ObjectMapper();		
 		StringBuilder answer = new StringBuilder();
 		answer.append("[");
 		for(int i = 0; i< requestedIngredientsofThisType.size(); i++) {
@@ -94,7 +170,7 @@ public class IngredientController {
 				String jsonResponse = jsonCreator.writeValueAsString(ingredient);
 				answer.append(jsonResponse);
 				if (i < requestedIngredientsofThisType.size()-1) answer.append(", ");
-				
+				System.out.println(jsonResponse);
  			}
 			catch(JsonProcessingException jpExp) {
 				System.err.println("Error [ingredient -> json] for ingredient with id= " + ingredient.getId());
@@ -102,7 +178,82 @@ public class IngredientController {
 			}
 		}
 		answer.append("]");
+		System.out.println("FINISH");
 		return answer.toString();
 	}
 	
+	@GetMapping("loadPhoto")
+	@ResponseBody
+	public byte[] loadPhoto(@RequestParam long ingrId) {
+		Ingredient ingredient = this.ingrRepo.findById(ingrId);
+		String photoName = ingredient.getPreviewPhotoName();
+		byte[] bytes = null;
+		try {
+			bytes = yandexDiskConnector.getTargetFileByteArrayByPath("/ApplicationsFolder/CookBook/_IngredientsPhotos/"+photoName);
+		} catch (IOException | YandexDiskException exp) {
+			System.out.println("При загрузке превью фото для ингредиента " + ingrId + ") " + ingredient.getName() + " произошла ошибка: " + exp.getMessage());
+		}
+		return bytes;
+	}
+	
+	@PostMapping("saveImage")
+	@ResponseBody
+	public String saveImage( @RequestParam MultipartFile ingrImage, @RequestParam long ingrId) {
+		String response = null;
+		byte[] byteArray = null;
+		try {
+			byteArray = ingrImage.getBytes();
+		}
+		catch(IOException ioExp) {
+			response = "{\"error\":\"нет файла с изображением, возможно он был поврежден при передаче.\"}";
+			return response;
+		}
+				
+		Ingredient ingredient = this.ingrRepo.findById(ingrId);
+		if(ingredient == null) {
+			response = "{\"error\":\"Ингредиент не найден\"}";
+			return response;
+		}
+		
+		if (byteArray.length != 0) {	
+			String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+			uniqPhotoName.replace(' ', '_');
+			String uploadTempDirPath = new File(".").getAbsolutePath() + "/temp";
+			String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
+			File uploadDir = new File(uploadTempDirPath);
+			if(!uploadDir.exists()){
+				uploadDir.mkdir();
+			}									
+			try {
+				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
+				fos.write(byteArray);
+				fos.close();
+				yandexDiskConnector.uploadFile("/ApplicationsFolder/CookBook/_IngredientsPhotos", uniqPhotoName, resultFullPhotoName);
+				
+				String oldPreviewPhotoName = ingredient.getPreviewPhotoName();
+				ingredient.setPreviewPhotoName(uniqPhotoName);
+				this.ingrRepo.save(ingredient);
+				
+				if(oldPreviewPhotoName != null) {
+					yandexDiskConnector.delete("/ApplicationsFolder/CookBook/_IngredientsPhotos/" + oldPreviewPhotoName);
+				}
+				
+				for (File f : uploadDir.listFiles()) {				
+					f.delete();
+				}
+				uploadDir.delete();
+				
+				response = "{\"done\":\"true\"}";
+				return response;
+			} catch (IOException | YandexDiskException exp) {
+				exp.printStackTrace();
+				response = "{\"error\":\""+exp.getMessage()+"\"}";
+				return response;
+			}				
+		}
+		else {
+			response = "{\"error\":\"Массив байт загруженной фотографии пуст\"}";
+			return response;
+		}
+	}	
 }
