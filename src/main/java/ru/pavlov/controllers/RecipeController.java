@@ -315,40 +315,56 @@ public class RecipeController {
 	@PostMapping("save")
 	@ResponseBody
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
-								@RequestParam Map<String, String> allParametrs,
-								Model model) throws IOException, YandexDiskException {		
+								@RequestParam Map<String, String> allParametrs) throws IOException, YandexDiskException {	
+		
+		System.out.println("---------------------");
+		System.out.println("In 'saverecipe'");
 		User currentUser = currentUserDetails.getUser();	
+		System.out.println("User: login - " + currentUser.getUserLoginName() + " name - " + currentUser.getName());
 		//Main recipe info
+		System.out.println("Recipe main info: ");
 		String name = allParametrs.get("name");
+		System.out.println("name " + name);
 		allParametrs.remove("name");
 		String type = allParametrs.get("type");
+		System.out.println("type " + type);
 		allParametrs.remove("type");
 		String tagline = allParametrs.get("tagline");
+		System.out.println("tagline " + tagline);
 		allParametrs.remove("tagline");
 		String youtubeLink = allParametrs.get("youtubeLink");
+		System.out.println("youtubeLink " + youtubeLink);
 		allParametrs.remove("youtubeLink");
 		String text = allParametrs.get("text");
+		System.out.println("text " + text);
 		allParametrs.remove("text");
 		
 		String previewPhotoCode = allParametrs.get("previewRb");
 		allParametrs.remove("previewRb");
+		System.out.println("previewPhotoCode " + previewPhotoCode);
 		
 		List<IngredientVolume> ingredients = new ArrayList<>();
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
+		System.out.println("Recipe created");
 		
-		//Ingredients of recipe and their volume		
+		//Ingredients of recipe and their volume
+		System.out.println("Ingredients of recipe and their volume");
 		for (String ingredientName : allParametrs.keySet()) {
+			System.out.println("ingredientName " + ingredientName);
 			Double volume = null;
 			try {
 				volume = Double.parseDouble(allParametrs.get(ingredientName));
 			} catch(NumberFormatException nfExp) {
 				volume = 0.0;
 			} 
-			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);		
+			System.out.println("volume " + volume);
+			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);	
+			System.out.println("Ingredient found: id - " + currentIngredient.getId() + " name-" + currentIngredient.getName() + " type-" + currentIngredient.getType());
 			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
 			ingredients.add(ingrVolume);
 		}
 		
+		System.out.println("Photos saving");
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();
 		List<String> photoPaths = new ArrayList<>();
@@ -357,17 +373,20 @@ public class RecipeController {
 		File uploadDir = new File(uploadTempDirPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
+			System.out.println("Temp folder created");
 		}
 		
 		//Creating yandex folder for photos;				
 		String recipePhotosYandexDiskFolder = UUID.randomUUID().toString();  //name of the folder with photos
 		recipePhotosYandexDiskFolder.replace(" ", "_");
 		yandexDiskConnector.createFolder("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder);
+		System.out.println("Folder on Yandex disk - " + recipePhotosYandexDiskFolder);
 		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
+				System.out.println("photoKey - "+photoKey+"; uniqPhotoName - " + uniqPhotoName);
 				String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
 				photoPaths.add(resultFullPhotoName);
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
@@ -384,17 +403,20 @@ public class RecipeController {
 		}
 		
 		for (File f : uploadDir.listFiles()) {				
-			f.delete();
+			f.delete();			
 		}
 		uploadDir.delete();
+		System.out.println("Temp folder deleted");
 		//Clear container for photos - newRecipePhotos
-		this.newRecipePhotos.clear();	
+		this.newRecipePhotos.clear();
+		System.out.println("Size of List 'newRecipePhotos' after photos saving " + this.newRecipePhotos.size());
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
+		System.out.println("Recipe saved");
 		recipePhotoRepo.saveAll(photos);
-		ingrVolumeRepo.saveAll(ingredients);				
-		Iterable<Recipe> recipes = recipeRepo.findAll();
-		model.addAttribute("recipes", recipes);
+		System.out.println("Photos saved");
+		ingrVolumeRepo.saveAll(ingredients);
+		System.out.println("Ingredient volumes saved");
 		return "{\"done\":\" + true + \"}";
 	}
 	
