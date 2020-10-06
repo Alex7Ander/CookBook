@@ -134,7 +134,13 @@ public class IngredientController {
 		
 		System.out.println("Serching ingredient parametrs by name="+name+" and type="+type+"...");
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
-		
+		if(ingr != null) {
+			System.out.println("Founded ingredient with id = " + ingr.getId());
+		}
+		else {
+			System.out.println("Ingredient was not found and it is null");
+		}
+				
 		ObjectMapper jsonCreator = new ObjectMapper();
 		String jsonResponse = null;
 		try {
