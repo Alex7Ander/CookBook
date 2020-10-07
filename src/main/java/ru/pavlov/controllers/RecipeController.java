@@ -149,6 +149,7 @@ public class RecipeController {
 		for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
 			totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
 		}
+		totalResultCalorie = ((double)Math.round(totalResultCalorie*100))/100;
 		return "{\"message\":\"success\", \"ingredientVolumeId\":\""+ingredientVolumeId.toString()+"\", \"totalCalorie\":\""+totalResultCalorie+"\"}";
 	}
 	

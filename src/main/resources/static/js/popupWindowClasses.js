@@ -91,7 +91,8 @@ class IngredientsPopUpWindow extends PopUpWindow{
             var savingMessage = ingr.save();
             if (ingr.isSaved()) {
                 try{
-                    this.addingFunction(ingr);
+                    var ingredientVolume = new IngredientVolume(ingr);
+                    this.addingFunction(ingredientVolume);
                 }
                 catch{
                     console.log("Отсутствует таблица для сохранения");
