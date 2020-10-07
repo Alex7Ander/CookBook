@@ -261,8 +261,8 @@ function getCurrentlyUploadedPhoto(){
 }
 
 function addPhotoToPhotoList(event){
-	if(currentlyUploadedPhoto.size >= 1048576){
-		alert("Размер фото превышает максимально допустимый (1 мб)");
+	if(currentlyUploadedPhoto.size >= 10 * 1048576){
+		alert("Размер фото превышает максимально допустимый (10 мб)");
 		return;
 	}
 	event.stopPropagation(); // остановка всех текущих JS событий

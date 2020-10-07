@@ -276,10 +276,15 @@ function showNewIngredientPreview(){
     $('#savePreviewBtn').show();
 }
 
-function saveNewIngredientPreview(){
-	var ingredientData = new FormData();
-	var currentIngrId = $('#currentIngrId').val(); 		
-	var currentlyUploadedPhoto = $('#ingrPhotoLoader').prop('files')[0];
+function saveNewIngredientPreview(){		
+    var currentlyUploadedPhoto = $('#ingrPhotoLoader').prop('files')[0];
+    if(currentlyUploadedPhoto.size >= 10 * 1048576){
+		alert("Размер фото превышает максимально допустимый (10 мб)");
+		return;
+    }
+    var currentIngrId = $('#currentIngrId').val();
+
+	var ingredientData = new FormData();   
 	ingredientData.append('ingrImage', currentlyUploadedPhoto);
 	ingredientData.append('ingrId', currentIngrId);
 
@@ -331,4 +336,3 @@ function getFloat(id){
     var newValue = initValue.replace(/,/, '.');
     return newValue;
 }
-

@@ -81,14 +81,13 @@ function finishImageLoading(){
 
 function showChosenPhoto(){
 	let photoFileLoader = document.getElementById('imageLoader');
-	currentlyUploadedPhoto = photoFileLoader.files[0];
+	let currentlyUploadedPhoto = photoFileLoader.files[0];
+	if(currentlyUploadedPhoto.size >= 10 * 1048576){
+		alert("Размер фото превышает максимально допустимый (10 мб)");
+		return;
+    }
 	let output  = document.getElementById('image');
 	output.src = URL.createObjectURL(currentlyUploadedPhoto); 
-	/*
-	var chosenPhoto = ('#imageLoader').files[0];	
-	var chosenPhotoSrc = URL.createObjectURL(chosenPhoto);
-	$("#image").attr("src", chosenPhotoSrc);
-	*/
 }
 
 function sendIngrImage(){
