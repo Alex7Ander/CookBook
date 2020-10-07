@@ -128,55 +128,33 @@ public class IngredientController {
 	
 	@GetMapping("getProperties")
 	@ResponseBody
-	public String getProperties(@RequestParam String type, @RequestParam String name, Model model){
-		System.out.println("-----------------------");
-		System.out.println("In 'getProperties'");
-		
-		System.out.println("Serching ingredient parametrs by name="+name+" and type="+type+"...");
+	public String getProperties(@RequestParam String type, @RequestParam String name){
 		Ingredient ingr = ingrRepo.findByNameAndType(name, type);
-		if(ingr != null) {
-			System.out.println("Founded ingredient with id = " + ingr.getId());
-		}
-		else {
-			System.out.println("Ingredient was not found and it is null");
-		}
-				
 		ObjectMapper jsonCreator = new ObjectMapper();
-		String jsonResponse = null;
 		try {
-			jsonResponse = jsonCreator.writeValueAsString(ingr);
+			String jsonResponse = jsonCreator.writeValueAsString(ingr);
+			return jsonResponse;
 		}
 		catch(JsonProcessingException jpExp) {
 			jpExp.printStackTrace();
-			jsonResponse = "{\"error\": \"" + jpExp.getMessage() + "\"}";
+			return "{\"error\": \"" + jpExp.getMessage() + "\"}";
 		}		
-		System.out.println("jsonResponse = " + jsonResponse);
-		System.out.println("FINISH");
-		System.out.println("-----------------------");
-		return jsonResponse;
 	}
 	
 	@GetMapping("getIngredients")
 	@ResponseBody
-	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType) {
-		System.out.println("-----------------------");
-		System.out.println("In 'getIngredients'");
-		System.out.println("ingrType: " + ingrType);
-		
-		System.out.println("Serching ingredients...");
+	public String getIngredients(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam String ingrType, Model model) {
 		List<Ingredient> allIngredientsofThisType = ingrRepo.findByType(ingrType);
-		System.out.println("Founded " + allIngredientsofThisType.size() + " ingredients of type " + ingrType);
-		
 		List<Ingredient> requestedIngredientsofThisType = new ArrayList<>();
 		for (int i = 0; i < allIngredientsofThisType.size(); i++ ) {
 			Ingredient ingredient = allIngredientsofThisType.get(i);
 			if(ingredient.isCommon() || ingredient.getUser().equals(currentUserDetails.getUser())) {
 				requestedIngredientsofThisType.add(ingredient);
 			}
-		}
-		System.out.println("Requested (common and "+currentUserDetails.getUsername()+"'s) " + requestedIngredientsofThisType.size() + " ingredients of type " + ingrType);
+		}		
+		model.addAttribute("ingredients", requestedIngredientsofThisType);
+		ObjectMapper jsonCreator = new ObjectMapper();
 		
-		ObjectMapper jsonCreator = new ObjectMapper();		
 		StringBuilder answer = new StringBuilder();
 		answer.append("[");
 		for(int i = 0; i< requestedIngredientsofThisType.size(); i++) {
@@ -185,7 +163,7 @@ public class IngredientController {
 				String jsonResponse = jsonCreator.writeValueAsString(ingredient);
 				answer.append(jsonResponse);
 				if (i < requestedIngredientsofThisType.size()-1) answer.append(", ");
-				System.out.println(jsonResponse);
+				
  			}
 			catch(JsonProcessingException jpExp) {
 				System.err.println("Error [ingredient -> json] for ingredient with id= " + ingredient.getId());
@@ -193,8 +171,6 @@ public class IngredientController {
 			}
 		}
 		answer.append("]");
-		System.out.println("FINISH");
-		System.out.println("-----------------------");
 		return answer.toString();
 	}
 	

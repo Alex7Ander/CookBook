@@ -13,10 +13,9 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
 	public Ingredient findById(long id);
 	public Ingredient findByName(String name);
-	public Page<Ingredient> findByCommon(Pageable pageOption, boolean isCommon);
-	
-	public List<Ingredient> findByType(String type);	
 	public Ingredient findByNameAndType(String name, String type);
+	public List<Ingredient> findByType(String type);
+	public Page<Ingredient> findByCommon(Pageable pageOption, boolean isCommon);
 	
 	@Query(value="SELECT DISTINCT type FROM ingredients", nativeQuery=true)
 	public List<String> getIngrTypes();			

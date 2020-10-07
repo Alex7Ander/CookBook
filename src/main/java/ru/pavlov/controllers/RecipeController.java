@@ -95,22 +95,16 @@ public class RecipeController {
 	@PostMapping("editMainInfo")
 	@ResponseBody
 	public String editMainInfo(@RequestParam Map<String, String> allParametrs) {
-		System.out.println("-----------------------");
-		System.out.println("In 'editMainInfo'");		
 		Long id = Long.parseLong(allParametrs.get("id"));
-		System.out.println("Recipe id = " + id);
 		allParametrs.remove("id");
 		Recipe recipe = recipeRepo.findById(id);	
 		String response = "{\"wrongFields\":\"[";
 		for(String key : allParametrs.keySet()) {
 			String value = allParametrs.get(key);
-			System.out.println("Editing " + key);
-			System.out.println("New value of field " + key + " is " + value);			
 			try {
 				Field field = recipe.getClass().getDeclaredField(key);
 				field.setAccessible(true);
 				field.set(recipe, value);	
-				System.out.println("New value is setted");
 			}
 			catch(NoSuchFieldException | IllegalAccessException reflExp) {
 				System.out.println("Ошибка при изменении значения поля: " + key);
@@ -120,10 +114,6 @@ public class RecipeController {
 		}
 		response += "]\"}";
 		recipeRepo.save(recipe);
-		System.out.println("Changes is saved");
-		System.out.println("Answer: " + response);
-		System.out.println("FINISH");
-		System.out.println("-----------------------");
 		return response;
 	}
 	
@@ -142,35 +132,19 @@ public class RecipeController {
 	@PostMapping("addExistingIngredient")
 	@ResponseBody
 	public String addExistingIngredient(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double volume) {
-		
-		System.out.println("-----------------------------------------------");
-		System.out.println("addExistingIngredient");
-		System.out.println("recipeId = " + recipeId + " ingredientId = " + ingredientId + " volume = " + volume);
 		Recipe recipe = recipeRepo.findById(recipeId);
-		if(recipe != null) {
-			System.out.println("Recipe founded. Name = " + recipe.getName() + " type = " + recipe.getType());
-		}
-		else {
-			System.out.println("Recipe not founded.");
-		}
 		Ingredient ingredient = ingrRepo.findById(ingredientId);
-		if(ingredient != null) {
-			System.out.println("Ingredient founded. Name = " + ingredient.getName() + " type = " + ingredient.getType());
-		}
-		else {
-			System.out.println("Ingredient not founded.");
-		}
 		
 		IngredientVolume ingrVolume = new IngredientVolume(ingredient, volume, recipe);
 		ingrVolumeRepo.save(ingrVolume);
 		Long ingredientVolumeId = ingrVolume.getId();
 		
-		System.out.println("To recipe " + recipe.getName() + " added ingredient " + ingrVolume.getName() + 
-				".\nId in table ingredientVolume - " + ingredientVolumeId.toString());
+		System.out.println("В рецепт " + recipe.getName() + " добавлене ингредиент " + ingrVolume.getName() + 
+				".\nИдентификатор записи в тблице ingredientVolume - " + ingredientVolumeId.toString());
 		
 		recipe.getIngredients().add(ingrVolume);
 		recipeRepo.save(recipe);
-		//Расчет полной калорийности
+		//расчет полной калорийности
 		double totalResultCalorie = 0;
 		for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
 			totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
@@ -331,56 +305,40 @@ public class RecipeController {
 	@PostMapping("save")
 	@ResponseBody
 	public String saverecipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, 
-								@RequestParam Map<String, String> allParametrs) throws IOException, YandexDiskException {	
-		
-		System.out.println("---------------------");
-		System.out.println("In 'saverecipe'");
+								@RequestParam Map<String, String> allParametrs,
+								Model model) throws IOException, YandexDiskException {		
 		User currentUser = currentUserDetails.getUser();	
-		System.out.println("User: login - " + currentUser.getUserLoginName() + " name - " + currentUser.getName());
 		//Main recipe info
-		System.out.println("Recipe main info: ");
 		String name = allParametrs.get("name");
-		System.out.println("name " + name);
 		allParametrs.remove("name");
 		String type = allParametrs.get("type");
-		System.out.println("type " + type);
 		allParametrs.remove("type");
 		String tagline = allParametrs.get("tagline");
-		System.out.println("tagline " + tagline);
 		allParametrs.remove("tagline");
 		String youtubeLink = allParametrs.get("youtubeLink");
-		System.out.println("youtubeLink " + youtubeLink);
 		allParametrs.remove("youtubeLink");
 		String text = allParametrs.get("text");
-		System.out.println("text " + text);
 		allParametrs.remove("text");
 		
 		String previewPhotoCode = allParametrs.get("previewRb");
 		allParametrs.remove("previewRb");
-		System.out.println("previewPhotoCode " + previewPhotoCode);
 		
 		List<IngredientVolume> ingredients = new ArrayList<>();
 		Recipe recipe = new Recipe(currentUser, name, type, tagline, youtubeLink, text, ingredients);
-		System.out.println("Recipe created");
 		
-		//Ingredients of recipe and their volume
-		System.out.println("Ingredients of recipe and their volume");
+		//Ingredients of recipe and their volume		
 		for (String ingredientName : allParametrs.keySet()) {
-			System.out.println("ingredientName " + ingredientName);
 			Double volume = null;
 			try {
 				volume = Double.parseDouble(allParametrs.get(ingredientName));
 			} catch(NumberFormatException nfExp) {
 				volume = 0.0;
 			} 
-			System.out.println("volume " + volume);
-			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);	
-			System.out.println("Ingredient found: id - " + currentIngredient.getId() + " name-" + currentIngredient.getName() + " type-" + currentIngredient.getType());
+			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);		
 			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);
 			ingredients.add(ingrVolume);
 		}
 		
-		System.out.println("Photos saving");
 		//Photos saving 
 		List<RecipePhoto> photos = new ArrayList<>();
 		List<String> photoPaths = new ArrayList<>();
@@ -389,20 +347,17 @@ public class RecipeController {
 		File uploadDir = new File(uploadTempDirPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
-			System.out.println("Temp folder created");
 		}
 		
 		//Creating yandex folder for photos;				
 		String recipePhotosYandexDiskFolder = UUID.randomUUID().toString();  //name of the folder with photos
 		recipePhotosYandexDiskFolder.replace(" ", "_");
 		yandexDiskConnector.createFolder("/ApplicationsFolder/CookBook/" + recipePhotosYandexDiskFolder);
-		System.out.println("Folder on Yandex disk - " + recipePhotosYandexDiskFolder);
 		recipe.setPhotoFolder(recipePhotosYandexDiskFolder);
 		for (Integer photoKey : this.newRecipePhotos.keySet()) {
 			byte[] byteArray = this.newRecipePhotos.get(photoKey);
 			if (byteArray.length != 0) {	
 				String uniqPhotoName = UUID.randomUUID().toString() + ".jpg";
-				System.out.println("photoKey - "+photoKey+"; uniqPhotoName - " + uniqPhotoName);
 				String resultFullPhotoName = uploadTempDirPath + "/" + uniqPhotoName;
 				photoPaths.add(resultFullPhotoName);
 				FileOutputStream fos = new FileOutputStream(resultFullPhotoName);
@@ -419,20 +374,17 @@ public class RecipeController {
 		}
 		
 		for (File f : uploadDir.listFiles()) {				
-			f.delete();			
+			f.delete();
 		}
 		uploadDir.delete();
-		System.out.println("Temp folder deleted");
 		//Clear container for photos - newRecipePhotos
-		this.newRecipePhotos.clear();
-		System.out.println("Size of List 'newRecipePhotos' after photos saving " + this.newRecipePhotos.size());
+		this.newRecipePhotos.clear();	
 		recipe.setPhotos(photos);
 		recipeRepo.save(recipe);
-		System.out.println("Recipe saved");
 		recipePhotoRepo.saveAll(photos);
-		System.out.println("Photos saved");
-		ingrVolumeRepo.saveAll(ingredients);
-		System.out.println("Ingredient volumes saved");
+		ingrVolumeRepo.saveAll(ingredients);				
+		Iterable<Recipe> recipes = recipeRepo.findAll();
+		model.addAttribute("recipes", recipes);
 		return "{\"done\":\" + true + \"}";
 	}
 	
