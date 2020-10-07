@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,14 +50,10 @@ public class AdminController {
 	@Autowired
 	private MailSender mailSender;
 	
-	@Value("${spring.datasource.url}")
-	private String connetionUrl;
-	
 	@GetMapping("users")	
 	public String adminPageUsers(Model model) {
 		Iterable<User> users = userRepo.findAll();
 		model.addAttribute("users", users);
-		model.addAttribute("connetionUrl", connetionUrl);
 		return "adminpage_users";
 	}
 	

@@ -142,19 +142,35 @@ public class RecipeController {
 	@PostMapping("addExistingIngredient")
 	@ResponseBody
 	public String addExistingIngredient(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double volume) {
+		
+		System.out.println("-----------------------------------------------");
+		System.out.println("addExistingIngredient");
+		System.out.println("recipeId = " + recipeId + " ingredientId = " + ingredientId + " volume = " + volume);
 		Recipe recipe = recipeRepo.findById(recipeId);
+		if(recipe != null) {
+			System.out.println("Recipe founded. Name = " + recipe.getName() + " type = " + recipe.getType());
+		}
+		else {
+			System.out.println("Recipe not founded.");
+		}
 		Ingredient ingredient = ingrRepo.findById(ingredientId);
+		if(ingredient != null) {
+			System.out.println("Ingredient founded. Name = " + ingredient.getName() + " type = " + ingredient.getType());
+		}
+		else {
+			System.out.println("Ingredient not founded.");
+		}
 		
 		IngredientVolume ingrVolume = new IngredientVolume(ingredient, volume, recipe);
 		ingrVolumeRepo.save(ingrVolume);
 		Long ingredientVolumeId = ingrVolume.getId();
 		
-		System.out.println("В рецепт " + recipe.getName() + " добавлене ингредиент " + ingrVolume.getName() + 
-				".\nИдентификатор записи в тблице ingredientVolume - " + ingredientVolumeId.toString());
+		System.out.println("To recipe " + recipe.getName() + " added ingredient " + ingrVolume.getName() + 
+				".\nId in table ingredientVolume - " + ingredientVolumeId.toString());
 		
 		recipe.getIngredients().add(ingrVolume);
 		recipeRepo.save(recipe);
-		//расчет полной калорийности
+		//Расчет полной калорийности
 		double totalResultCalorie = 0;
 		for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
 			totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
