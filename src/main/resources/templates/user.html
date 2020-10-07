@@ -56,10 +56,8 @@
 		<div class = "container-md">
 			<div class="row">
 				<div class="col-md-3 cookBookContainer">
-					<div class="d-flex justify-content-center">
-						<div class="spinner-border" role="status" id="spinner_avatar">
-							<span class="sr-only">Loading...</span>
-						</div>
+					<div class="spinner-border" role="status" id="spinner_avatar">
+						<span class="sr-only">Loading...</span>
 					</div>
 					<img id="avatar">
 				</div>
@@ -79,51 +77,22 @@
 					</div>
 				</div>
 			</div>
-			
-			<div class="row">
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Тип </b> </br>
-					<select name="type">
-						<option></option>
-						<option>Горячие блюда</option>
-						<option>Гарниры</option>
-						<option>Закуски</option>
-						<option>Салаты</option>
-						<option>Десерты</option>
-						<option>Напитки</option>
-						<option>Fast food</option>
-					</select>
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Имя </b> </br>
-					<input type = "text" name = "name">
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<b class = "label"> Слоган </b> </br>
-					<input type = "text" name = "tagline">
-				</div>
-				<div class="col-md-3 cookBookContainer">
-					<input type="submit" class="dws-btn" value="Поиск">
-				</div>
-			</div>
 
 			<div class="row">
 				<div class="card" style="width: 25%;" th:each="recipe : ${recipes}">
 					<div class="card-body">
 						<form method="get" action="/recipe/show">
-							<div class="d-flex align-content-between flex-wrap">
-								<input type="hidden" name="recipeId" th:id="recipeId_+${recipe.id}" th:value="${recipe.id}">
-								<div class="d-flex justify-content-center">
-									<div class="spinner-border" role="status" th:id="spinner_+${recipe.id}">
-										<span class="sr-only">Loading...</span>
-									</div>
+							<input type="hidden" name="recipeId" th:id="recipeId_+${recipe.id}" th:value="${recipe.id}">
+							<div class="d-flex justify-content-center">
+								<div class="spinner-border" role="status" th:id="spinner_+${recipe.id}">
+									<span class="sr-only">Loading...</span>
 								</div>
-								<img class="d-block w-100" th:id="img_+${recipe.id}">
-								<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
-								<p><span th:text="${recipe.type}"> Категория </span></p><br>
-								<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>
-								<button class = "dws-btn" type="submit">Подробнее</button><br>
 							</div>
+							<img class="d-block w-100" th:id="img_+${recipe.id}">
+							<b class="label"><span th:text="${recipe.name}"> Название </span></b><br>
+							<p><span th:text="${recipe.type}"> Категория </span></p><br>
+							<p><span th:text="${recipe.tagline}"> Слоган </span></p><br>
+							<button class = "dws-btn" type="submit">Подробнее</button><br>
 						</form> 
 					</div>
 				</div>

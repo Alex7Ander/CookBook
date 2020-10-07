@@ -32,9 +32,6 @@ function load(index){
                 console.log("На страницу отсутсвует элемент карусель");
             }
         },
-        error: function(respond, status, jqXHR) {
-            alert(respond.statusText);
-        },
         complete: function(){
             if(index != photoIdInputs.length - 1){
                 index++;

@@ -78,26 +78,26 @@ function getCurrentlyUploadedPhoto(event){
 }
 
 function addPhotoToPhotoList(event){
-	if(currentlyUploadedPhoto.size >= 10 * 1048576){
-		alert("Размер фото превышает максимально допустимый (10 мб)");
+	if(currentlyUploadedPhoto.size >= 1048576){
+		alert("Размер фото превышает максимально допустимый (1 мб)");
 		return;
 	}
 	event.stopPropagation(); // остановка всех текущих JS событий
 	event.preventDefault();  // остановка дефолтного события для текущего элемента	
 	let photoData = new FormData();
 	photoData.append('photo', currentlyUploadedPhoto);
-	$.ajax({type: "POST", url: "/recipe/sendPhoto", mimeType: "multipart/form-data", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
+	$.ajax({type: "POST", url: "/recipe/sendPhoto", cache: false, dataType: 'json', contentType: false, processData : false, data: photoData,
 		success: function(respond, status, jqXHR){
 			if( typeof respond.error === 'undefined' ){
 				showUploadedPhotoOnMainPage(respond.code);							
 			}
 			else{
 				console.log(respond.error);
-				alert('Ошибка загрузки фотографии. Повторите попытку.');
+				alert('Ошибка уделнеия фотографии. Повторите попытку.');
 			}
 		}, 
 		error: function(respond, status, jqXHR){
-			alert('Не удалось загрузить фото на сервер ' + status);
+			alert('Не удалось зашрузить фото на сервер ' + status);
 		},
 		complete: function(){
 			photoUploadPopUpWindow.hideWindow();

@@ -44,7 +44,7 @@ public class MainController {
 						@RequestParam String code,
 						Model model) {
 		
-		System.out.println("Начата регистрация нового пользователя");
+		System.err.println("Начата регистрация нового пользователя");
 		if(!code.equals("CookBookGuest5000")) {
 			return "notinvited";
 		}
@@ -66,7 +66,7 @@ public class MainController {
 		User userByEmail = userRepo.findByEmail(email);
 		if (userByEmail != null) {
 			model.addAttribute("errorMsg", "Введенный email занят");
-			System.err.println("Введенный пользователем адресс электронной почты занят");
+			System.err.println("Введенный пользователем адрес электронной почты занят");
 			return "registration";
 		}	
 		
@@ -77,12 +77,12 @@ public class MainController {
 		user.setActivationCode(userActivationCode);		
 		String message = "Добро пожаловать! Вы в одном шаге от регистрации в книге рецептов CookBook.\n"
 				+ "Пройдите по ссылке, что бы активировать свой аккаунт:\n\n"
-				+ "localhost:5000/activate?code="+userActivationCode;
+				+ "https://sleepy-lowlands-05290.herokuapp.com/activate?code="+userActivationCode;
 		try {
 			mailSender.send(email, "Активация регистрации на сайте CookBook", message);
 		}
 		catch(Exception exp) {
-			System.err.println("-------------------------ERROR---------------------------");
+			System.err.println("-------------------------ERROR (email sending) ---------------------------");
 			exp.printStackTrace();
 			System.err.println("---------------------------------------------------------");
 			model.addAttribute("errorMsg", "Ошибка отправки письма с активацией аккаунта.");
