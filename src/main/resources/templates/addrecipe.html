@@ -146,11 +146,11 @@
 								<b>Тип:</b><br>
 								<input type= "text" id="newIngrType" name= "type" placeholder= "Тип"><br>	
 								<b>Белки:</b><br>
-								<input type= "text" id="newIngrProt" name= "prot" placeholder= "Белки / 100гр"><br>
+								<input type= "text" id="newIngrProt" name= "prot" placeholder= "Белки / 100гр" onchange="checkComma('newIngrProt');"><br>
 								<b>Жиры:</b><br>
-								<input type= "text" id="newIngrFat" name= "fat" placeholder= "Жиры / 100 гр"><br>
+								<input type= "text" id="newIngrFat" name= "fat" placeholder= "Жиры / 100 гр" onchange="checkComma('newIngrFat');"><br>
 								<b>Углеводы:</b><br>
-								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр"><br>
+								<input type= "text" id="newIngrCarbo" name= "carbo" placeholder= "Углеводы / 100 гр" onchange="checkComma('newIngrCarbo');"><br>
 								<b>Описание:<b></br>
 								<textarea id= "newIngrDesription" name= "descr" style="width: 100%;" rows=7> - </textarea><br>
 								<a href="javascript:addNewIngredientToRecipe()">Сохранить новый и добавить его к рецепту</a>
@@ -209,6 +209,7 @@
 		<script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
 		<script th:src="@{/js/addRecipe.js}" src="../static/js/addRecipe.js" ></script>
 		<script th:src="@{/js/ingredient.js}" src="../static/js/ingredient.js"></script>
-		<script th:src="@{/js/ingredientVolume.js}" src="../static/js/ingredientVolume.js"></script>	
+		<script th:src="@{/js/ingredientVolume.js}" src="../static/js/ingredientVolume.js"></script>
+		<script th:src="@{/js/checkComma.js}" src="../static/js/checkComma.js"></script>	
 	</body>
 </html>

@@ -73,7 +73,7 @@
 					<b class = "label"> E-mail: <span th:text="${user.getEmail()}"> - </span> </b> <br>
 					<input th:if="${activated}" type = "button" class="dws-btn" value="Написать рецепт" onclick='location.href="/cookbook/addrecipe"'><br>
 					<div class="notActiveText" th:unless="${activated}">
-						<p>Зайдите в почтовый ящик, что Вы указывали при регистрации и активируйте свой аккаунт, что бы начать вести свою книгу рецептов </p>
+						<p>Зайдите в почтовый ящик, что Вы указывали при регистрации и активируйте свой аккаунт, чтобы начать вести свою книгу рецептов </p>
 					</div>
 				</div>
 			</div>

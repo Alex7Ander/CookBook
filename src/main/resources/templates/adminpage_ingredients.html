@@ -66,9 +66,9 @@
                     <input type="hidden" id="currentIngrId">
                     <p>Название: </p><input type="text" id="nameEdit"><br>
                     <p>Тип: </p><input type="text" id="typeEdit"><br>
-                    <p>Белки: </p><input type="text" id="protEdit"><br>
-                    <p>Жиры: </p><input type="text" id="fatEdit"><br>
-                    <p>Углеводы: </p><input type="text" id="carboEdit"><br>
+                    <p>Белки: </p><input type="text" id="protEdit" onchange="checkComma('protEdit');"><br>
+                    <p>Жиры: </p><input type="text" id="fatEdit" onchange="checkComma('fatEdit');"><br>
+                    <p>Углеводы: </p><input type="text" id="carboEdit" onchange="checkComma('carboEdit');"><br>
                     <p>Описание: </p><textarea id="descriptionEdit" rows="12" style="width: 100%;"></textarea><br>
                     <input type="button" id="saveBtn" value="Сохранить" onclick="saveIngrBtnClick()">
                     <input type="button" id="deleteBtn" value="Удалить" onclick="deleteIngr()"> <br>
@@ -113,6 +113,7 @@
         <script th:src="@{/js/popupWindowClasses.js}"	src="../static/js/popupWindowClasses.js"></script>
         <script th:src="@{/js/adminpage.js}" src="../static/js/adminpage.js"></script>
         <script th:src="@{/js/ingredientsPageScripts.js}" src="../static/js/ingredientsPageScripts.js"></script>
+        <script th:src="@{/js/checkComma.js}" src="../static/js/checkComma.js"></script>
     </body>
 
 </html>

@@ -136,15 +136,15 @@ public class AdminController {
 		if(pageIndex == null) {
 			pageIndex = 0;
 		}		
-		Pageable findSortedByType = PageRequest.of(pageIndex, 10, Sort.by("type"));
+		Pageable findSortedByName = PageRequest.of(pageIndex, 10, Sort.by("name"));
 		Page<Ingredient> ingredients = null;
 		if(common == null || common == -1) {
-			ingredients = ingredientRepo.findAll(findSortedByType);
+			ingredients = ingredientRepo.findAll(findSortedByName);
 		}
 		else {
 			boolean isCommon = false;
 			if(common == 1) isCommon = true;
-			ingredients = ingredientRepo.findByCommon(findSortedByType, isCommon);
+			ingredients = ingredientRepo.findByCommon(findSortedByName, isCommon);
 		}		
 		model.addAttribute("ingredients", ingredients);
 		int pagesCount = ingredients.getTotalPages();
