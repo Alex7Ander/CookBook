@@ -74,16 +74,10 @@ function addIngrToTable(ingredient){
 	var tbody = document.getElementById('ingrTable').getElementsByTagName("TBODY")[0];
 	var row = document.createElement("TR");	
 
-	//Поле с итоговой калорийностью для ингредиента
-	var resultCalorificValueField = document.createElement('b');
-
 	//Поле с количеством ингредиента и поле для редактирования
 	var volumeTextField = document.createElement('input');
 	volumeTextField.setAttribute("type", "text");
 	volumeTextField.id = "new" + newIngrCount + "VolumeTextField";
-	volumeTextField.oninput = function() {
-		resultCalorificValueField.innerText = ingredient.calorie * volumeTextField.value / 100;
-	}
 	var volumeLabel = document.createElement('b');
 	volumeLabel.id = "new" + newIngrCount + "Volume";
 
@@ -112,17 +106,14 @@ function addIngrToTable(ingredient){
 	col2.appendChild(volumeTextField);
 	col2.appendChild(volumeLabel);
 	var col3 = document.createElement("TD");
-	col3.appendChild(resultCalorificValueField);
-	var col4 = document.createElement("TD");
-	col4.appendChild(deleteBtn);
-	var col5 = document.createElement("TD");		
-	col5.appendChild(saveBtn);	
+	col3.appendChild(deleteBtn);
+	var col4 = document.createElement("TD");		
+	col4.appendChild(saveBtn);	
 	
 	row.appendChild(col1);
 	row.appendChild(col2);
 	row.appendChild(col3);
 	row.appendChild(col4);
-	row.appendChild(col5);
 	tbody.appendChild(row);
 }
 
@@ -160,9 +151,7 @@ function saveIngredientInRecipe(newIngrIndex, recipeId, ingredientId, volume){
 				});
 				volumeLabel.attr('id', ingredientVolumeId + "Volume");
 				volumeLabel.text(volumeTxtField.val());
-				volumeLabel.attr('hidden', false);
-
-				$("#total_calorie").text(respond.totalCalorie);						
+				volumeLabel.attr('hidden', false);					
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
@@ -184,8 +173,7 @@ function deleteIngredient(ingredientVolumeId){
 		},	
 		success: function(respond, status, jqXHR) {
 			if (typeof respond.error === 'undefined') {
-				$("#" + ingredientVolumeId).closest("tr").remove();
-				$("#total_calorie").text(respond.totalCalorie);						
+				$("#" + ingredientVolumeId).closest("tr").remove();						
 			}
 		}, 
 		error: function(respond, status, jqXHR) {
@@ -206,38 +194,32 @@ function changeIngredientVolume(ingredientVolumeId){
 	var newValue = $("#" + ingredientVolumeId + "VolumeTextField").prop("value");
 	var re = '/./g';
 	newValue.replace(re, '.');
-	if (isNaN(newValue)==true){
-		alert("Вы ввели значение, не являющееся числом");
-	}
-	else{
-		var ingredientData = new FormData(); 
-		ingredientData.append("ingredientVolumeId", ingredientVolumeId);
-		ingredientData.append("newValue", newValue);
-		$.ajax({type: "POST", url: "/recipe/editIngredientVolume", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
-			beforeSend: function(){
-				waitingWindow.setTitle("Ожидайте, идет редактирование количества ингредиента");
-				waitingWindow.showWindow();
-			},
-			success: function(respond, status, jqXHR) {
-				if (typeof respond.error === 'undefined') {	
-					$("#" + ingredientVolumeId + "Volume").text(newValue);
-					$("#" + ingredientVolumeId + "Calorie").text(respond.calorie);
-					$("#total_calorie").text(respond.totalCalorie);									
-				}
-				else {
-					alert('Ошибка при редактирования значения на сервере: ' + respond.data);
-				}
-			}, 
-			error: function(respond, status, jqXHR) {
-				alert('Ошибка при редактирования значения на сервере: ' + status);
-			},
-			complete: function(){
-				$("#" + ingredientVolumeId + "VolumeTextField").hide();
-				$("#" + ingredientVolumeId + "Volume").show();
-				waitingWindow.hideWindow();	
+	var ingredientData = new FormData(); 
+	ingredientData.append("ingredientVolumeId", ingredientVolumeId);
+	ingredientData.append("newValue", newValue);
+	$.ajax({type: "POST", url: "/recipe/editIngredientVolume", cache: false, dataType: 'json', contentType: false, processData : false, data: ingredientData,
+		beforeSend: function(){
+			waitingWindow.setTitle("Ожидайте, идет редактирование количества ингредиента");
+			waitingWindow.showWindow();
+		},
+		success: function(respond, status, jqXHR) {
+			if (typeof respond.error === 'undefined') {	
+				$("#" + ingredientVolumeId + "Volume").text(newValue);
+				$("#" + ingredientVolumeId + "Calorie").text(respond.calorie);								
 			}
-		});
-	}
+			else {
+				alert('Ошибка при редактирования значения на сервере: ' + respond.data);
+			}
+		}, 
+		error: function(respond, status, jqXHR) {
+			alert('Ошибка при редактирования значения на сервере: ' + status);
+		},
+		complete: function(){
+			$("#" + ingredientVolumeId + "VolumeTextField").hide();
+			$("#" + ingredientVolumeId + "Volume").show();
+			waitingWindow.hideWindow();	
+		}
+	});
 }
 function getIngrListFromServer(){
 	addIngredientWindow.getIngrListFromServer();

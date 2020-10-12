@@ -33,7 +33,6 @@ import ru.pavlov.repos.IngredientVolumeRepository;
 import ru.pavlov.repos.RecipePhotoRepository;
 import ru.pavlov.repos.RecipeRepository;
 import ru.pavlov.security.CookBookUserDetails;
-import ru.pavlov.wrappers.IngredientVolumeWrapper;
 import ru.pavlov.yandex.disk.YandexDiskConnector;
 import ru.pavlov.yandex.disk.YandexDiskException;
 
@@ -76,16 +75,8 @@ public class RecipeController {
 			model.addAttribute("editable", false);
 		}			
 				
-		List<IngredientVolume> currentRecipeIngredientVolume = recipe.getIngredients();	
-		List<IngredientVolumeWrapper> ingredientsVolumesWrappers = new ArrayList<>();
-		double totalResultCalorie = 0;
-		for(IngredientVolume ingredientVolume : currentRecipeIngredientVolume) {
-			IngredientVolumeWrapper ingredientVolumeWrapper = new IngredientVolumeWrapper(ingredientVolume);
-			ingredientsVolumesWrappers.add(ingredientVolumeWrapper);
-			totalResultCalorie += ingredientVolumeWrapper.getResultCalorie();
-		}
-		model.addAttribute("ingredientsVolumesWrappers", ingredientsVolumesWrappers);
-		model.addAttribute("totalResultCalorie", totalResultCalorie);
+		List<IngredientVolume> currentRecipeIngredientVolumies = recipe.getIngredients();			
+		model.addAttribute("ingredientVolumies", currentRecipeIngredientVolumies);
 		
 		List<RecipePhoto> recipePhotos = recipe.getPhotos();
 		model.addAttribute("recipePhotos", recipePhotos);			
@@ -131,7 +122,7 @@ public class RecipeController {
 	
 	@PostMapping("addExistingIngredient")
 	@ResponseBody
-	public String addExistingIngredient(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam double volume) {
+	public String addExistingIngredient(@RequestParam long recipeId, @RequestParam long ingredientId, @RequestParam String volume) {
 		Recipe recipe = recipeRepo.findById(recipeId);
 		Ingredient ingredient = ingrRepo.findById(ingredientId);
 		
@@ -144,13 +135,7 @@ public class RecipeController {
 		
 		recipe.getIngredients().add(ingrVolume);
 		recipeRepo.save(recipe);
-		//расчет полной калорийности
-		double totalResultCalorie = 0;
-		for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
-			totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
-		}
-		totalResultCalorie = ((double)Math.round(totalResultCalorie*100))/100;
-		return "{\"message\":\"success\", \"ingredientVolumeId\":\""+ingredientVolumeId.toString()+"\", \"totalCalorie\":\""+totalResultCalorie+"\"}";
+		return "{\"message\":\"success\", \"ingredientVolumeId\":\""+ingredientVolumeId.toString()+"\"}";
 	}
 	
 	@PostMapping("deleteIngredient")
@@ -169,19 +154,13 @@ public class RecipeController {
 		}
 		else {
 			System.out.println("Удалено");
-			//расчет полной калорийности
-			Recipe recipe = currentIngredient.getRecipe();
-			double totalResultCalorie = 0;
-			for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
-				totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
-			}
-			return "{\"message\": \"success\", \"totalCalorie\": \""+totalResultCalorie+"\"}";
+			return "{\"message\": \"success\"}";
 		}		
 	}
 	
 	@PostMapping("editIngredientVolume")
 	@ResponseBody 
-	public String editIngredientVolume(@RequestParam long ingredientVolumeId, @RequestParam double newValue) {
+	public String editIngredientVolume(@RequestParam long ingredientVolumeId, @RequestParam String newValue) {
 		IngredientVolume currentIngredient = ingrVolumeRepo.findById(ingredientVolumeId);
 		currentIngredient.setVolume(newValue);
 		ingrVolumeRepo.save(currentIngredient);			
@@ -191,15 +170,7 @@ public class RecipeController {
 			return "{\"error\": \"Значение не изменено\"}";			
 		}
 		else {
-			//расчет калорийности нового количесва ингредиента
-			double calorie = currentIngredient.getIngredient().getCalorie() * newValue / 100;
-			//расчет полной калорийности
-			Recipe recipe = currentIngredient.getRecipe();
-			double totalResultCalorie = 0;
-			for(IngredientVolume ingredientVolume : recipe.getIngredients()) {
-				totalResultCalorie += ingredientVolume.getIngredient().getCalorie()*ingredientVolume.getVolume()/100;
-			}
-			return "{\"message\": \"success\",\"calorie\": \""+calorie+"\",\"totalCalorie\": \""+totalResultCalorie+"\"}";
+			return "{\"message\": \"success\"}";
 		}
 	}
 
@@ -329,11 +300,11 @@ public class RecipeController {
 		
 		//Ingredients of recipe and their volume		
 		for (String ingredientName : allParametrs.keySet()) {
-			Double volume = null;
+			String volume = null;
 			try {
-				volume = Double.parseDouble(allParametrs.get(ingredientName));
+				volume = allParametrs.get(ingredientName);
 			} catch(NumberFormatException nfExp) {
-				volume = 0.0;
+				volume = "0.0";
 			} 
 			Ingredient currentIngredient = this.ingrRepo.findByName(ingredientName);		
 			IngredientVolume ingrVolume = new IngredientVolume(currentIngredient, volume, recipe);

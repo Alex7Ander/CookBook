@@ -72,31 +72,22 @@
 							<th>Количество (гр/мл)</th>
 							<th>Калорийность (ккал)</th>
 							<th></th>
-						</tr>		
-						<tr th:each="ingredientWrapper : ${ingredientsVolumesWrappers}">
-							<!--Имя и id рецепта-->
+						</tr>	
+						<tr th:each="ingredientVolume : ${ingredientVolumies}">
 							<td>
-								<span th:text="${ingredientWrapper.getName()}"></span>
-								<input type="hidden" th:id="${ingredientWrapper.getId()}">
+								<span th:text="${ingredientVolume.ingredient.name}"></span>
+								<input type="hidden" th:id="${ingredientVolume.id}">
 							</td>
-							<!--Количество-->
 							<td>
-								<b th:id="${ingredientWrapper.getId()}+Volume" th:text="${ingredientWrapper.getVolume()}" th:attr="onclick=|showVolumeTextField('${ingredientWrapper.getId()}')|"></b>
-								<input type="text" th:id="${ingredientWrapper.getId()}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientWrapper.getId()}')|">
+								<b th:id="${ingredientVolume.id}+Volume" th:text="${ingredientVolume.volume}" th:attr="onclick=|showVolumeTextField('${ingredientVolume.id}')|"></b>
+								<input type="text" th:id="${ingredientVolume.id}+VolumeTextField" th:attr="onchange=|changeIngredientVolume('${ingredientVolume.id}')|">
 							</td>
-							<!--Калорийность с учетом количества рецепта-->
 							<td>
-								<b th:id="${ingredientWrapper.getId()}+Calorie" th:text="${ingredientWrapper.getResultCalorie()}"></b>
-							</td>
-							<!--Кнопка удаления-->
-							<td>
-								<input type="button" th:if="${editable}" th:id="${ingredientWrapper.getId()}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientWrapper.getId()}')|" value="Удалить">
+								<input type="button" th:if="${editable}" th:id="${ingredientVolume.id}+DeleteBtn" th:attr="onclick=|deleteIngredient('${ingredientVolume.id}')|" value="Удалить">
 							</td>
 						</tr>
 						<tr th:if="${editable}" colspan="4"><a href="javascript:showAddIngredientWindow()">Добавить</a></tr>	
-					</table>
-					<b class="label">Итоговая калорийность: </b> <b id="total_calorie" th:text="${totalResultCalorie}"> - </b><br>	
-
+					</table>	
 					<h4> Процедура приготовления:</h4><br>
 					<b><span id="text" th:text="${recipe.text}"> - </span></b>
 				</div>	
