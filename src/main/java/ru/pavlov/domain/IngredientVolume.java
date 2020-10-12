@@ -24,16 +24,14 @@ public class IngredientVolume {
 	@JoinColumn(name="recipe_id")
 	private Recipe recipe;
 	
-	private Double volume;
-	private Double resultCalorie;
+	private String volume;
 	
 	public IngredientVolume() {}
 	
-	public IngredientVolume(Ingredient ingredient, Double volume, Recipe recipe) {
+	public IngredientVolume(Ingredient ingredient, String volume, Recipe recipe) {
 		this.ingredient = ingredient;
 		this.volume = volume;
 		this.recipe = recipe;
-		this.resultCalorie = this.volume * this.ingredient.getCalorie() / 100;
 	}
 	
 	public Long getId() {
@@ -48,22 +46,14 @@ public class IngredientVolume {
 	public void setIngredient(Ingredient ingredient) {
 		this.ingredient = ingredient;
 	}
-	public Double getVolume() {
+	public String getVolume() {
 		return volume;
 	}
-	public void setVolume(Double volume) {
+	public void setVolume(String volume) {
 		this.volume = volume;
 	}
 	public String getName() {
 		return this.ingredient.getName();
-	}
-
-	public Double getResultCalorie() {
-		return resultCalorie;
-	}
-
-	public void setResultCalorie(Double resultCalorie) {
-		this.resultCalorie = resultCalorie;
 	}
 	public Recipe getRecipe() {
 		return recipe;
