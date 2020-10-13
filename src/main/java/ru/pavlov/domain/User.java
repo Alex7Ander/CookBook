@@ -149,8 +149,9 @@ public class User {
 	
 	@Override
 	public boolean equals(Object user) {
-		User usr = (User) user;		
-		if(usr.getId() == this.id) {
+		User usr = (User) user;	
+		long id = usr.getId();
+		if(id == this.id) {
 			return true;
 		}
 		else {

@@ -62,17 +62,21 @@ public class RecipeController {
 		
 	@GetMapping("show")
 	public String recipe(@AuthenticationPrincipal CookBookUserDetails currentUserDetails, @RequestParam(required = true, name="recipeId") Long recipeId, Model model) {
+		User currentUser = currentUserDetails.getUser();
+		System.out.println("Пользователь c логином " + currentUser.getUserLoginName() + " загружает рецепт с id = " + recipeId);
 		Recipe recipe = recipeRepo.findById(recipeId);
 		model.addAttribute("recipe", recipe);		
 		List<String> ingrTypes = ingrRepo.getIngrTypes();
 		model.addAttribute("ingrTypes", ingrTypes);
-		
-		User currentUser = currentUserDetails.getUser();
+				
+		System.out.println("Автор рецепта пользователь с логином " + recipe.getRecipeAuther().getUserLoginName());
 		if (recipe.getRecipeAuther().equals(currentUser)) {
 			model.addAttribute("editable", true);
+			System.out.println("Пользователь являеся автором рецепта");
 		}
 		else {
 			model.addAttribute("editable", false);
+			System.out.println("Пользователь НЕ являеся автором рецепта");
 		}			
 				
 		List<IngredientVolume> currentRecipeIngredientVolumies = recipe.getIngredients();			
